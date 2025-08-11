@@ -57,7 +57,7 @@ export default function Collection() {
         return allCustomers
           .map(customer => ({
             ...customer,
-            calculated_due: customerDueMap.get(customer.id) || parseFloat(customer.total_credit) || 0
+            calculated_due: customerDueMap.get(customer.id) || parseFloat(customer.total_credit || '0') || 0
           }))
           .filter(customer => customer.calculated_due > 0);
       } catch (error) {
@@ -90,11 +90,14 @@ export default function Collection() {
       // Update customer's due amount
       const customer = customers.find(c => c.id === data.customer_id);
       if (customer) {
-        const newCredit = Math.max(0, parseFloat(customer.total_credit) - parseFloat(data.amount));
+        const newCredit = Math.max(0, parseFloat(customer.total_credit || '0') - parseFloat(data.amount));
         await supabaseService.updateCustomer(data.customer_id, {
           total_credit: newCredit.toString(),
         });
       }
+
+      // Also reduce due amounts from sales records for this customer
+      await supabaseService.reduceCustomerDueFromSales(data.customer_id, parseFloat(data.amount));
 
       return result;
     },
@@ -103,8 +106,11 @@ export default function Collection() {
         title: "সফল!",
         description: "বাকি আদায় সফলভাবে সংরক্ষিত হয়েছে",
       });
-      queryClient.invalidateQueries({ queryKey: ['customers', CURRENT_USER_ID] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard', CURRENT_USER_ID] });
+      // Invalidate all related queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
       form.reset();
       setLocation("/");
     },
@@ -135,8 +141,8 @@ export default function Collection() {
             customers(name)
           `)
           .eq('user_id', CURRENT_USER_ID)
-          .gte('collection_date', startOfDay.toISOString())
-          .lt('collection_date', endOfDay.toISOString())
+          .gte('created_at', startOfDay.toISOString())
+          .lt('created_at', endOfDay.toISOString())
           .order('created_at', { ascending: false });
         
         if (error) throw error;

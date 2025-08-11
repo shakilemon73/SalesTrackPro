@@ -287,13 +287,55 @@ export const supabaseService = {
         customer_id: collection.customerId,
         sale_id: collection.saleId,
         amount: parseFloat(collection.amount),
-        user_id: userId 
+        user_id: userId,
+        collection_date: new Date().toISOString()
       })
-      .select()
+      .select(`
+        *,
+        customers(name)
+      `)
       .single();
     
     if (error) throw error;
     return data;
+  },
+
+  async reduceCustomerDueFromSales(customerId: string, amountPaid: number): Promise<void> {
+    try {
+      // Get all sales with due amounts for this customer
+      const { data: salesWithDue, error: fetchError } = await supabase
+        .from('sales')
+        .select('id, due_amount')
+        .eq('customer_id', customerId)
+        .gt('due_amount', 0)
+        .order('sale_date', { ascending: true }); // Pay oldest first
+      
+      if (fetchError) throw fetchError;
+      
+      let remainingAmount = amountPaid;
+      
+      // Reduce due amounts from oldest sales first
+      for (const sale of salesWithDue || []) {
+        if (remainingAmount <= 0) break;
+        
+        const currentDue = typeof sale.due_amount === 'string' ? parseFloat(sale.due_amount) : sale.due_amount;
+        const paymentForThisSale = Math.min(remainingAmount, currentDue);
+        const newDueAmount = currentDue - paymentForThisSale;
+        
+        // Update this sale's due amount
+        const { error: updateError } = await supabase
+          .from('sales')
+          .update({ due_amount: newDueAmount })
+          .eq('id', sale.id);
+        
+        if (updateError) throw updateError;
+        
+        remainingAmount -= paymentForThisSale;
+      }
+    } catch (error) {
+      console.error('Error reducing customer due from sales:', error);
+      // Don't throw error to prevent collection creation failure
+    }
   },
 
   // Dashboard stats
@@ -350,8 +392,8 @@ export const supabaseService = {
             );
             
             if (product && itemPrice > 0) {
-              const buyingPrice = typeof product.buying_price === 'string' ? 
-                parseFloat(product.buying_price) : (product.buying_price || 0);
+              const buyingPrice = typeof product.buyingPrice === 'string' ? 
+                parseFloat(product.buyingPrice) : (product.buyingPrice || 0);
               const profit = (itemPrice - buyingPrice) * quantity;
               console.log(`Profit calc - Item: ${productName}, Selling: ${itemPrice}, Buying: ${buyingPrice}, Qty: ${quantity}, Profit: ${profit}`);
               todayProfit += profit || 0;
@@ -362,11 +404,23 @@ export const supabaseService = {
         }
       }
 
-      // Calculate pending collection from due amounts in sales
-      const pendingCollection = allSales.reduce((sum, sale) => {
+      // Calculate pending collection from customer total_credit and due amounts
+      let pendingCollection = 0;
+      
+      // Add up customer total_credit (this is the main source of truth for pending amounts)
+      pendingCollection += customers.reduce((sum, customer) => {
+        const credit = typeof customer.total_credit === 'string' ? parseFloat(customer.total_credit) : customer.total_credit;
+        return sum + (credit || 0);
+      }, 0);
+      
+      // Also add due amounts from recent sales that haven't been updated in customer records
+      const recentDueFromSales = allSales.reduce((sum, sale) => {
         const dueAmount = typeof sale.due_amount === 'string' ? parseFloat(sale.due_amount) : sale.due_amount;
         return sum + (dueAmount || 0);
       }, 0);
+      
+      // Use the higher value to ensure we don't lose any due amounts during transition
+      pendingCollection = Math.max(pendingCollection, recentDueFromSales);
 
       const stats = {
         todaySales: todaySalesTotal,
