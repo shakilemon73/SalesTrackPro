@@ -120,9 +120,9 @@ export default function SalesEntry() {
     if (product) {
       updateItem(index, 'productId', productId);
       updateItem(index, 'productName', product.name);
-      updateItem(index, 'unitPrice', product.sellingPrice || "0");
+      updateItem(index, 'unitPrice', product.selling_price || product.sellingPrice || "0");
       const quantity = items[index]?.quantity || 1;
-      const price = parseFloat(product.sellingPrice || "0") || 0;
+      const price = parseFloat(product.selling_price || product.sellingPrice || "0") || 0;
       updateItem(index, 'totalPrice', quantity * price);
     }
   };
@@ -273,9 +273,9 @@ export default function SalesEntry() {
                     <SelectContent>
                       {products.map((product: any) => (
                         <SelectItem key={product.id} value={product.id}>
-                          {product.name} - {formatCurrency(parseFloat(product.sellingPrice))} টাকা
+                          {product.name} - {formatCurrency(parseFloat(product.selling_price || product.sellingPrice || 0))}
                           <span className="text-gray-500 ml-2">
-                            (স্টক: {toBengaliNumber(product.currentStock)})
+                            (স্টক: {toBengaliNumber(product.current_stock || product.currentStock || 0)})
                           </span>
                         </SelectItem>
                       ))}
@@ -341,7 +341,7 @@ export default function SalesEntry() {
                 <Label>মোট পরিমাণ</Label>
                 <div className="p-3 bg-primary/10 rounded-lg text-center">
                   <span className="text-lg font-bold text-primary number-font">
-                    {formatCurrency(totalAmount)} টাকা
+                    {formatCurrency(totalAmount)}
                   </span>
                 </div>
               </div>
@@ -384,7 +384,7 @@ export default function SalesEntry() {
                 <div className="flex justify-between items-center">
                   <span className="font-medium text-warning">বাকি পরিমাণ:</span>
                   <span className="text-lg font-bold text-warning number-font">
-                    {formatCurrency(dueAmount)} টাকা
+                    {formatCurrency(dueAmount)}
                   </span>
                 </div>
               </div>
