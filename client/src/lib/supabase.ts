@@ -282,6 +282,7 @@ export const supabaseService = {
 
       console.log('Dashboard stats - Today sales:', todaySales);
       console.log('Dashboard stats - Customers count:', customers.length);
+      console.log('Dashboard stats - Products sample:', products.slice(0, 2));
 
       const todaySalesTotal = todaySales.reduce((sum, sale) => {
         const amount = typeof sale.total_amount === 'string' ? parseFloat(sale.total_amount) : sale.total_amount;
@@ -293,12 +294,18 @@ export const supabaseService = {
       for (const sale of todaySales) {
         if (Array.isArray(sale.items)) {
           for (const item of sale.items as any[]) {
-            const product = products.find(p => p.id === item.productId);
+            const product = products.find(p => p.id === item.productId || p.name === item.productName);
             if (product) {
               const itemPrice = typeof item.unitPrice === 'string' ? parseFloat(item.unitPrice) : item.unitPrice;
-              const buyingPrice = typeof product.buying_price === 'string' ? parseFloat(product.buying_price) : product.buying_price;
+              // Try both camelCase and snake_case field names
+              const buyingPrice = typeof product.buyingPrice === 'string' ? parseFloat(product.buyingPrice) : 
+                                 typeof product.buying_price === 'string' ? parseFloat(product.buying_price) : 
+                                 product.buyingPrice || product.buying_price || 0;
               const profit = (itemPrice - buyingPrice) * (item.quantity || 0);
+              console.log(`Item: ${item.productName}, Price: ${itemPrice}, Buying: ${buyingPrice}, Quantity: ${item.quantity}, Profit: ${profit}`);
               todayProfit += profit || 0;
+            } else {
+              console.log(`Product not found for item: ${item.productName}, productId: ${item.productId}`);
             }
           }
         }

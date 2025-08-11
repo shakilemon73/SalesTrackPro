@@ -12,7 +12,10 @@ export default function Dashboard() {
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getDashboardStats(CURRENT_USER_ID),
+    queryFn: () => {
+      console.log('Fetching dashboard stats for user:', CURRENT_USER_ID);
+      return supabaseService.getDashboardStats(CURRENT_USER_ID);
+    },
   });
 
   const { data: recentSales = [], isLoading: salesLoading } = useQuery({
