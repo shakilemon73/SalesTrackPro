@@ -11,14 +11,14 @@ const STATIC_ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
-// API endpoints to cache
+// Supabase API endpoints to cache
 const API_ENDPOINTS = [
-  '/api/dashboard/',
-  '/api/customers/',
-  '/api/products/',
-  '/api/sales/',
-  '/api/expenses/',
-  '/api/collections/'
+  'https://lkhqdqlryjzalsemofdt.supabase.co/rest/v1/customers',
+  'https://lkhqdqlryjzalsemofdt.supabase.co/rest/v1/products',
+  'https://lkhqdqlryjzalsemofdt.supabase.co/rest/v1/sales',
+  'https://lkhqdqlryjzalsemofdt.supabase.co/rest/v1/expenses',
+  'https://lkhqdqlryjzalsemofdt.supabase.co/rest/v1/collections',
+  'https://lkhqdqlryjzalsemofdt.supabase.co/rest/v1/users'
 ];
 
 // Install event - cache static assets
@@ -65,8 +65,8 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Handle API requests
-  if (url.pathname.startsWith('/api/')) {
+  // Handle Supabase API requests
+  if (url.hostname === 'lkhqdqlryjzalsemofdt.supabase.co' && url.pathname.startsWith('/rest/v1/')) {
     event.respondWith(handleApiRequest(request));
     return;
   }
