@@ -69,9 +69,9 @@ export default function ExpenseEntry() {
     mutationFn: async (data: ExpenseFormData) => {
       const expenseData = {
         category: data.category,
-        amount: data.amount,
+        amount: parseFloat(data.amount),
         description: data.description,
-        payment_method: data.payment_method,
+        user_id: CURRENT_USER_ID,
         expense_date: new Date().toISOString(),
       };
 

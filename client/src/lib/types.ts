@@ -106,12 +106,15 @@ export interface InsertSale {
 
 export interface InsertExpense {
   description: string;
-  amount: string;
+  amount: number;
   category: string;
+  expense_date?: string;
 }
 
 export interface InsertCollection {
-  customerId: string;
-  saleId?: string;
-  amount: string;
+  customer_id: string;
+  sale_id?: string;
+  amount: number;
+  collection_date?: string;
+  notes?: string;
 }

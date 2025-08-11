@@ -91,9 +91,9 @@ export default function Collection() {
   const createCollectionMutation = useMutation({
     mutationFn: async (data: CollectionFormData) => {
       const collectionData = {
-        customerId: data.customer_id,
-        amount: data.amount,
-        paymentMethod: data.payment_method,
+        customer_id: data.customer_id,
+        amount: parseFloat(data.amount),
+        collection_date: new Date().toISOString(),
         notes: data.notes || null,
       };
 
