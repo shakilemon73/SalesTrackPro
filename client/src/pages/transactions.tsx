@@ -121,29 +121,26 @@ export default function Transactions() {
 
     // Filter by date
     if (dateFilter === "today") {
-      // Check both today and yesterday to handle timezone issues
+      // Only check today's date for more precise filtering
       const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      
       const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-      const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
       
-      console.log('🔥 FILTERING TODAY/YESTERDAY:', todayStr, yesterdayStr);
+      console.log('🔥 FILTERING TODAY ONLY:', todayStr);
+      console.log('🔥 SAMPLE TRANSACTION DATES:', allTransactions.slice(0, 3).map(t => ({ type: t.type, date: t.date ? t.date.split('T')[0] : 'no-date' })));
       
       filtered = filtered.filter(transaction => {
         const transactionDateStr = transaction.date ? transaction.date.split('T')[0] : '';
-        // Check if transaction is from today OR yesterday (to handle timezone issues)
-        const isRecentTransaction = transactionDateStr === todayStr || transactionDateStr === yesterdayStr;
+        const isTodayTransaction = transactionDateStr === todayStr;
         
-        if (isRecentTransaction) {
-          console.log('✅ MATCHED RECENT:', transaction.type, transaction.title, transactionDateStr);
+        if (isTodayTransaction) {
+          console.log('✅ MATCHED TODAY:', transaction.type, transaction.title, transactionDateStr);
         }
         
-        return isRecentTransaction;
+        return isTodayTransaction;
       });
       
       console.log('🔥 AFTER TODAY FILTER:', filtered.length, 'transactions');
+      console.log('🔥 FILTERED SAMPLE:', filtered.slice(0, 2).map(t => ({ type: t.type, title: t.title, date: t.date ? t.date.split('T')[0] : 'no-date' })));
     } else if (dateFilter === "week") {
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
