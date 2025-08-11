@@ -57,9 +57,19 @@ export default function SalesEntry() {
   });
 
   const createSaleMutation = useMutation({
-    mutationFn: async (saleData: any) => {
-      console.log('Mutation sending saleData:', saleData);
-      return await supabaseService.createSale(CURRENT_USER_ID, saleData);
+    mutationFn: async (formData: any) => {
+      // Transform to proper database format
+      const dbSaleData = {
+        customer_id: formData.customer_id,
+        customer_name: formData.customer_name,
+        total_amount: formData.total_amount,
+        paid_amount: formData.paid_amount,
+        due_amount: formData.due_amount,
+        payment_method: formData.payment_method,
+        items: formData.items
+      };
+      console.log('Transformed DB saleData:', dbSaleData);
+      return await supabaseService.createSale(CURRENT_USER_ID, dbSaleData);
     },
     onSuccess: () => {
       toast({
