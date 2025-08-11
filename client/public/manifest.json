@@ -1,0 +1,98 @@
+{
+  "name": "দোকান হিসাব - ব্যবসা ব্যবস্থাপনা",
+  "short_name": "দোকান হিসাব",
+  "description": "বাংলাদেশী দোকানদারদের জন্য সম্পূর্ণ ব্যবসা ব্যবস্থাপনা অ্যাপ। বিক্রয় ট্র্যাকিং, গ্রাহক ব্যবস্থাপনা এবং লাভ-ক্ষতি হিসাব।",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#2E7D32",
+  "theme_color": "#2E7D32",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "bn",
+  "dir": "ltr",
+  "categories": ["business", "finance", "productivity"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iMTIiIGZpbGw9IiMyRTdEMzIiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPgo8cGF0aCBkPSJNMTkgN0g1QzMuOSA3IDMgNy45IDMgOVYxOUM5IDIwLjEgMy45IDIxIDUgMjFIMTlDMjAuMSAyMSAyMSAyMC4xIDIxIDE5VjlDMjEgNy45IDIwLjEgNyAxOSA3Wk0xOSA5VjEySDE2LjVWMTBIMTNWMTJINS4wMUw1LjAxIDlIMTlaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNNSAxNEgxM1YxNkg1VjE0WiIgZmlsbD0id2hpdGUiLz4KPHN2Zz4KPHN2Zz4K",
+      "sizes": "48x48",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzIiIGhlaWdodD0iNzIiIHZpZXdCb3g9IjAgMCA3MiA3MiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjcyIiBoZWlnaHQ9IjcyIiByeD0iMTgiIGZpbGw9IiMyRTdEMzIiLz4KPHN2ZyB4PSIxMiIgeT0iMTIiIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xOSA3SDVDMy45IDcgMyA3LjkgMyA5VjE5QzkgMjAuMSAzLjkgMjEgNSAyMUgxOUMyMC4xIDIxIDIxIDIwLjEgMjEgMTlWOUMyMSA3LjkgMjAuMSA3IDE5IDdaTTE5IDlWMTJIMTYuNVYxMEgxM1YxMkg1LjAxTDUuMDEgOUgxOVoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik01IDE0SDEzVjE2SDVWMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+Cg==",
+      "sizes": "72x72",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiByeD0iMjQiIGZpbGw9IiMyRTdEMzIiLz4KPHN2ZyB4PSIyNCIgeT0iMjQiIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xOSA3SDVDMy45IDcgMyA3LjkgMyA5VjE5QzkgMjAuMSAzLjkgMjEgNSAyMUgxOUMyMC4xIDIxIDIxIDIwLjEgMjEgMTlWOUMyMSA3LjkgMjAuMSA3IDE5IDdaTTE5IDlWMTJIMTYuNVYxMEgxM1YxMkg1LjAxTDUuMDEgOUgxOVoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik01IDE0SDEzVjE2SDVWMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+Cg==",
+      "sizes": "96x96",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQ0IiBoZWlnaHQ9IjE0NCIgdmlld0JveD0iMCAwIDE0NCAxNDQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNDQiIGhlaWdodD0iMTQ0IiByeD0iMzYiIGZpbGw9IiMyRTdEMzIiLz4KPHN2ZyB4PSIzNiIgeT0iMzYiIHdpZHRoPSI3MiIgaGVpZ2h0PSI3MiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xOSA3SDVDMy45IDcgMyA3LjkgMyA5VjE5QzkgMjAuMSAzLjkgMjEgNSAyMUgxOUMyMC4xIDIxIDIxIDIwLjEgMjEgMTlWOUMyMSA3LjkgMjAuMSA3IDE5IDdaTTE5IDlWMTJIMTYuNVYxMEgxM1YxMkg1LjAxTDUuMDEgOUgxOVoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik01IDE0SDEzVjE2SDVWMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+Cg==",
+      "sizes": "144x144",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iNDgiIGZpbGw9IiMyRTdEMzIiLz4KPHN2ZyB4PSI0OCIgeT0iNDgiIHdpZHRoPSI5NiIgaGVpZ2h0PSI5NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xOSA3SDVDMy45IDcgMyA3LjkgMyA5VjE5QzkgMjAuMSAzLjkgMjEgNSAyMUgxOUMyMC4xIDIxIDIxIDIwLjEgMjEgMTlWOUMyMSA3LjkgMjAuMSA3IDE5IDdaTTE5IDlWMTJIMTYuNVYxMEgxM1YxMkg1LjAxTDUuMDEgOUgxOVoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik01IDE0SDEzVjE2SDVWMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+Cg==",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTI4IiBmaWxsPSIjMkU3RDMyIi8+CjxzdmcgeD0iMTI4IiB5PSIxMjgiIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IndoaXRlIj4KPHBhdGggZD0iTTE5IDdINUMzLjkgNyAzIDcuOSAzIDlWMTlDOSAyMC4xIDMuOSAyMSA1IDIxSDE5QzIwLjEgMjEgMjEgMjAuMSAyMSAxOVY5QzIxIDcuOSAyMC4xIDcgMTkgN1pNMTkgOVYxMkgxNi41VjEwSDEzVjEySDUuMDFMNS4wMSA5SDE5WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTUgMTRIMTNWMTZINVYxNFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo8L3N2Zz4K",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjU2OCIgdmlld0JveD0iMCAwIDMyMCA1NjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iNTY4IiBmaWxsPSIjRkFGQUZBIi8+CjxyZWN0IHk9IjAiIHdpZHRoPSIzMjAiIGhlaWdodD0iNjQiIGZpbGw9IiMyRTdEMzIiLz4KPHN2ZyB4PSIxNiIgeT0iODAiIHdpZHRoPSIyODgiIGhlaWdodD0iNDAwIj4KPHN2ZyB3aWR0aD0iMjg4IiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDI4OCA0MDAiIGZpbGw9Im5vbmUiPgo8cmVjdCB3aWR0aD0iMjg4IiBoZWlnaHQ9IjQwMCIgZmlsbD0iI0ZBRkFGQSIvPgo8L3N2Zz4KPC9zdmc+Cjwvc3ZnPgo=",
+      "sizes": "320x568",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "নতুন বিক্রয়",
+      "short_name": "বিক্রয়",
+      "description": "দ্রুত নতুন বিক্রয় এন্ট্রি করুন",
+      "url": "/sales/new",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiByeD0iMjQiIGZpbGw9IiMyRTdEMzIiLz4KPHN2ZyB4PSIyNCIgeT0iMjQiIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xMiAyQzEzLjEgMiAxNCAyLjkgMTQgNFYxMEgyMEMyMS4xIDEwIDIyIDEwLjkgMjIgMTJDMjIgMTMuMSAyMS4xIDE0IDIwIDE0SDE0VjIwQzE0IDIxLjEgMTMuMSAyMiAxMiAyMkMxMC45IDIyIDEwIDIxLjEgMTAgMjBWMTRINEMyLjkgMTQgMiAxMy4xIDIgMTJDMiAxMC45IDIuOSAxMCA0IDEwSDEwVjRDMTAgMi45IDEwLjkgMiAxMiAyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+CjwvZz4K",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "গ্রাহক যোগ",
+      "short_name": "গ্রাহক",
+      "description": "নতুন গ্রাহক যোগ করুন",
+      "url": "/customers/new",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiByeD0iMjQiIGZpbGw9IiMxNTY1QzAiLz4KPHN2ZyB4PSIyNCIgeT0iMjQiIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xNSAxMkMxNy4yMSAxMiAxOSAxMC4yMSAxOSA4UzE3LjIxIDQgMTUgNCA3LjIxIDYgOVMxMC43OSAxMiA5IDEyIDcgMTAuMjEgNyA4IDE4LjIxIDYgMTUgNiAxNS4yMSA4IDE1IDhTMTUgMTAuMjEgMTcgMTEgMTIgMjEuMDIgMTNDMTkuMzMgMTMuNTUgMTggMTIuOTEgMTggMTJDMTggMTAuMzEgMTYuNjkgOSAxNSA5UzEyIDEwLjMxIDEyIDEyUzEzLjMxIDE1IDE1IDE1IDE4IDEzLjY5IDE4IDEyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+CjwvZz4K",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "স্টক দেখুন",
+      "short_name": "স্টক",
+      "description": "পণ্যের স্টক পরীক্ষা করুন",
+      "url": "/inventory",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiByeD0iMjQiIGZpbGw9IiNGRjk4MDAiLz4KPHN2ZyB4PSIyNCIgeT0iMjQiIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xMi4wMDEgMTBIMTRDMTUuMSAxMCAxNiAxMC45IDE2IDEyVjIwSDE0QzEzIDIwIDEyIDIxIDEyIDIwVjE2SDZMOTY9Ik0yMSAxOUwyMC41IDNWNSAyIDVDOCA1IDEwLjMxIDEwIDEyVjE1QzEzLjY5IDE1IDE1IDEzLjY5IDE1IDEyVjEwSDE3VjIwSDEzVjE0SDlWMTBIMTBMMTMuMyA3SDE4SDE3LjU5TDIwIDNDMTguMyAzIDE3IDMgMjEgM1YxOVoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo8L3N2Zz4K",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "edge_side_panel": {
+    "preferred_width": 412
+  }
+}
