@@ -343,9 +343,9 @@ export const supabaseService = {
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId);
 
-      // Get total due amount (collections needed)
-      const { data: customersWithDue, error: dueError } = await supabase
-        .from('customers')
+      // Get total due amount from sales (collections needed)
+      const { data: salesWithDue, error: dueError } = await supabase
+        .from('sales')
         .select('due_amount')
         .eq('user_id', userId)
         .gt('due_amount', 0);
@@ -356,7 +356,7 @@ export const supabaseService = {
       const totalSales = todaySales?.reduce((sum, sale) => sum + parseFloat(sale.total_amount || '0'), 0) || 0;
       const totalExpenses = todayExpenses?.reduce((sum, expense) => sum + parseFloat(expense.amount || '0'), 0) || 0;
       const profit = totalSales - totalExpenses;
-      const pendingCollection = customersWithDue?.reduce((sum, customer) => sum + parseFloat(customer.due_amount || '0'), 0) || 0;
+      const pendingCollection = salesWithDue?.reduce((sum, sale) => sum + parseFloat(sale.due_amount || '0'), 0) || 0;
       
       const stats = {
         todaySales: totalSales,

@@ -17,7 +17,7 @@ import Collection from "@/pages/collection";
 import ExpenseEntry from "@/pages/expense-entry";
 import BottomNavigation from "@/components/ui/bottom-navigation";
 import { useEffect } from "react";
-import { seedCustomers, seedProducts, seedSales, seedExpenses } from "./lib/seed-data";
+// Removed seed data import - using only live Supabase data
 import { supabase } from "./lib/supabase";
 
 function Router() {
