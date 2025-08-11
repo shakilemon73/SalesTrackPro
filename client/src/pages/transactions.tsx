@@ -93,6 +93,17 @@ export default function Transactions() {
     }))
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
+  // Debug logging
+  console.log('🔥 ALL TRANSACTIONS DATA:', {
+    salesCount: sales.length,
+    expensesCount: expenses.length,
+    collectionsCount: collections.length,
+    totalTransactions: allTransactions.length,
+    sampleSaleDate: sales[0]?.sale_date || sales[0]?.created_at,
+    sampleExpenseDate: expenses[0]?.expense_date || expenses[0]?.created_at,
+    currentDateFilter: dateFilter
+  });
+
   // Filter transactions
   const getFilteredTransactions = () => {
     let filtered = allTransactions;
@@ -111,26 +122,43 @@ export default function Transactions() {
 
     // Filter by date
     if (dateFilter === "today") {
+      // Get today's date in local timezone
       const today = new Date();
-      const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+      const todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+      
+      console.log('🔥 FILTERING TODAY:', todayStr, 'Total transactions before filter:', filtered.length);
       
       filtered = filtered.filter(transaction => {
-        const transactionDate = new Date(transaction.date);
-        return transactionDate >= startOfDay && transactionDate < endOfDay;
+        // Extract date part from transaction date (ignore time)
+        const transactionDateStr = transaction.date ? transaction.date.split('T')[0] : '';
+        const isToday = transactionDateStr === todayStr;
+        
+        if (isToday) {
+          console.log('✅ TODAY TRANSACTION:', transaction.type, transaction.title, transactionDateStr);
+        }
+        
+        return isToday;
       });
+      
+      console.log('🔥 AFTER TODAY FILTER:', filtered.length, 'transactions');
     } else if (dateFilter === "week") {
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
-      filtered = filtered.filter(transaction =>
-        new Date(transaction.date) >= weekAgo
-      );
+      const weekAgoStr = weekAgo.toISOString().split('T')[0];
+      
+      filtered = filtered.filter(transaction => {
+        const transactionDateStr = transaction.date ? transaction.date.split('T')[0] : '';
+        return transactionDateStr >= weekAgoStr;
+      });
     } else if (dateFilter === "month") {
       const monthAgo = new Date();
       monthAgo.setMonth(monthAgo.getMonth() - 1);
-      filtered = filtered.filter(transaction =>
-        new Date(transaction.date) >= monthAgo
-      );
+      const monthAgoStr = monthAgo.toISOString().split('T')[0];
+      
+      filtered = filtered.filter(transaction => {
+        const transactionDateStr = transaction.date ? transaction.date.split('T')[0] : '';
+        return transactionDateStr >= monthAgoStr;
+      });
     }
 
     return filtered;
