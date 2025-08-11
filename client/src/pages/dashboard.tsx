@@ -47,11 +47,11 @@ export default function Dashboard() {
   if (statsLoading) {
     console.log('🔥 DASHBOARD: Loading state - waiting for stats...');
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-gray-600">লোড হচ্ছে...</p>
-          <p className="text-xs text-gray-400 mt-2">Fetching real Supabase data...</p>
+      <div className="flex items-center justify-center min-h-screen bg-background-app">
+        <div className="text-center fade-in">
+          <div className="loading-spinner mx-auto mb-4"></div>
+          <h3 className="text-lg font-semibold text-foreground mb-2 bengali-font">লোড হচ্ছে...</h3>
+          <p className="text-muted-foreground text-sm">রিয়েল-টাইম ডেটা আনা হচ্ছে...</p>
         </div>
       </div>
     );
@@ -62,220 +62,287 @@ export default function Dashboard() {
 
   return (
     <>
-      {/* Status Bar */}
+      {/* Premium Status Bar */}
       <div className="status-bar">
-        <div className="flex items-center space-x-1">
-          <i className="fas fa-signal text-xs"></i>
-          <span>{getBengaliTime()}</span>
-        </div>
         <div className="flex items-center space-x-2">
-          <i className="fas fa-wifi text-xs"></i>
-          <i className="fas fa-battery-three-quarters text-xs"></i>
+          <div className="flex space-x-1">
+            <div className="w-1 h-1 bg-white rounded-full opacity-100"></div>
+            <div className="w-1 h-1 bg-white rounded-full opacity-100"></div>
+            <div className="w-1 h-1 bg-white rounded-full opacity-100"></div>
+            <div className="w-1 h-1 bg-white rounded-full opacity-60"></div>
+          </div>
+          <span className="text-xs font-semibold">দোকান হিসাব</span>
+        </div>
+        <div className="flex items-center space-x-3">
+          <span className="text-xs font-bold number-font">
+            {new Date().toLocaleTimeString('bn-BD', { 
+              hour: '2-digit', 
+              minute: '2-digit',
+              hour12: false 
+            })}
+          </span>
+          <div className="flex items-center space-x-1">
+            <div className="w-4 h-2 border border-white/80 rounded-sm relative overflow-hidden">
+              <div className="w-4/5 h-full bg-white rounded-sm"></div>
+            </div>
+            <div className="w-0.5 h-1 bg-white rounded-full"></div>
+          </div>
         </div>
       </div>
 
-      {/* Header Bar */}
+      {/* Enhanced Header Design */}
       <div className="header-bar">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-semibold">আজকের হিসাব</h1>
-            <p className="text-sm text-green-100">{getBengaliDate()}</p>
-          </div>
           <div className="flex items-center space-x-3">
-            <div className="relative">
-              <i className="fas fa-cloud text-green-100"></i>
-              <div className="absolute -top-1 -right-1 w-2 h-2 bg-success rounded-full"></div>
+            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/30 shadow-lg">
+              <i className="fas fa-store text-white text-xl"></i>
             </div>
-            <div className="relative">
-              <i className="fas fa-bell text-white"></i>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full flex items-center justify-center text-xs number-font">
-                {toBengaliNumber(3)}
+            <div>
+              <h1 className="text-2xl font-bold bengali-font tracking-tight mb-1">দোকান হিসাব</h1>
+              <div className="flex items-center space-x-2">
+                <p className="text-sm text-white/90 bengali-font font-medium">
+                  {new Date().toLocaleDateString('bn-BD', { 
+                    weekday: 'long',
+                    day: 'numeric', 
+                    month: 'long' 
+                  })}
+                </p>
+                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-xs text-green-200 font-semibold">লাইভ</span>
               </div>
             </div>
           </div>
+          <div className="flex items-center space-x-2">
+            <Link to="/reports">
+              <button className="w-11 h-11 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300 hover:scale-110 border border-white/20">
+                <i className="fas fa-chart-line text-white text-lg"></i>
+              </button>
+            </Link>
+            <Link to="/settings">
+              <button className="w-11 h-11 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300 hover:scale-110 border border-white/20">
+                <i className="fas fa-user-circle text-white text-lg"></i>
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="pb-20 px-4 py-4">
-        {/* Dashboard Summary */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <DashboardCard
-            title="আজকের বিক্রয়"
-            value={formatCurrency(stats?.todaySales || 0)}
-            unit=""
-            icon="fas fa-chart-line"
-            color="primary"
-            isLoading={statsLoading}
-          />
-          <DashboardCard
-            title="আজকের লাভ"
-            value={formatCurrency(stats?.todayProfit || 0)}
-            unit=""
-            icon="fas fa-coins"
-            color="success"
-            isLoading={statsLoading}
-          />
-          <DashboardCard
-            title="বাকি আদায়"
-            value={formatCurrency(stats?.pendingCollection || 0)}
-            unit=""
-            icon="fas fa-clock"
-            color="warning"
-            isLoading={statsLoading}
-          />
-          <DashboardCard
-            title="মোট গ্রাহক"
-            value={toBengaliNumber(stats?.totalCustomers || 0)}
-            unit="জন"
-            icon="fas fa-users"
-            color="secondary"
-            isLoading={statsLoading}
-          />
+      {/* Main Content with Improved Spacing */}
+      <div className="mobile-safe-area px-4 py-6 space-y-6">
+        
+        {/* Enhanced Stats Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="stats-card group cursor-pointer" onClick={() => window.location.href = '/sales'}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-chart-line text-white"></i>
+              </div>
+              <div className="w-2 h-2 bg-green-500 rounded-full opacity-60"></div>
+            </div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-1 bengali-font">আজকের বিক্রয়</h3>
+            <p className="text-2xl font-bold text-foreground number-font tracking-tight">
+              {formatCurrency(stats?.todaySales || 0)}
+            </p>
+            <div className="flex items-center mt-2 space-x-1">
+              <div className="w-1 h-1 bg-green-500 rounded-full"></div>
+              <span className="text-xs text-green-600 font-medium">রিয়েল-টাইম</span>
+            </div>
+          </div>
+
+          <div className="stats-card group cursor-pointer" onClick={() => window.location.href = '/collection'}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-hand-holding-usd text-white"></i>
+              </div>
+              <div className="w-2 h-2 bg-blue-500 rounded-full opacity-60"></div>
+            </div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-1 bengali-font">বাকি আদায়</h3>
+            <p className="text-2xl font-bold text-foreground number-font tracking-tight">
+              {formatCurrency(stats?.pendingCollection || 0)}
+            </p>
+            <div className="flex items-center mt-2 space-x-1">
+              <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
+              <span className="text-xs text-blue-600 font-medium">মোট বাকি</span>
+            </div>
+          </div>
+
+          <div className="stats-card group cursor-pointer" onClick={() => window.location.href = '/customers'}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-users text-white"></i>
+              </div>
+              <div className="w-2 h-2 bg-purple-500 rounded-full opacity-60"></div>
+            </div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-1 bengali-font">মোট গ্রাহক</h3>
+            <p className="text-2xl font-bold text-foreground number-font tracking-tight">
+              {toBengaliNumber(stats?.totalCustomers || 0)}
+            </p>
+            <div className="flex items-center mt-2 space-x-1">
+              <div className="w-1 h-1 bg-purple-500 rounded-full"></div>
+              <span className="text-xs text-purple-600 font-medium">সক্রিয়</span>
+            </div>
+          </div>
+
+          <div className="stats-card group cursor-pointer" onClick={() => window.location.href = '/reports'}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-chart-pie text-white"></i>
+              </div>
+              <div className="w-2 h-2 bg-orange-500 rounded-full opacity-60"></div>
+            </div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-1 bengali-font">মোট লাভ</h3>
+            <p className="text-2xl font-bold text-foreground number-font tracking-tight">
+              {formatCurrency(stats?.profit || 0)}
+            </p>
+            <div className="flex items-center mt-2 space-x-1">
+              <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
+              <span className="text-xs text-orange-600 font-medium">সব মিলিয়ে</span>
+            </div>
+          </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-white rounded-lg card-shadow p-4 mb-6">
-          <h2 className="text-lg font-semibold mb-4 flex items-center">
-            <i className="fas fa-bolt text-accent mr-2"></i>
+        {/* Quick Actions with Enhanced Design */}
+        <div className="dashboard-card">
+          <h2 className="text-lg font-bold text-foreground mb-4 bengali-font flex items-center">
+            <div className="w-6 h-6 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
+              <i className="fas fa-bolt text-primary text-sm"></i>
+            </div>
             দ্রুত কাজ
           </h2>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <Link to="/sales/new">
-              <button className="bg-primary quick-action-btn w-full">
-                <i className="fas fa-plus-circle text-xl"></i>
-                <span className="text-sm font-medium">নতুন বিক্রয়</span>
+              <button className="quick-action-btn bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
+                <i className="fas fa-plus-circle text-2xl"></i>
+                <span className="text-sm font-semibold bengali-font">নতুন বিক্রয়</span>
               </button>
             </Link>
             <Link to="/customers/new">
-              <button className="bg-secondary quick-action-btn w-full">
-                <i className="fas fa-user-plus text-xl"></i>
-                <span className="text-sm font-medium">নতুন গ্রাহক</span>
-              </button>
-            </Link>
-            <Link to="/collection">
-              <button className="bg-success quick-action-btn w-full">
-                <i className="fas fa-money-bill-wave text-xl"></i>
-                <span className="text-sm font-medium">বাকি আদায়</span>
+              <button className="quick-action-btn bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700">
+                <i className="fas fa-user-plus text-2xl"></i>
+                <span className="text-sm font-semibold bengali-font">নতুন গ্রাহক</span>
               </button>
             </Link>
             <Link to="/expenses/new">
-              <button className="bg-warning quick-action-btn w-full">
-                <i className="fas fa-minus-circle text-xl"></i>
-                <span className="text-sm font-medium">খরচ এন্ট্রি</span>
+              <button className="quick-action-btn bg-gradient-to-br from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
+                <i className="fas fa-receipt text-2xl"></i>
+                <span className="text-sm font-semibold bengali-font">খরচ যোগ</span>
               </button>
             </Link>
           </div>
         </div>
 
-        {/* Recent Transactions */}
-        <div className="bg-white rounded-lg card-shadow p-4 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold flex items-center">
-              <i className="fas fa-history text-primary mr-2"></i>
-              সাম্প্রতিক লেনদেন
+        {/* Recent Activity with Enhanced Visual Design */}
+        <div className="dashboard-card">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-lg font-bold text-foreground bengali-font flex items-center">
+              <div className="w-6 h-6 bg-blue-500/10 rounded-lg flex items-center justify-center mr-3">
+                <i className="fas fa-clock text-blue-500 text-sm"></i>
+              </div>
+              সাম্প্রতিক কার্যক্রম
             </h2>
-            <Link to="/transactions" className="text-primary text-sm font-medium">
-              সব দেখুন
+            <Link to="/transactions">
+              <button className="text-sm text-primary hover:text-primary-hover font-semibold bengali-font flex items-center space-x-1 transition-colors">
+                <span>সব দেখুন</span>
+                <i className="fas fa-arrow-right text-xs"></i>
+              </button>
             </Link>
           </div>
-
+          
           <div className="space-y-3">
-            {salesLoading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="animate-pulse transaction-item">
-                    <div className="flex items-center space-x-3">
-                      <div className="bg-gray-200 p-2 rounded-full w-8 h-8"></div>
-                      <div className="space-y-1">
-                        <div className="h-4 bg-gray-200 rounded w-20"></div>
-                        <div className="h-3 bg-gray-200 rounded w-16"></div>
-                      </div>
-                    </div>
-                    <div className="text-right space-y-1">
-                      <div className="h-4 bg-gray-200 rounded w-16"></div>
-                      <div className="h-3 bg-gray-200 rounded w-12"></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (() => {
-              // Combine all transactions
+            {(() => {
+              // Combine recent sales and expenses for display
               const allTransactions = [
                 ...recentSales.map((sale: any) => ({
-                  ...sale,
+                  id: sale.id,
                   type: 'sale',
-                  displayName: sale.customer_name,
-                  displayAmount: formatCurrency(parseFloat(sale.total_amount)),
-                  displayType: sale.payment_method,
-                  icon: "fas fa-shopping-cart",
-                  iconColor: "primary",
-                  time: new Date(sale.created_at)
+                  displayName: sale.customer_name || 'অজানা গ্রাহক',
+                  displayAmount: `+ ${formatCurrency(sale.total_amount)}`,
+                  displayType: 'বিক্রয়',
+                  time: new Date(sale.sale_date || sale.created_at),
+                  icon: 'fas fa-shopping-cart',
+                  iconColor: 'text-green-600',
+                  bgColor: 'bg-green-50'
                 })),
                 ...recentExpenses.map((expense: any) => ({
-                  ...expense,
+                  id: expense.id,
                   type: 'expense',
-                  displayName: expense.category,
-                  displayAmount: formatCurrency(parseFloat(expense.amount)),
-                  displayType: "খরচ",
-                  icon: "fas fa-minus-circle",
-                  iconColor: "error",
-                  time: new Date(expense.created_at)
-                })),
-                ...recentCollections.map((collection: any) => ({
-                  ...collection,
-                  type: 'collection',
-                  displayName: collection.customers?.name || collection.customer_name || 'গ্রাহক',
-                  displayAmount: formatCurrency(parseFloat(collection.amount)),
-                  displayType: "আদায়",
-                  icon: "fas fa-hand-holding-usd",
-                  iconColor: "success",
-                  time: new Date(collection.created_at)
+                  displayName: expense.description || 'খরচ',
+                  displayAmount: `- ${formatCurrency(expense.amount)}`,
+                  displayType: 'খরচ',
+                  time: new Date(expense.expense_date || expense.created_at),
+                  icon: 'fas fa-receipt',
+                  iconColor: 'text-red-600',
+                  bgColor: 'bg-red-50'
                 }))
               ]
               .sort((a, b) => b.time.getTime() - a.time.getTime())
               .slice(0, 5);
 
               return allTransactions.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <i className="fas fa-receipt text-3xl mb-2 text-gray-300"></i>
-                  <p>আজ এখনো কোনো লেনদেন হয়নি</p>
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i className="fas fa-receipt text-2xl text-muted-foreground"></i>
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-2 bengali-font">এখনো কোনো লেনদেন নেই</h3>
+                  <p className="text-muted-foreground text-sm bengali-font">আপনার প্রথম বিক্রয় বা খরচ যোগ করুন</p>
                 </div>
               ) : (
                 allTransactions.map((transaction: any, index: number) => (
-                  <TransactionItem
+                  <div 
                     key={`${transaction.type}-${transaction.id || index}`}
-                    customerName={transaction.displayName}
-                    time={getBengaliTime(transaction.time)}
-                    amount={transaction.displayAmount}
-                    type={transaction.displayType}
-                    icon={transaction.icon}
-                    iconColor={transaction.iconColor}
-                  />
+                    className="transaction-item scale-in"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-10 h-10 ${transaction.bgColor} rounded-xl flex items-center justify-center`}>
+                        <i className={`${transaction.icon} ${transaction.iconColor} text-sm`}></i>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-foreground truncate bengali-font">{transaction.displayName}</h4>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <span className="text-xs text-muted-foreground bengali-font">{transaction.displayType}</span>
+                          <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
+                          <span className="text-xs text-muted-foreground number-font">{getBengaliTime(transaction.time)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className={`font-bold text-lg number-font ${transaction.type === 'sale' ? 'text-green-600' : 'text-red-600'}`}>
+                        {transaction.displayAmount}
+                      </p>
+                    </div>
+                  </div>
                 ))
               );
             })()}
           </div>
         </div>
 
-        {/* Low Stock Alert */}
+        {/* Low Stock Alert - Enhanced Design */}
         {lowStockProducts.length > 0 && (
-          <div className="bg-white rounded-lg card-shadow p-4 mb-6 border-l-4 border-error">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold flex items-center text-error">
-                <i className="fas fa-exclamation-triangle mr-2"></i>
+          <div className="dashboard-card border-l-4 border-orange-500 bg-orange-50/50">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold flex items-center text-orange-700 bengali-font">
+                <div className="w-6 h-6 bg-orange-500/20 rounded-lg flex items-center justify-center mr-3">
+                  <i className="fas fa-exclamation-triangle text-orange-600 text-sm"></i>
+                </div>
                 স্টক শেষ হয়ে যাচ্ছে
               </h2>
-              <span className="bg-error text-white text-xs px-2 py-1 rounded-full number-font">
+              <span className="bg-orange-500 text-white text-xs px-3 py-1 rounded-full font-bold number-font">
                 {toBengaliNumber(lowStockProducts.length)}
               </span>
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-3 mb-4">
               {lowStockProducts.slice(0, 3).map((product: any) => (
-                <div key={product.id} className="flex items-center justify-between text-sm">
-                  <span>{product.name}</span>
-                  <span className="text-error font-medium number-font">
+                <div key={product.id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-orange-200">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <i className="fas fa-box text-orange-600 text-sm"></i>
+                    </div>
+                    <span className="font-medium text-foreground bengali-font">{product.name}</span>
+                  </div>
+                  <span className="text-orange-600 font-bold text-sm number-font">
                     {toBengaliNumber(product.currentStock)} টি বাকি
                   </span>
                 </div>
@@ -283,7 +350,7 @@ export default function Dashboard() {
             </div>
             
             <Link to="/inventory">
-              <button className="w-full mt-3 bg-error text-white py-2 rounded-lg text-sm font-medium active:bg-error/90 transition-colors">
+              <button className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl text-sm font-semibold transition-colors bengali-font">
                 সব পণ্য দেখুন
               </button>
             </Link>
@@ -291,10 +358,10 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Floating Action Button */}
+      {/* Enhanced Floating Action Button */}
       <Link to="/sales/new">
-        <button className="floating-action-btn">
-          <i className="fas fa-plus text-xl"></i>
+        <button className="floating-action-btn group">
+          <i className="fas fa-plus text-xl transition-transform group-hover:rotate-90"></i>
         </button>
       </Link>
     </>
