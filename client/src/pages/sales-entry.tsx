@@ -58,6 +58,7 @@ export default function SalesEntry() {
 
   const createSaleMutation = useMutation({
     mutationFn: async (saleData: any) => {
+      console.log('Mutation sending saleData:', saleData);
       return await supabaseService.createSale(CURRENT_USER_ID, saleData);
     },
     onSuccess: () => {
@@ -69,7 +70,8 @@ export default function SalesEntry() {
       queryClient.invalidateQueries({ queryKey: ['sales'] });
       setLocation("/sales");
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Sale mutation error:', error);
       toast({
         title: "ত্রুটি!",
         description: "বিক্রয় সংরক্ষণে সমস্যা হয়েছে",
@@ -150,6 +152,7 @@ export default function SalesEntry() {
       })),
     };
 
+    console.log('Final saleData before mutation:', saleData);
     createSaleMutation.mutate(saleData);
   };
 
