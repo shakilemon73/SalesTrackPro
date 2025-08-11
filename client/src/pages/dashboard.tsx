@@ -217,7 +217,7 @@ export default function Dashboard() {
                 ...recentCollections.map((collection: any) => ({
                   ...collection,
                   type: 'collection',
-                  displayName: collection.customers?.name || 'গ্রাহক',
+                  displayName: collection.customers?.name || collection.customer_name || 'গ্রাহক',
                   displayAmount: formatCurrency(parseFloat(collection.amount)),
                   displayType: "আদায়",
                   icon: "fas fa-hand-holding-usd",

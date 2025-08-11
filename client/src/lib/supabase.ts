@@ -266,7 +266,10 @@ export const supabaseService = {
   async getCollections(userId: string, limit?: number): Promise<Collection[]> {
     let query = supabase
       .from('collections')
-      .select('*')
+      .select(`
+        *,
+        customers(name)
+      `)
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
     
