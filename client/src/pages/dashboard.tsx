@@ -14,14 +14,14 @@ export default function Dashboard() {
       return supabaseService.getDashboardStats(CURRENT_USER_ID);
     },
     staleTime: 0,
-    cacheTime: 0,
+    gcTime: 0,
   });
 
   const { data: recentSales = [], isLoading: salesLoading, error: salesError } = useQuery({
     queryKey: ['sales', CURRENT_USER_ID, 'recent'],
     queryFn: () => supabaseService.getSales(CURRENT_USER_ID, 3),
     staleTime: 0,
-    cacheTime: 0,
+    gcTime: 0,
   });
 
   if (statsError) console.error('🔥 DASHBOARD Stats error:', statsError);
@@ -45,15 +45,20 @@ export default function Dashboard() {
   });
 
   if (statsLoading) {
+    console.log('🔥 DASHBOARD: Loading state - waiting for stats...');
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
           <p className="text-gray-600">লোড হচ্ছে...</p>
+          <p className="text-xs text-gray-400 mt-2">Fetching real Supabase data...</p>
         </div>
       </div>
     );
   }
+
+  console.log('🔥 DASHBOARD: Stats loaded:', stats);
+  console.log('🔥 DASHBOARD: Recent sales loaded:', recentSales);
 
   return (
     <>

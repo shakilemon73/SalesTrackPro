@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Supabase Data</title>
+</head>
+<body>
+    <h1>Testing Supabase Data Connection</h1>
+    <div id="results"></div>
+    
+    <script>
+        const SUPABASE_URL = 'https://lkhqdqlryjzalsemofdt.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxraHFkcWxyeWp6YWxzZW1vZmR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4MjgzOTcsImV4cCI6MjA3MDQwNDM5N30.uyaSNaaUf_hEx6RSqND6a9Unb_IvHKmV6tOLsGFcITc';
+        
+        async function testSupabaseData() {
+            const results = document.getElementById('results');
+            
+            try {
+                // Test customers
+                const customersResponse = await fetch(`${SUPABASE_URL}/rest/v1/customers?select=*&user_id=eq.11111111-1111-1111-1111-111111111111`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                const customers = await customersResponse.json();
+                results.innerHTML += `<h3>Customers (${customers.length}):</h3><pre>${JSON.stringify(customers, null, 2)}</pre>`;
+                
+                // Test sales  
+                const salesResponse = await fetch(`${SUPABASE_URL}/rest/v1/sales?select=*&user_id=eq.11111111-1111-1111-1111-111111111111&limit=3`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                const sales = await salesResponse.json();
+                results.innerHTML += `<h3>Sales (${sales.length}):</h3><pre>${JSON.stringify(sales, null, 2)}</pre>`;
+                
+                // Test products
+                const productsResponse = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&user_id=eq.11111111-1111-1111-1111-111111111111&limit=3`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                const products = await productsResponse.json();
+                results.innerHTML += `<h3>Products (${products.length}):</h3><pre>${JSON.stringify(products, null, 2)}</pre>`;
+                
+            } catch (error) {
+                results.innerHTML += `<h3>Error:</h3><pre>${error.message}</pre>`;
+            }
+        }
+        
+        testSupabaseData();
+    </script>
+</body>
+</html>

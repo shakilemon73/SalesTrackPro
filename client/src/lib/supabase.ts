@@ -243,8 +243,7 @@ export const supabaseService = {
       
       if (error) {
         console.error('Error fetching products:', error);
-        console.log('Falling back to offline products');
-        return this.getOfflineProducts();
+        throw error; // Don't fallback during debugging
       }
       
       console.log('Products fetched from Supabase:', data?.length || 0);
@@ -261,8 +260,7 @@ export const supabaseService = {
       return mappedProducts;
     } catch (error) {
       console.error('getProducts failed:', error);
-      console.log('Falling back to offline products');
-      return this.getOfflineProducts();
+      throw error; // Don't fallback during debugging
     }
   },
 
@@ -450,20 +448,8 @@ export const supabaseService = {
 
   async getTodaySales(userId: string): Promise<Sale[]> {
     try {
-      if (isOfflineMode) {
-        // Return today's sales from offline data
-        const allOfflineSales = this.getOfflineSales();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        
-        return allOfflineSales.filter(sale => {
-          const saleDate = sale.sale_date ? new Date(sale.sale_date) : new Date();
-          return saleDate >= today && saleDate < tomorrow;
-        });
-      }
-
+      console.log('🔥 FETCHING TODAY SALES for user:', userId);
+      
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const tomorrow = new Date(today);
@@ -478,29 +464,15 @@ export const supabaseService = {
         .order('created_at', { ascending: false });
       
       if (error) {
-        console.error('Error fetching today sales:', error);
-        // Fallback to offline data
-        const allOfflineSales = this.getOfflineSales();
-        return allOfflineSales.filter(sale => {
-          const saleDate = sale.sale_date ? new Date(sale.sale_date) : new Date();
-          return saleDate >= today && saleDate < tomorrow;
-        });
+        console.error('❌ Error fetching today sales:', error);
+        throw error; // Don't fallback during debugging
       }
       
+      console.log('✅ Today sales fetched from Supabase:', data?.length || 0, data);
       return data || [];
     } catch (error) {
-      console.error('getTodaySales failed:', error);
-      // Fallback to offline data
-      const allOfflineSales = this.getOfflineSales();
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      
-      return allOfflineSales.filter(sale => {
-        const saleDate = sale.sale_date ? new Date(sale.sale_date) : new Date();
-        return saleDate >= today && saleDate < tomorrow;
-      });
+      console.error('❌ getTodaySales failed:', error);
+      throw error; // Don't fallback during debugging
     }
   },
 
@@ -523,9 +495,7 @@ export const supabaseService = {
       
       if (error) {
         console.error('Error fetching expenses:', error);
-        console.log('Falling back to offline expenses');
-        const offlineExpenses = this.getOfflineExpenses();
-        return limit ? offlineExpenses.slice(0, limit) : offlineExpenses;
+        throw error; // Don't fallback during debugging
       }
       
       console.log('Expenses fetched from Supabase:', data?.length || 0);
@@ -539,9 +509,7 @@ export const supabaseService = {
       return mappedExpenses;
     } catch (error) {
       console.error('getExpenses failed:', error);
-      console.log('Falling back to offline expenses');
-      const offlineExpenses = this.getOfflineExpenses();
-      return limit ? offlineExpenses.slice(0, limit) : offlineExpenses;
+      throw error; // Don't fallback during debugging
     }
   },
 

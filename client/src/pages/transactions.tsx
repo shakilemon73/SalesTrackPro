@@ -22,14 +22,14 @@ export default function Transactions() {
     queryKey: ['sales', CURRENT_USER_ID],
     queryFn: () => supabaseService.getSales(CURRENT_USER_ID),
     staleTime: 0,
-    cacheTime: 0,
+    gcTime: 0,
   });
 
   const { data: expenses = [], isLoading: expensesLoading, error: expensesError } = useQuery({
     queryKey: ['expenses', CURRENT_USER_ID],
     queryFn: () => supabaseService.getExpenses(CURRENT_USER_ID),
     staleTime: 0,
-    cacheTime: 0,
+    gcTime: 0,
   });
 
   if (salesError) console.error('🔥 TRANSACTIONS Sales error:', salesError);

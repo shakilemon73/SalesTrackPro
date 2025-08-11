@@ -14,7 +14,7 @@ export default function Customers() {
     queryKey: ['customers', CURRENT_USER_ID],
     queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
     staleTime: 0, // Always fetch fresh data
-    cacheTime: 0, // Don't cache
+    gcTime: 0, // Don't cache
   });
 
   if (error) {
