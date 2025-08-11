@@ -373,17 +373,32 @@ export const supabaseService = {
       // Get total due amount from sales (collections needed)
       const { data: salesWithDue, error: dueError } = await supabase
         .from('sales')
-        .select('due_amount')
+        .select('due_amount, customer_name, total_amount')
         .eq('user_id', userId)
         .gt('due_amount', 0);
 
       if (dueError) throw dueError;
+      
+      console.log('🔥 SALES WITH DUE AMOUNT:', salesWithDue);
+      
+      // Also check customer total_credit as alternative source for pending amounts
+      const { data: customersWithCredit, error: creditError } = await supabase
+        .from('customers')
+        .select('name, total_credit')
+        .eq('user_id', userId)
+        .gt('total_credit', 0);
+        
+      if (creditError) throw creditError;
+      
+      console.log('🔥 CUSTOMERS WITH CREDIT:', customersWithCredit);
 
       // Calculate totals
       const totalSales = todaySales?.reduce((sum, sale) => sum + parseFloat(sale.total_amount || '0'), 0) || 0;
       const totalExpenses = todayExpenses?.reduce((sum, expense) => sum + parseFloat(expense.amount || '0'), 0) || 0;
       const profit = totalSales - totalExpenses;
-      const pendingCollection = salesWithDue?.reduce((sum, sale) => sum + parseFloat(sale.due_amount || '0'), 0) || 0;
+      const pendingFromSales = salesWithDue?.reduce((sum, sale) => sum + parseFloat(sale.due_amount || '0'), 0) || 0;
+      const pendingFromCustomers = customersWithCredit?.reduce((sum, customer) => sum + parseFloat(customer.total_credit || '0'), 0) || 0;
+      const pendingCollection = Math.max(pendingFromSales, pendingFromCustomers); // Use whichever is higher
       
       const stats = {
         todaySales: totalSales,
@@ -397,6 +412,15 @@ export const supabaseService = {
       };
       
       console.log('✅ Stats calculated from Supabase:', stats);
+      console.log('📊 PENDING COLLECTION DETAILS:', {
+        salesWithDue: salesWithDue?.length || 0,
+        customersWithCredit: customersWithCredit?.length || 0,
+        pendingFromSales: pendingFromSales,
+        pendingFromCustomers: pendingFromCustomers,
+        finalPendingCollection: pendingCollection,
+        dueAmounts: salesWithDue?.map(s => ({ customer: s.customer_name, due: s.due_amount })),
+        customerCredits: customersWithCredit?.map(c => ({ customer: c.name, credit: c.total_credit }))
+      });
       return stats;
     } catch (error) {
       console.error('❌ Error fetching stats:', error);
