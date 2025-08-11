@@ -18,35 +18,13 @@ import type {
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://lkhqdqlryjzalsemofdt.supabase.co';
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxraHFkcWxyeWp6YWxzZW1vZmR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4MjgzOTcsImV4cCI6MjA3MDQwNDM5N30.uyaSNaaUf_hEx6RSqND6a9Unb_IvHKmV6tOLsGFcITc';
 
-// Check if we should use offline mode - force online mode for now
+// Force online mode - never use offline data during development
 let isOfflineMode = false;
 
-// Function to test Supabase connection
-async function testSupabaseConnection(): Promise<boolean> {
-  try {
-    const { error } = await supabase.from('customers').select('id').limit(1);
-    if (!error) {
-      console.log('Supabase connection successful');
-      return true;
-    } else {
-      console.log('Supabase connection test failed:', error);
-      return false;
-    }
-  } catch (error) {
-    console.log('Supabase connection test failed, switching to offline mode:', error);
-    return false;
-  }
-}
-
-// Initialize connection test
-testSupabaseConnection().then(isConnected => {
-  if (!isConnected) {
-    isOfflineMode = true;
-    console.log('Running in offline mode with local data');
-  } else {
-    isOfflineMode = false;
-    console.log('Connected to Supabase - using live data');
-  }
+console.log('Supabase service initialized with:', {
+  url: SUPABASE_URL,
+  hasKey: !!SUPABASE_ANON_KEY,
+  isOffline: isOfflineMode
 });
 
 // Create Supabase client
@@ -95,7 +73,7 @@ export const supabaseService = {
   // Customers
   async getCustomers(userId: string): Promise<Customer[]> {
     try {
-      console.log('Fetching customers for user:', userId, 'isOfflineMode:', isOfflineMode);
+      console.log('🔥 FETCHING CUSTOMERS for user:', userId);
       
       const { data, error } = await supabase
         .from('customers')
@@ -104,17 +82,15 @@ export const supabaseService = {
         .order('created_at', { ascending: false });
       
       if (error) {
-        console.error('Error fetching customers:', error);
-        console.log('Falling back to offline customers');
-        return this.getOfflineCustomers();
+        console.error('❌ Error fetching customers:', error);
+        throw error; // Don't fallback, force error to be visible
       }
       
-      console.log('Customers fetched from Supabase:', data?.length || 0);
+      console.log('✅ Customers fetched from Supabase:', data?.length || 0, data);
       return data || [];
     } catch (error) {
-      console.error('getCustomers failed:', error);
-      console.log('Falling back to offline customers');
-      return this.getOfflineCustomers();
+      console.error('❌ getCustomers failed:', error);
+      throw error; // Don't fallback during debugging
     }
   },
 
@@ -357,7 +333,7 @@ export const supabaseService = {
   // Sales
   async getSales(userId: string, limit?: number): Promise<Sale[]> {
     try {
-      console.log('Fetching sales for user:', userId, 'limit:', limit);
+      console.log('🔥 FETCHING SALES for user:', userId, 'limit:', limit);
 
       let query = supabase
         .from('sales')
@@ -372,19 +348,15 @@ export const supabaseService = {
       const { data, error } = await query;
       
       if (error) {
-        console.error('Error fetching sales:', error);
-        console.log('Falling back to offline sales');
-        const offlineSales = this.getOfflineSales();
-        return limit ? offlineSales.slice(0, limit) : offlineSales;
+        console.error('❌ Error fetching sales:', error);
+        throw error; // Don't fallback during debugging
       }
       
-      console.log('Sales fetched from Supabase:', data?.length || 0);
+      console.log('✅ Sales fetched from Supabase:', data?.length || 0, data);
       return data || [];
     } catch (error) {
-      console.error('getSales failed:', error);
-      console.log('Falling back to offline sales');
-      const offlineSales = this.getOfflineSales();
-      return limit ? offlineSales.slice(0, limit) : offlineSales;
+      console.error('❌ getSales failed:', error);
+      throw error; // Don't fallback during debugging
     }
   },
 
@@ -706,6 +678,7 @@ export const supabaseService = {
     totalCustomers: number;
   }> {
     try {
+      console.log('🔥 DASHBOARD STATS: Starting calculation for user:', userId);
       // Get today's sales
       const todaySales = await this.getTodaySales(userId);
       const customers = await this.getCustomers(userId);

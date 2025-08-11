@@ -10,10 +10,16 @@ import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
 export default function Customers() {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: customers = [], isLoading } = useQuery({
+  const { data: customers = [], isLoading, error } = useQuery({
     queryKey: ['customers', CURRENT_USER_ID],
     queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
+    staleTime: 0, // Always fetch fresh data
+    cacheTime: 0, // Don't cache
   });
+
+  if (error) {
+    console.error('Customers page error:', error);
+  }
 
   const filteredCustomers = customers.filter((customer: any) =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

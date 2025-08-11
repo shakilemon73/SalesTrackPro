@@ -7,18 +7,25 @@ import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
 
 export default function Dashboard() {
 
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: stats, isLoading: statsLoading, error: statsError } = useQuery({
     queryKey: ['dashboard', CURRENT_USER_ID],
     queryFn: () => {
-      console.log('Fetching dashboard stats for user:', CURRENT_USER_ID);
+      console.log('🔥 DASHBOARD: Fetching dashboard stats for user:', CURRENT_USER_ID);
       return supabaseService.getDashboardStats(CURRENT_USER_ID);
     },
+    staleTime: 0,
+    cacheTime: 0,
   });
 
-  const { data: recentSales = [], isLoading: salesLoading } = useQuery({
+  const { data: recentSales = [], isLoading: salesLoading, error: salesError } = useQuery({
     queryKey: ['sales', CURRENT_USER_ID, 'recent'],
     queryFn: () => supabaseService.getSales(CURRENT_USER_ID, 3),
+    staleTime: 0,
+    cacheTime: 0,
   });
+
+  if (statsError) console.error('🔥 DASHBOARD Stats error:', statsError);
+  if (salesError) console.error('🔥 DASHBOARD Sales error:', salesError);
 
   // Fetch recent expenses
   const { data: recentExpenses = [] } = useQuery({

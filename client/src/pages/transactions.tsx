@@ -18,15 +18,22 @@ export default function Transactions() {
   const [activeTab, setActiveTab] = useState("all");
   const { toast } = useToast();
 
-  const { data: sales = [], isLoading: salesLoading } = useQuery({
+  const { data: sales = [], isLoading: salesLoading, error: salesError } = useQuery({
     queryKey: ['sales', CURRENT_USER_ID],
     queryFn: () => supabaseService.getSales(CURRENT_USER_ID),
+    staleTime: 0,
+    cacheTime: 0,
   });
 
-  const { data: expenses = [], isLoading: expensesLoading } = useQuery({
+  const { data: expenses = [], isLoading: expensesLoading, error: expensesError } = useQuery({
     queryKey: ['expenses', CURRENT_USER_ID],
     queryFn: () => supabaseService.getExpenses(CURRENT_USER_ID),
+    staleTime: 0,
+    cacheTime: 0,
   });
+
+  if (salesError) console.error('🔥 TRANSACTIONS Sales error:', salesError);
+  if (expensesError) console.error('🔥 TRANSACTIONS Expenses error:', expensesError);
 
   // For collections, use sales data with paid amounts as a simple solution
   const { data: collectionsData = [], isLoading: collectionsLoading } = useQuery({
