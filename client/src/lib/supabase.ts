@@ -22,7 +22,8 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJ
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Current user ID (in a real app, this would come from authentication)
-export const CURRENT_USER_ID = 'demo-user-123';
+// Using a UUID format for consistency with database
+export const CURRENT_USER_ID = '11111111-1111-1111-1111-111111111111';
 
 // Database service functions
 export const supabaseService = {

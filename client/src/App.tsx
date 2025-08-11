@@ -13,6 +13,9 @@ import SalesEntry from "@/pages/sales-entry";
 import CustomerAdd from "@/pages/customer-add";
 import Inventory from "@/pages/inventory";
 import BottomNavigation from "@/components/ui/bottom-navigation";
+import { useEffect } from "react";
+import { seedCustomers, seedProducts, seedSales, seedExpenses } from "./lib/seed-data";
+import { supabase } from "./lib/supabase";
 
 function Router() {
   return (
@@ -34,6 +37,39 @@ function Router() {
 }
 
 function App() {
+  useEffect(() => {
+    const seedDatabase = async () => {
+      try {
+        console.log('Seeding database with sample data...');
+        
+        // Check if data already exists
+        const { data: existingCustomers } = await supabase
+          .from('customers')
+          .select('id')
+          .limit(1);
+        
+        if (existingCustomers && existingCustomers.length > 0) {
+          console.log('Sample data already exists');
+          return;
+        }
+        
+        // Insert seed data
+        await Promise.allSettled([
+          supabase.from('customers').insert(seedCustomers),
+          supabase.from('products').insert(seedProducts),
+          supabase.from('sales').insert(seedSales),
+          supabase.from('expenses').insert(seedExpenses)
+        ]);
+        
+        console.log('Database seeded successfully!');
+      } catch (error) {
+        console.error('Error seeding database:', error);
+      }
+    };
+    
+    seedDatabase();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
