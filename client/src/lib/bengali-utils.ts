@@ -64,11 +64,16 @@ export function getBengaliDay(date: Date = new Date()): string {
 
 // Currency formatting
 export function formatCurrency(amount: number | string): string {
-  // Handle invalid numbers
-  if (amount === null || amount === undefined || amount === '' || isNaN(Number(amount))) {
+  // Handle invalid numbers - but don't be too aggressive
+  if (amount === null || amount === undefined) {
     return '০ টাকা';
   }
+  
   const numAmount = Number(amount);
+  if (isNaN(numAmount)) {
+    return '০ টাকা';
+  }
+  
   const formatted = numAmount.toLocaleString('en-IN');
   return `${toBengaliNumber(formatted)} টাকা`;
 }

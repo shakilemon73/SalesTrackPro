@@ -274,34 +274,58 @@ export const supabaseService = {
     pendingCollection: number;
     totalCustomers: number;
   }> {
-    // Get today's sales
-    const todaySales = await this.getTodaySales(userId);
-    const customers = await this.getCustomers(userId);
-    const products = await this.getProducts(userId);
+    try {
+      // Get today's sales
+      const todaySales = await this.getTodaySales(userId);
+      const customers = await this.getCustomers(userId);
+      const products = await this.getProducts(userId);
 
-    const todaySalesTotal = todaySales.reduce((sum, sale) => sum + parseFloat(sale.total_amount), 0);
-    
-    // Calculate profit based on buying vs selling price
-    let todayProfit = 0;
-    for (const sale of todaySales) {
-      if (Array.isArray(sale.items)) {
-        for (const item of sale.items as any[]) {
-          const product = products.find(p => p.id === item.productId);
-          if (product) {
-            const profit = (parseFloat(item.unitPrice) - parseFloat(product.buyingPrice)) * item.quantity;
-            todayProfit += profit;
+      console.log('Dashboard stats - Today sales:', todaySales);
+      console.log('Dashboard stats - Customers count:', customers.length);
+
+      const todaySalesTotal = todaySales.reduce((sum, sale) => {
+        const amount = typeof sale.total_amount === 'string' ? parseFloat(sale.total_amount) : sale.total_amount;
+        return sum + (amount || 0);
+      }, 0);
+      
+      // Calculate profit based on buying vs selling price
+      let todayProfit = 0;
+      for (const sale of todaySales) {
+        if (Array.isArray(sale.items)) {
+          for (const item of sale.items as any[]) {
+            const product = products.find(p => p.id === item.productId);
+            if (product) {
+              const itemPrice = typeof item.unitPrice === 'string' ? parseFloat(item.unitPrice) : item.unitPrice;
+              const buyingPrice = typeof product.buying_price === 'string' ? parseFloat(product.buying_price) : product.buying_price;
+              const profit = (itemPrice - buyingPrice) * (item.quantity || 0);
+              todayProfit += profit || 0;
+            }
           }
         }
       }
+
+      const pendingCollection = customers.reduce((sum, customer) => {
+        const credit = typeof customer.total_credit === 'string' ? parseFloat(customer.total_credit) : customer.total_credit;
+        return sum + (credit || 0);
+      }, 0);
+
+      const stats = {
+        todaySales: todaySalesTotal,
+        todayProfit,
+        pendingCollection,
+        totalCustomers: customers.length
+      };
+
+      console.log('Dashboard stats calculated:', stats);
+      return stats;
+    } catch (error) {
+      console.error('Error calculating dashboard stats:', error);
+      return {
+        todaySales: 0,
+        todayProfit: 0,
+        pendingCollection: 0,
+        totalCustomers: 0
+      };
     }
-
-    const pendingCollection = customers.reduce((sum, customer) => sum + parseFloat(customer.total_credit || '0'), 0);
-
-    return {
-      todaySales: todaySalesTotal,
-      todayProfit,
-      pendingCollection,
-      totalCustomers: customers.length
-    };
   }
 };

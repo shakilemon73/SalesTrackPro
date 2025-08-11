@@ -79,7 +79,7 @@ export default function Dashboard() {
           <DashboardCard
             title="আজকের বিক্রয়"
             value={formatCurrency(stats?.todaySales || 0)}
-            unit="টাকা"
+            unit=""
             icon="fas fa-chart-line"
             color="primary"
             isLoading={statsLoading}
@@ -87,7 +87,7 @@ export default function Dashboard() {
           <DashboardCard
             title="আজকের লাভ"
             value={formatCurrency(stats?.todayProfit || 0)}
-            unit="টাকা"
+            unit=""
             icon="fas fa-coins"
             color="success"
             isLoading={statsLoading}
@@ -95,7 +95,7 @@ export default function Dashboard() {
           <DashboardCard
             title="বাকি আদায়"
             value={formatCurrency(stats?.pendingCollection || 0)}
-            unit="টাকা"
+            unit=""
             icon="fas fa-clock"
             color="warning"
             isLoading={statsLoading}
