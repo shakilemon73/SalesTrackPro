@@ -1,12 +1,10 @@
 const CACHE_NAME = 'dokan-hisab-v1';
 const API_CACHE_NAME = 'dokan-hisab-api-v1';
 
-// Assets to cache for offline use
+// Assets to cache for offline use  
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/src/main.tsx',
-  '/src/index.css',
   'https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];

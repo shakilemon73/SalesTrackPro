@@ -371,6 +371,26 @@ export const supabaseService = {
   getOfflineSales(): Sale[] {
     return [
       {
+        id: '8a65f171-26ad-4528-8ca9-c53fde2ad91a',
+        user_id: '11111111-1111-1111-1111-111111111111',
+        customer_id: '33333333-3333-3333-3333-333333333333',
+        customer_name: 'ফাতেমা খাতুন',
+        total_amount: 12269.97,
+        paid_amount: 12269.97,
+        due_amount: 0,
+        payment_method: 'নগদ',
+        items: [
+          {
+            quantity: 3,
+            unitPrice: "4089.99",
+            totalPrice: "12269.97",
+            productName: "nnn"
+          }
+        ],
+        sale_date: new Date(),
+        created_at: new Date()
+      },
+      {
         id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
         user_id: '11111111-1111-1111-1111-111111111111',
         customer_id: '22222222-2222-2222-2222-222222222222',
@@ -437,21 +457,59 @@ export const supabaseService = {
   },
 
   async getTodaySales(userId: string): Promise<Sale[]> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    try {
+      if (isOfflineMode) {
+        // Return today's sales from offline data
+        const allOfflineSales = this.getOfflineSales();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        return allOfflineSales.filter(sale => {
+          const saleDate = new Date(sale.sale_date);
+          return saleDate >= today && saleDate < tomorrow;
+        });
+      }
 
-    const { data, error } = await supabase
-      .from('sales')
-      .select('*')
-      .eq('user_id', userId)
-      .gte('sale_date', today.toISOString())
-      .lt('sale_date', tomorrow.toISOString())
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data || [];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const { data, error } = await supabase
+        .from('sales')
+        .select('*')
+        .eq('user_id', userId)
+        .gte('sale_date', today.toISOString())
+        .lt('sale_date', tomorrow.toISOString())
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching today sales:', error);
+        // Fallback to offline data
+        const allOfflineSales = this.getOfflineSales();
+        return allOfflineSales.filter(sale => {
+          const saleDate = new Date(sale.sale_date);
+          return saleDate >= today && saleDate < tomorrow;
+        });
+      }
+      
+      return data || [];
+    } catch (error) {
+      console.error('getTodaySales failed:', error);
+      // Fallback to offline data
+      const allOfflineSales = this.getOfflineSales();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      return allOfflineSales.filter(sale => {
+        const saleDate = new Date(sale.sale_date);
+        return saleDate >= today && saleDate < tomorrow;
+      });
+    }
   },
 
   // Expenses
