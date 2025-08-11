@@ -5,10 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-
-// Mock user ID for demo
-const DEMO_USER_ID = "demo-user-123";
+import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
 
 interface SalesModalProps {
   isOpen: boolean;
@@ -26,26 +23,28 @@ export default function SalesModal({ isOpen, onClose }: SalesModalProps) {
   const queryClient = useQueryClient();
 
   const { data: customers = [] } = useQuery({
-    queryKey: ['/api/customers', DEMO_USER_ID],
+    queryKey: ['customers', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
     enabled: isOpen,
   });
 
   const { data: products = [] } = useQuery({
-    queryKey: ['/api/products', DEMO_USER_ID],
+    queryKey: ['products', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getProducts(CURRENT_USER_ID),
     enabled: isOpen,
   });
 
   const createSaleMutation = useMutation({
     mutationFn: async (saleData: any) => {
-      return await apiRequest('POST', `/api/sales/${DEMO_USER_ID}`, saleData);
+      return await supabaseService.createSale(CURRENT_USER_ID, saleData);
     },
     onSuccess: () => {
       toast({
         title: "সফল!",
         description: "বিক্রয় সফলভাবে সেভ হয়েছে",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/sales'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
       resetForm();
       onClose();
     },

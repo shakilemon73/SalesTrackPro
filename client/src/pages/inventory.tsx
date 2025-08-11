@@ -11,10 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { getBengaliDate, formatCurrency, toBengaliNumber } from "@/lib/bengali-utils";
-
-const DEMO_USER_ID = "demo-user-123";
+import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
 
 const productSchema = z.object({
   name: z.string().min(1, "পণ্যের নাম আবশ্যক"),
@@ -49,23 +47,25 @@ export default function Inventory() {
   });
 
   const { data: products = [], isLoading } = useQuery({
-    queryKey: ['/api/products', DEMO_USER_ID],
+    queryKey: ['products', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getProducts(CURRENT_USER_ID),
   });
 
   const { data: lowStockProducts = [] } = useQuery({
-    queryKey: ['/api/products', DEMO_USER_ID, 'low-stock'],
+    queryKey: ['products', CURRENT_USER_ID, 'low-stock'],
+    queryFn: () => supabaseService.getLowStockProducts(CURRENT_USER_ID),
   });
 
   const createProductMutation = useMutation({
     mutationFn: async (productData: any) => {
-      return await apiRequest('POST', `/api/products/${DEMO_USER_ID}`, productData);
+      return await supabaseService.createProduct(CURRENT_USER_ID, productData);
     },
     onSuccess: () => {
       toast({
         title: "সফল!",
         description: "পণ্য সফলভাবে যোগ করা হয়েছে",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
       form.reset();
       setIsAddModalOpen(false);
     },

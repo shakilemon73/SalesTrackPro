@@ -18,17 +18,17 @@ Preferred communication style: Simple, everyday language.
 - **Mobile Design**: Bottom navigation pattern optimized for mobile usage
 
 ## Backend Architecture
-- **Framework**: Express.js with TypeScript
-- **Database ORM**: Drizzle ORM for type-safe database operations
-- **API Design**: RESTful API with structured route handlers
-- **Session Management**: Express sessions with PostgreSQL session store
-- **Development Setup**: Vite development server with HMR integration
+- **Framework**: Supabase (serverless PostgreSQL with built-in APIs)
+- **Database Access**: Direct Supabase client SDK for type-safe operations
+- **API Design**: Direct database calls using Supabase client
+- **Authentication**: Supabase Auth (ready for implementation)
+- **Development Setup**: Vite development server with frontend-only architecture
 
 ## Data Storage Solutions
-- **Primary Database**: PostgreSQL with Drizzle ORM
-- **Database Provider**: Neon Database (serverless PostgreSQL)
+- **Primary Database**: Supabase PostgreSQL with auto-generated APIs
+- **Database Provider**: Supabase (serverless PostgreSQL with real-time features)
 - **Offline Storage**: IndexedDB for client-side caching and offline functionality
-- **Session Storage**: PostgreSQL-backed sessions using connect-pg-simple
+- **Session Management**: Supabase Auth sessions (when authentication is implemented)
 
 ## Database Schema Design
 The application uses a multi-tenant architecture with the following core entities:
@@ -60,8 +60,8 @@ The application uses a multi-tenant architecture with the following core entitie
 # External Dependencies
 
 ## Database Services
-- **Neon Database**: Serverless PostgreSQL hosting with connection pooling
-- **Drizzle Kit**: Database migrations and schema management
+- **Supabase**: Complete backend-as-a-service with PostgreSQL, real-time APIs, and authentication
+- **Supabase Client**: Official JavaScript client for database operations and real-time subscriptions
 
 ## UI and Styling
 - **Shadcn/UI**: Pre-built component library with customizable themes
@@ -81,8 +81,8 @@ The application uses a multi-tenant architecture with the following core entitie
 - **Bengali Typography**: Proper Bengali text rendering and layout
 
 ## Authentication and Session Management
-- **Express Session**: Server-side session management
-- **Connect PG Simple**: PostgreSQL session store integration
+- **Supabase Auth**: Built-in authentication with JWT tokens
+- **Session Management**: Client-side JWT token handling with automatic refresh
 
 ## Form Validation
 - **Zod**: Runtime type validation and schema definition

@@ -5,14 +5,14 @@ import { getBengaliDate, formatCurrency, toBengaliNumber, formatBengaliPhone } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-
-const DEMO_USER_ID = "demo-user-123";
+import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
 
 export default function Customers() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: customers = [], isLoading } = useQuery({
-    queryKey: ['/api/customers', DEMO_USER_ID],
+    queryKey: ['customers', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
   });
 
   const filteredCustomers = customers.filter((customer: any) =>

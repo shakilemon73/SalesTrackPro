@@ -5,22 +5,24 @@ import { getBengaliDate, formatCurrency, toBengaliNumber } from "@/lib/bengali-u
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const DEMO_USER_ID = "demo-user-123";
+import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
 
 export default function Reports() {
   const [reportPeriod, setReportPeriod] = useState("today");
 
   const { data: stats } = useQuery({
-    queryKey: ['/api/dashboard', DEMO_USER_ID],
+    queryKey: ['dashboard', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getDashboardStats(CURRENT_USER_ID),
   });
 
   const { data: sales = [] } = useQuery({
-    queryKey: ['/api/sales', DEMO_USER_ID],
+    queryKey: ['sales', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getSales(CURRENT_USER_ID),
   });
 
   const { data: expenses = [] } = useQuery({
-    queryKey: ['/api/expenses', DEMO_USER_ID],
+    queryKey: ['expenses', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getExpenses(CURRENT_USER_ID),
   });
 
   const todayRevenue = stats?.todaySales || 0;

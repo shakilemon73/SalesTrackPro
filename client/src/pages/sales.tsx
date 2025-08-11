@@ -6,15 +6,15 @@ import TransactionItem from "@/components/ui/transaction-item";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const DEMO_USER_ID = "demo-user-123";
+import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
 
 export default function Sales() {
   const [dateFilter, setDateFilter] = useState("today");
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: sales = [], isLoading } = useQuery({
-    queryKey: ['/api/sales', DEMO_USER_ID],
+    queryKey: ['sales', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getSales(CURRENT_USER_ID),
   });
 
   const filteredSales = sales.filter((sale: any) => {

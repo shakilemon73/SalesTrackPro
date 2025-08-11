@@ -9,10 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { getBengaliDate, isValidBengaliPhone } from "@/lib/bengali-utils";
-
-const DEMO_USER_ID = "demo-user-123";
+import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
 
 const customerSchema = z.object({
   name: z.string().min(1, "গ্রাহকের নাম আবশ্যক"),
@@ -39,15 +37,15 @@ export default function CustomerAdd() {
 
   const createCustomerMutation = useMutation({
     mutationFn: async (customerData: any) => {
-      return await apiRequest('POST', `/api/customers/${DEMO_USER_ID}`, customerData);
+      return await supabaseService.createCustomer(CURRENT_USER_ID, customerData);
     },
     onSuccess: () => {
       toast({
         title: "সফল!",
         description: "গ্রাহক সফলভাবে যোগ করা হয়েছে",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/customers'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       setLocation("/customers");
     },
     onError: () => {

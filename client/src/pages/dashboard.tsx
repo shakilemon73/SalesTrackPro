@@ -5,24 +5,24 @@ import SalesModal from "@/components/ui/sales-modal";
 import { toBengaliNumber, formatCurrency, getBengaliDate, getBengaliTime } from "@/lib/bengali-utils";
 import { useState } from "react";
 import { Link } from "wouter";
-
-// Mock user ID for demo - in real app this would come from auth
-const DEMO_USER_ID = "demo-user-123";
+import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
 
 export default function Dashboard() {
   const [showSalesModal, setShowSalesModal] = useState(false);
 
   const { data: stats, isLoading: statsLoading } = useQuery({
-    queryKey: ['/api/dashboard', DEMO_USER_ID],
+    queryKey: ['dashboard', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getDashboardStats(CURRENT_USER_ID),
   });
 
   const { data: recentSales = [], isLoading: salesLoading } = useQuery({
-    queryKey: ['/api/sales', DEMO_USER_ID],
-    queryFn: () => fetch(`/api/sales/${DEMO_USER_ID}?limit=3`).then(res => res.json()),
+    queryKey: ['sales', CURRENT_USER_ID, 'recent'],
+    queryFn: () => supabaseService.getSales(CURRENT_USER_ID, 3),
   });
 
   const { data: lowStockProducts = [], isLoading: stockLoading } = useQuery({
-    queryKey: ['/api/products', DEMO_USER_ID, 'low-stock'],
+    queryKey: ['products', CURRENT_USER_ID, 'low-stock'],
+    queryFn: () => supabaseService.getLowStockProducts(CURRENT_USER_ID),
   });
 
   if (statsLoading) {
