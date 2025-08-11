@@ -2,6 +2,9 @@
 const bengaliNumerals = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
 
 export function toBengaliNumber(num: number | string): string {
+  if (num === null || num === undefined || num === '' || isNaN(Number(num))) {
+    return '০';
+  }
   return num.toString().split('').map(digit => 
     /\d/.test(digit) ? bengaliNumerals[parseInt(digit)] : digit
   ).join('');
@@ -26,6 +29,10 @@ const bengaliDays = [
 ];
 
 export function getBengaliDate(date: Date = new Date()): string {
+  // Handle invalid dates
+  if (!date || isNaN(date.getTime())) {
+    date = new Date();
+  }
   const day = toBengaliNumber(date.getDate());
   const month = bengaliMonths[date.getMonth()];
   const year = toBengaliNumber(date.getFullYear());
@@ -34,6 +41,10 @@ export function getBengaliDate(date: Date = new Date()): string {
 }
 
 export function getBengaliTime(date: Date = new Date()): string {
+  // Handle invalid dates
+  if (!date || isNaN(date.getTime())) {
+    date = new Date();
+  }
   let hours = date.getHours();
   const minutes = date.getMinutes();
   const period = hours >= 12 ? 'অপরাহ্ন' : 'সকাল';
@@ -52,10 +63,14 @@ export function getBengaliDay(date: Date = new Date()): string {
 }
 
 // Currency formatting
-export function formatCurrency(amount: number): string {
-  // Format with commas and convert to Bengali numerals
-  const formatted = amount.toLocaleString('en-IN');
-  return toBengaliNumber(formatted);
+export function formatCurrency(amount: number | string): string {
+  // Handle invalid numbers
+  if (amount === null || amount === undefined || amount === '' || isNaN(Number(amount))) {
+    return '০ টাকা';
+  }
+  const numAmount = Number(amount);
+  const formatted = numAmount.toLocaleString('en-IN');
+  return `${toBengaliNumber(formatted)} টাকা`;
 }
 
 // Time period helpers

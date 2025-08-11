@@ -106,9 +106,10 @@ export default function SalesEntry() {
     
     // Recalculate total price
     if (field === 'quantity' || field === 'unitPrice') {
-      const quantity = field === 'quantity' ? value : newItems[index].quantity;
-      const unitPrice = field === 'unitPrice' ? value : newItems[index].unitPrice;
-      newItems[index].totalPrice = quantity * parseFloat(unitPrice || "0");
+      const quantity = field === 'quantity' ? value : newItems[index].quantity || 1;
+      const unitPrice = field === 'unitPrice' ? value : newItems[index].unitPrice || "0";
+      const numericPrice = parseFloat(unitPrice) || 0;
+      newItems[index].totalPrice = quantity * numericPrice;
     }
     
     setItems(newItems);
@@ -119,8 +120,10 @@ export default function SalesEntry() {
     if (product) {
       updateItem(index, 'productId', productId);
       updateItem(index, 'productName', product.name);
-      updateItem(index, 'unitPrice', product.sellingPrice);
-      updateItem(index, 'totalPrice', items[index].quantity * parseFloat(product.sellingPrice));
+      updateItem(index, 'unitPrice', product.sellingPrice || "0");
+      const quantity = items[index]?.quantity || 1;
+      const price = parseFloat(product.sellingPrice || "0") || 0;
+      updateItem(index, 'totalPrice', quantity * price);
     }
   };
 
@@ -132,9 +135,9 @@ export default function SalesEntry() {
     }
   };
 
-  const totalAmount = items.reduce((sum, item) => sum + item.totalPrice, 0);
-  const paidAmount = parseFloat(form.watch('paidAmount') || "0");
-  const dueAmount = totalAmount - paidAmount;
+  const totalAmount = items.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
+  const paidAmount = parseFloat(form.watch('paidAmount') || "0") || 0;
+  const dueAmount = Math.max(0, totalAmount - paidAmount);
 
   const onSubmit = (data: z.infer<typeof saleSchema>) => {
     if (items.some(item => !item.productName || !item.unitPrice)) {
@@ -149,16 +152,16 @@ export default function SalesEntry() {
     const saleData = {
       customer_id: selectedCustomerId || null,
       customer_name: data.customerName,
-      total_amount: totalAmount.toString(),
-      paid_amount: data.paidAmount,
-      due_amount: dueAmount.toString(),
+      total_amount: (totalAmount || 0).toString(),
+      paid_amount: (paidAmount || 0).toString(),
+      due_amount: (dueAmount || 0).toString(),
       payment_method: data.paymentMethod,
       items: items.map(item => ({
         productId: item.productId,
         productName: item.productName,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        totalPrice: item.totalPrice.toString(),
+        quantity: item.quantity || 1,
+        unitPrice: item.unitPrice || "0",
+        totalPrice: (item.totalPrice || 0).toString(),
       })),
     };
 
