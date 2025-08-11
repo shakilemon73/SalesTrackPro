@@ -115,6 +115,30 @@ export const supabaseService = {
     }
   },
 
+  async updateCustomer(customerId: string, updates: Partial<Customer>): Promise<Customer> {
+    try {
+      console.log('Updating customer:', customerId, updates);
+      
+      const { data, error } = await supabase
+        .from('customers')
+        .update(updates)
+        .eq('id', customerId)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error updating customer:', error);
+        throw error;
+      }
+      
+      console.log('Customer updated successfully:', data);
+      return data;
+    } catch (error) {
+      console.error('updateCustomer failed:', error);
+      throw error;
+    }
+  },
+
   // Products
   async getProducts(userId: string): Promise<Product[]> {
     const { data, error } = await supabase

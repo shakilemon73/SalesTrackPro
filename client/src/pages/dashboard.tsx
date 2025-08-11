@@ -133,14 +133,18 @@ export default function Dashboard() {
                 <span className="text-sm font-medium">নতুন গ্রাহক</span>
               </button>
             </Link>
-            <button className="bg-success quick-action-btn">
-              <i className="fas fa-money-bill-wave text-xl"></i>
-              <span className="text-sm font-medium">বাকি আদায়</span>
-            </button>
-            <button className="bg-warning quick-action-btn">
-              <i className="fas fa-minus-circle text-xl"></i>
-              <span className="text-sm font-medium">খরচ এন্ট্রি</span>
-            </button>
+            <Link to="/collection">
+              <button className="bg-success quick-action-btn w-full">
+                <i className="fas fa-money-bill-wave text-xl"></i>
+                <span className="text-sm font-medium">বাকি আদায়</span>
+              </button>
+            </Link>
+            <Link to="/expenses/new">
+              <button className="bg-warning quick-action-btn w-full">
+                <i className="fas fa-minus-circle text-xl"></i>
+                <span className="text-sm font-medium">খরচ এন্ট্রি</span>
+              </button>
+            </Link>
           </div>
         </div>
 

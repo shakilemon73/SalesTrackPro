@@ -12,6 +12,8 @@ import Settings from "@/pages/settings";
 import SalesEntry from "@/pages/sales-entry";
 import CustomerAdd from "@/pages/customer-add";
 import Inventory from "@/pages/inventory";
+import Collection from "@/pages/collection";
+import ExpenseEntry from "@/pages/expense-entry";
 import BottomNavigation from "@/components/ui/bottom-navigation";
 import { useEffect } from "react";
 import { seedCustomers, seedProducts, seedSales, seedExpenses } from "./lib/seed-data";
@@ -29,6 +31,8 @@ function Router() {
         <Route path="/sales/new" component={SalesEntry} />
         <Route path="/customers/new" component={CustomerAdd} />
         <Route path="/inventory" component={Inventory} />
+        <Route path="/collection" component={Collection} />
+        <Route path="/expenses/new" component={ExpenseEntry} />
         <Route component={NotFound} />
       </Switch>
       <BottomNavigation />
