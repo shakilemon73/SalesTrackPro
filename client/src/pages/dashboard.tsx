@@ -1,14 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import DashboardCard from "@/components/ui/dashboard-card";
 import TransactionItem from "@/components/ui/transaction-item";
-import SalesModal from "@/components/ui/sales-modal";
 import { toBengaliNumber, formatCurrency, getBengaliDate, getBengaliTime } from "@/lib/bengali-utils";
-import { useState } from "react";
 import { Link } from "wouter";
 import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
 
 export default function Dashboard() {
-  const [showSalesModal, setShowSalesModal] = useState(false);
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard', CURRENT_USER_ID],
@@ -132,13 +129,12 @@ export default function Dashboard() {
             দ্রুত কাজ
           </h2>
           <div className="grid grid-cols-2 gap-3">
-            <button 
-              className="bg-primary quick-action-btn"
-              onClick={() => setShowSalesModal(true)}
-            >
-              <i className="fas fa-plus-circle text-xl"></i>
-              <span className="text-sm font-medium">নতুন বিক্রয়</span>
-            </button>
+            <Link to="/sales/new">
+              <button className="bg-primary quick-action-btn w-full">
+                <i className="fas fa-plus-circle text-xl"></i>
+                <span className="text-sm font-medium">নতুন বিক্রয়</span>
+              </button>
+            </Link>
             <Link to="/customers/new">
               <button className="bg-secondary quick-action-btn w-full">
                 <i className="fas fa-user-plus text-xl"></i>
@@ -284,18 +280,11 @@ export default function Dashboard() {
       </div>
 
       {/* Floating Action Button */}
-      <button 
-        className="floating-action-btn"
-        onClick={() => setShowSalesModal(true)}
-      >
-        <i className="fas fa-plus text-xl"></i>
-      </button>
-
-      {/* Sales Modal */}
-      <SalesModal 
-        isOpen={showSalesModal} 
-        onClose={() => setShowSalesModal(false)} 
-      />
+      <Link to="/sales/new">
+        <button className="floating-action-btn">
+          <i className="fas fa-plus text-xl"></i>
+        </button>
+      </Link>
     </>
   );
 }
