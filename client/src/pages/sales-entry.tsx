@@ -76,7 +76,7 @@ export default function SalesEntry() {
         title: "সফল!",
         description: "বিক্রয় সফলভাবে সংরক্ষিত হয়েছে",
       });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard', CURRENT_USER_ID] });
       queryClient.invalidateQueries({ queryKey: ['sales'] });
       setLocation("/sales");
     },

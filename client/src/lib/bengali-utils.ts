@@ -2,12 +2,26 @@
 const bengaliNumerals = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
 
 export function toBengaliNumber(num: number | string): string {
-  if (num === null || num === undefined || num === '' || isNaN(Number(num))) {
+  if (num === null || num === undefined || num === '') {
     return '০';
   }
-  return num.toString().split('').map(digit => 
-    /\d/.test(digit) ? bengaliNumerals[parseInt(digit)] : digit
-  ).join('');
+  
+  // Handle numbers directly
+  if (typeof num === 'number') {
+    if (isNaN(num)) return '০';
+    return num.toString().split('').map(digit => 
+      /\d/.test(digit) ? bengaliNumerals[parseInt(digit)] : digit
+    ).join('');
+  }
+  
+  // Handle strings - preserve formatting characters like commas and decimals
+  return num.toString().split('').map(char => {
+    if (/\d/.test(char)) {
+      return bengaliNumerals[parseInt(char)];
+    }
+    // Keep non-digit characters like commas, decimals, etc.
+    return char;
+  }).join('');
 }
 
 export function toEnglishNumber(bengaliNum: string): string {

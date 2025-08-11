@@ -43,7 +43,7 @@ export default function SalesModal({ isOpen, onClose }: SalesModalProps) {
         title: "সফল!",
         description: "বিক্রয় সফলভাবে সেভ হয়েছে",
       });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard', CURRENT_USER_ID] });
       queryClient.invalidateQueries({ queryKey: ['sales'] });
       resetForm();
       onClose();
