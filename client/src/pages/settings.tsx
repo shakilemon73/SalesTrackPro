@@ -3,22 +3,80 @@ import { getBengaliDate } from "@/lib/bengali-utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { queryClient } from "@/lib/queryClient";
 
 export default function Settings() {
   const [notifications, setNotifications] = useState(true);
   const [autoBackup, setAutoBackup] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const [isBusinessInfoOpen, setIsBusinessInfoOpen] = useState(false);
+  const [businessInfo, setBusinessInfo] = useState({
+    shopName: "আমার দোকান",
+    ownerName: "দোকান মালিক",
+    address: "ঢাকা, বাংলাদেশ",
+    phone: "০১৭১২৩৪৫৬৭৮"
+  });
+  
+  const { toast } = useToast();
+
+  // Get actual customer and sales data for statistics
+  const { data: customers = [] } = useQuery({
+    queryKey: ['customers', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
+  });
+
+  const { data: sales = [] } = useQuery({
+    queryKey: ['sales', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getSales(CURRENT_USER_ID),
+  });
+
+  const handleBusinessInfoSave = () => {
+    // For now, just save to local storage - in a real app this would be saved to user profile
+    localStorage.setItem('businessInfo', JSON.stringify(businessInfo));
+    setIsBusinessInfoOpen(false);
+    toast({
+      title: "সফল",
+      description: "ব্যবসার তথ্য সংরক্ষিত হয়েছে",
+    });
+  };
+
+  const handleDataExport = () => {
+    const exportData = {
+      customers,
+      sales,
+      exportDate: new Date().toISOString()
+    };
+    
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `dokan-hisab-backup-${new Date().getDate()}-${new Date().getMonth() + 1}-${new Date().getFullYear()}.json`;
+    link.click();
+    
+    toast({
+      title: "সফল",
+      description: "ডেটা এক্সপোর্ট সম্পন্ন হয়েছে",
+    });
+  };
 
   const settingsSections = [
     {
       title: "ব্যবসার তথ্য",
       icon: "fas fa-store",
       items: [
-        { label: "দোকানের নাম", value: "রহিম স্টোর", action: "edit" },
-        { label: "মালিকের নাম", value: "রহিম উদ্দিন", action: "edit" },
-        { label: "ঠিকানা", value: "ঢাকা, বাংলাদেশ", action: "edit" },
-        { label: "ফোন নম্বর", value: "০১৭১২৩৪৫৬৭৮", action: "edit" }
+        { label: "দোকানের নাম", value: businessInfo.shopName, action: "edit" },
+        { label: "মালিকের নাম", value: businessInfo.ownerName, action: "edit" },
+        { label: "ঠিকানা", value: businessInfo.address, action: "edit" },
+        { label: "ফোন নম্বর", value: businessInfo.phone, action: "edit" }
       ]
     },
     {
@@ -123,7 +181,58 @@ export default function Settings() {
                         <p className="text-sm text-gray-600">{item.value}</p>
                       )}
                     </div>
-                    {item.action === "edit" && (
+                    {item.action === "edit" && section.title === "ব্যবসার তথ্য" && (
+                      <Dialog open={isBusinessInfoOpen} onOpenChange={setIsBusinessInfoOpen}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <i className="fas fa-edit"></i>
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>ব্যবসার তথ্য সম্পাদনা</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div>
+                              <Label htmlFor="shopName">দোকানের নাম</Label>
+                              <Input
+                                id="shopName"
+                                value={businessInfo.shopName}
+                                onChange={(e) => setBusinessInfo(prev => ({...prev, shopName: e.target.value}))}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="ownerName">মালিকের নাম</Label>
+                              <Input
+                                id="ownerName"
+                                value={businessInfo.ownerName}
+                                onChange={(e) => setBusinessInfo(prev => ({...prev, ownerName: e.target.value}))}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="address">ঠিকানা</Label>
+                              <Input
+                                id="address"
+                                value={businessInfo.address}
+                                onChange={(e) => setBusinessInfo(prev => ({...prev, address: e.target.value}))}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="phone">ফোন নম্বর</Label>
+                              <Input
+                                id="phone"
+                                value={businessInfo.phone}
+                                onChange={(e) => setBusinessInfo(prev => ({...prev, phone: e.target.value}))}
+                              />
+                            </div>
+                            <Button onClick={handleBusinessInfoSave} className="w-full">
+                              সংরক্ষণ করুন
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                    {item.action === "edit" && section.title !== "ব্যবসার তথ্য" && (
                       <Button variant="outline" size="sm">
                         <i className="fas fa-edit"></i>
                       </Button>
@@ -158,7 +267,7 @@ export default function Settings() {
               ডেটা ব্যবস্থাপনা
             </h2>
             <div className="space-y-3">
-              <Button className="w-full bg-success" variant="outline">
+              <Button onClick={handleDataExport} className="w-full bg-success" variant="outline">
                 <i className="fas fa-download mr-2"></i>
                 ডেটা এক্সপোর্ট করুন
               </Button>
@@ -170,6 +279,21 @@ export default function Settings() {
                 <i className="fas fa-sync mr-2"></i>
                 ব্যাকআপ তৈরি করুন
               </Button>
+            </div>
+            
+            {/* Data Statistics */}
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+              <h3 className="font-medium mb-2">ডেটা পরিসংখ্যান</h3>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">মোট গ্রাহক:</span>
+                  <span className="font-bold ml-1">{customers.length}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">মোট বিক্রয়:</span>
+                  <span className="font-bold ml-1">{sales.length}</span>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

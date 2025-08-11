@@ -25,8 +25,100 @@ export default function Reports() {
     queryFn: () => supabaseService.getExpenses(CURRENT_USER_ID),
   });
 
-  const todayRevenue = stats?.todaySales || 0;
-  const todayProfit = stats?.todayProfit || 0;
+  const { data: customers = [] } = useQuery({
+    queryKey: ['customers', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
+  });
+
+  // Calculate period-based data
+  const getFilteredData = () => {
+    const now = new Date();
+    let startDate = new Date();
+    
+    switch (reportPeriod) {
+      case 'today':
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      case 'week':
+        startDate.setDate(now.getDate() - 7);
+        break;
+      case 'month':
+        startDate.setMonth(now.getMonth() - 1);
+        break;
+      case 'year':
+        startDate.setFullYear(now.getFullYear() - 1);
+        break;
+    }
+
+    return sales.filter(sale => new Date(sale.sale_date) >= startDate);
+  };
+
+  const filteredSales = getFilteredData();
+
+  // Calculate top products from actual sales data
+  const getTopProducts = () => {
+    const productStats: { [key: string]: { name: string; quantity: number; revenue: number } } = {};
+    
+    filteredSales.forEach(sale => {
+      if (sale.items && Array.isArray(sale.items)) {
+        sale.items.forEach((item: any) => {
+          const productName = item.productName || 'অজানা পণ্য';
+          if (!productStats[productName]) {
+            productStats[productName] = { name: productName, quantity: 0, revenue: 0 };
+          }
+          productStats[productName].quantity += parseInt(item.quantity) || 0;
+          productStats[productName].revenue += parseFloat(item.totalPrice) || 0;
+        });
+      }
+    });
+
+    return Object.values(productStats)
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 5);
+  };
+
+  // Calculate top customers from actual sales data
+  const getTopCustomers = () => {
+    const customerStats: { [key: string]: { name: string; purchases: number; amount: number } } = {};
+    
+    filteredSales.forEach(sale => {
+      const customerId = sale.customer_id;
+      const customerName = sale.customer_name || 'অজানা গ্রাহক';
+      
+      if (!customerStats[customerId]) {
+        customerStats[customerId] = { name: customerName, purchases: 0, amount: 0 };
+      }
+      customerStats[customerId].purchases += 1;
+      customerStats[customerId].amount += parseFloat(sale.total_amount) || 0;
+    });
+
+    return Object.values(customerStats)
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 5);
+  };
+
+  const topProducts = getTopProducts();
+  const topCustomers = getTopCustomers();
+
+  // Calculate revenue and profit based on selected period
+  const calculatePeriodStats = () => {
+    const totalRevenue = filteredSales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || 0), 0);
+    const totalProfit = filteredSales.reduce((sum, sale) => {
+      if (sale.items && Array.isArray(sale.items)) {
+        return sum + sale.items.reduce((itemSum: number, item: any) => {
+          const quantity = parseInt(item.quantity) || 0;
+          const sellingPrice = parseFloat(item.unitPrice) || 0;
+          // Simplified profit calculation - would need product buying price for accurate calculation
+          return itemSum + (quantity * sellingPrice * 0.2); // Assuming 20% profit margin
+        }, 0);
+      }
+      return sum;
+    }, 0);
+    
+    return { totalRevenue, totalProfit };
+  };
+
+  const { totalRevenue, totalProfit } = calculatePeriodStats();
   const totalDue = stats?.pendingCollection || 0;
 
   return (
@@ -81,13 +173,13 @@ export default function Reports() {
               <div className="flex justify-between items-center p-3 bg-primary/5 rounded-lg">
                 <span className="text-gray-700">মোট বিক্রয়</span>
                 <span className="font-bold text-primary number-font">
-                  {formatCurrency(todayRevenue)} টাকা
+                  {formatCurrency(totalRevenue)}
                 </span>
               </div>
               <div className="flex justify-between items-center p-3 bg-success/5 rounded-lg">
                 <span className="text-gray-700">মোট লাভ</span>
                 <span className="font-bold text-success number-font">
-                  {formatCurrency(todayProfit)} টাকা
+                  {formatCurrency(totalProfit)}
                 </span>
               </div>
               <div className="flex justify-between items-center p-3 bg-warning/5 rounded-lg">
@@ -110,11 +202,13 @@ export default function Reports() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {[
-                { name: "চাল (বাসমতী)", sales: 25, revenue: 2500 },
-                { name: "ডাল (মসুর)", sales: 18, revenue: 1800 },
-                { name: "তেল (সয়াবিন)", sales: 15, revenue: 1950 }
-              ].map((product, index) => (
+              {topProducts.length === 0 ? (
+                <div className="text-center py-4 text-gray-500">
+                  <i className="fas fa-box text-3xl mb-2 text-gray-300"></i>
+                  <p>এই সময়ের জন্য কোনো বিক্রয় ডেটা নেই</p>
+                </div>
+              ) : (
+                topProducts.map((product, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center space-x-3">
                     <div className="bg-primary/10 w-8 h-8 rounded-full flex items-center justify-center">
@@ -123,7 +217,7 @@ export default function Reports() {
                     <div>
                       <p className="font-medium">{product.name}</p>
                       <p className="text-sm text-gray-600">
-                        {toBengaliNumber(product.sales)} বার বিক্রি
+                        {toBengaliNumber(product.quantity)} পিস বিক্রি
                       </p>
                     </div>
                   </div>
@@ -131,7 +225,8 @@ export default function Reports() {
                     {formatCurrency(product.revenue)} টাকা
                   </span>
                 </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
@@ -146,11 +241,13 @@ export default function Reports() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {[
-                { name: "রহিম উদ্দিন", purchases: 12, amount: 5600 },
-                { name: "করিম মিয়া", purchases: 8, amount: 3200 },
-                { name: "সালমা খাতুন", purchases: 6, amount: 2800 }
-              ].map((customer, index) => (
+              {topCustomers.length === 0 ? (
+                <div className="text-center py-4 text-gray-500">
+                  <i className="fas fa-users text-3xl mb-2 text-gray-300"></i>
+                  <p>এই সময়ের জন্য কোনো গ্রাহক ডেটা নেই</p>
+                </div>
+              ) : (
+                topCustomers.map((customer, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center space-x-3">
                     <div className="bg-secondary/10 w-8 h-8 rounded-full flex items-center justify-center">
@@ -167,45 +264,34 @@ export default function Reports() {
                     {formatCurrency(customer.amount)} টাকা
                   </span>
                 </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Monthly Trend */}
+        {/* Period Summary */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
               <i className="fas fa-chart-area text-accent mr-2"></i>
-              মাসিক প্রবণতা
+              সময়কাল সংক্ষেপ
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {[
-                { month: "জানুয়ারি", sales: 45000, profit: 8500 },
-                { month: "ফেব্রুয়ারি", sales: 52000, profit: 9200 },
-                { month: "মার্চ", sales: 48000, profit: 8800 },
-                { month: "এপ্রিল", sales: 55000, profit: 10200 }
-              ].map((data, index) => (
-                <div key={index} className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">{data.month}</span>
-                    <span className="text-sm text-gray-600">
-                      লাভ: {formatCurrency(data.profit)} টাকা
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-primary h-2 rounded-full"
-                      style={{ width: `${(data.sales / 60000) * 100}%` }}
-                    ></div>
-                  </div>
-                  <div className="text-right text-sm number-font text-gray-600">
-                    {formatCurrency(data.sales)} টাকা
-                  </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <div className="text-2xl font-bold text-primary number-font">
+                  {toBengaliNumber(filteredSales.length)}
                 </div>
-              ))}
+                <div className="text-sm text-gray-600">মোট লেনদেন</div>
+              </div>
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <div className="text-2xl font-bold text-secondary number-font">
+                  {toBengaliNumber(topCustomers.length)}
+                </div>
+                <div className="text-sm text-gray-600">সক্রিয় গ্রাহক</div>
+              </div>
             </div>
           </CardContent>
         </Card>
