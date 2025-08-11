@@ -3,7 +3,7 @@ import { Link } from "wouter";
 
 const navItems = [
   { path: "/", icon: "fas fa-home", label: "হোম" },
-  { path: "/sales", icon: "fas fa-cash-register", label: "বিক্রয়" },
+  { path: "/transactions", icon: "fas fa-exchange-alt", label: "লেনদেন" },
   { path: "/customers", icon: "fas fa-users", label: "গ্রাহক" },
   { path: "/reports", icon: "fas fa-chart-bar", label: "রিপোর্ট" },
   { path: "/settings", icon: "fas fa-cog", label: "সেটিংস" },

@@ -310,25 +310,31 @@ export const supabaseService = {
     return data;
   },
 
-  // Collections
-  async getCollections(userId: string, limit?: number): Promise<Collection[]> {
-    let query = supabase
-      .from('collections')
-      .select(`
-        *,
-        customers(name)
-      `)
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-    
-    if (limit) {
-      query = query.limit(limit);
+  // Collections - simplified using sales data
+  async getCollections(userId: string, limit?: number): Promise<any[]> {
+    try {
+      // Get sales with paid amounts as collections
+      const { data, error } = await supabase
+        .from('sales')
+        .select('*')
+        .eq('user_id', userId)
+        .gt('paid_amount', 0)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      const collections = (data || []).map(sale => ({
+        ...sale,
+        amount: sale.paid_amount,
+        collection_date: sale.created_at,
+        customer_name: sale.customer_name
+      }));
+      
+      return limit ? collections.slice(0, limit) : collections;
+    } catch (error) {
+      console.error('getCollections failed:', error);
+      return [];
     }
-    
-    const { data, error } = await query;
-    
-    if (error) throw error;
-    return data || [];
   },
 
   async createCollection(userId: string, collection: InsertCollection): Promise<Collection> {

@@ -163,7 +163,7 @@ export default function Dashboard() {
               <i className="fas fa-history text-primary mr-2"></i>
               সাম্প্রতিক লেনদেন
             </h2>
-            <Link to="/sales" className="text-primary text-sm font-medium">
+            <Link to="/transactions" className="text-primary text-sm font-medium">
               সব দেখুন
             </Link>
           </div>

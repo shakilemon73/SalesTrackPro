@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
-import Sales from "@/pages/sales";
+import Transactions from "@/pages/transactions";
 import Customers from "@/pages/customers";
 import Reports from "@/pages/reports";
 import Settings from "@/pages/settings";
@@ -25,7 +25,7 @@ function Router() {
     <div className="mobile-container">
       <Switch>
         <Route path="/" component={Dashboard} />
-        <Route path="/sales" component={Sales} />
+        <Route path="/transactions" component={Transactions} />
         <Route path="/customers" component={Customers} />
         <Route path="/reports" component={Reports} />
         <Route path="/settings" component={Settings} />

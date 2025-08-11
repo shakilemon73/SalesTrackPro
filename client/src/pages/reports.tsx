@@ -299,9 +299,9 @@ export default function Reports() {
         {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-3">
           <Button className="bg-primary" asChild>
-            <Link to="/sales">
+            <Link to="/transactions">
               <i className="fas fa-list mr-2"></i>
-              বিক্রয় দেখুন
+              লেনদেন দেখুন
             </Link>
           </Button>
           <Button variant="outline" className="border-primary text-primary">
