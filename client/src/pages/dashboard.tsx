@@ -184,10 +184,10 @@ export default function Dashboard() {
               recentSales.map((sale: any) => (
                 <TransactionItem
                   key={sale.id}
-                  customerName={sale.customerName}
-                  time={getBengaliTime(new Date(sale.createdAt))}
-                  amount={`+ ${formatCurrency(parseFloat(sale.totalAmount))} টাকা`}
-                  type={sale.paymentMethod}
+                  customerName={sale.customer_name}
+                  time={getBengaliTime(new Date(sale.created_at))}
+                  amount={formatCurrency(parseFloat(sale.total_amount))}
+                  type={sale.payment_method}
                   icon="fas fa-shopping-cart"
                   iconColor="primary"
                 />
