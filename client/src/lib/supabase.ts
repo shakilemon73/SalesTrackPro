@@ -375,9 +375,9 @@ export const supabaseService = {
         user_id: '11111111-1111-1111-1111-111111111111',
         customer_id: '33333333-3333-3333-3333-333333333333',
         customer_name: 'ফাতেমা খাতুন',
-        total_amount: 12269.97,
-        paid_amount: 12269.97,
-        due_amount: 0,
+        total_amount: '12269.97',
+        paid_amount: '12269.97',
+        due_amount: '0.00',
         payment_method: 'নগদ',
         items: [
           {
@@ -467,7 +467,7 @@ export const supabaseService = {
         tomorrow.setDate(tomorrow.getDate() + 1);
         
         return allOfflineSales.filter(sale => {
-          const saleDate = new Date(sale.sale_date);
+          const saleDate = sale.sale_date ? new Date(sale.sale_date) : new Date();
           return saleDate >= today && saleDate < tomorrow;
         });
       }
@@ -490,7 +490,7 @@ export const supabaseService = {
         // Fallback to offline data
         const allOfflineSales = this.getOfflineSales();
         return allOfflineSales.filter(sale => {
-          const saleDate = new Date(sale.sale_date);
+          const saleDate = sale.sale_date ? new Date(sale.sale_date) : new Date();
           return saleDate >= today && saleDate < tomorrow;
         });
       }
@@ -506,7 +506,7 @@ export const supabaseService = {
       tomorrow.setDate(tomorrow.getDate() + 1);
       
       return allOfflineSales.filter(sale => {
-        const saleDate = new Date(sale.sale_date);
+        const saleDate = sale.sale_date ? new Date(sale.sale_date) : new Date();
         return saleDate >= today && saleDate < tomorrow;
       });
     }

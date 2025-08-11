@@ -34,7 +34,13 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Loading fallback for refresh -->
+      <div id="loading-fallback" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Noto Sans Bengali', sans-serif; background: #f8fafc;">
+        <div style="animation: spin 1s linear infinite; width: 32px; height: 32px; border: 2px solid #e2e8f0; border-top: 2px solid #2563eb; border-radius: 50%; margin-bottom: 16px;"></div>
+        <p style="color: #64748b; font-size: 14px;">অ্যাপ লোড হচ্ছে...</p>
+      </div>
+    </div>
     
     <!-- Loading fallback -->
     <noscript>
@@ -43,6 +49,13 @@
         <p>এই অ্যাপ ব্যবহার করতে জাভাস্ক্রিপ্ট সক্রিয় করুন।</p>
       </div>
     </noscript>
+    
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
     
     <!-- Service Worker Registration -->
     <script>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dokan-hisab-v1';
+const CACHE_NAME = 'dokan-hisab-v2';
 const API_CACHE_NAME = 'dokan-hisab-api-v1';
 
 // Assets to cache for offline use  
