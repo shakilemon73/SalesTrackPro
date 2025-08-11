@@ -38,36 +38,23 @@ function Router() {
 
 function App() {
   useEffect(() => {
-    const seedDatabase = async () => {
+    console.log('App initialized with Supabase database connection');
+    
+    // Check database connection
+    const checkConnection = async () => {
       try {
-        console.log('Seeding database with sample data...');
-        
-        // Check if data already exists
-        const { data: existingCustomers } = await supabase
-          .from('customers')
-          .select('id')
-          .limit(1);
-        
-        if (existingCustomers && existingCustomers.length > 0) {
-          console.log('Sample data already exists');
-          return;
+        const { data, error } = await supabase.from('customers').select('count', { count: 'exact', head: true });
+        if (error) {
+          console.error('Database connection error:', error);
+        } else {
+          console.log('Database connected successfully. Total customers:', data?.length || 0);
         }
-        
-        // Insert seed data
-        await Promise.allSettled([
-          supabase.from('customers').insert(seedCustomers),
-          supabase.from('products').insert(seedProducts),
-          supabase.from('sales').insert(seedSales),
-          supabase.from('expenses').insert(seedExpenses)
-        ]);
-        
-        console.log('Database seeded successfully!');
       } catch (error) {
-        console.error('Error seeding database:', error);
+        console.error('Database check failed:', error);
       }
     };
     
-    seedDatabase();
+    checkConnection();
   }, []);
 
   return (
