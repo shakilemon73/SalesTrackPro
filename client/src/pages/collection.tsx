@@ -1,23 +1,22 @@
-import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useLocation } from "wouter";
-import { supabaseService, CURRENT_USER_ID, supabase } from "@/lib/supabase";
-import { queryClient } from "@/lib/queryClient";
-import { formatCurrency, toBengaliNumber, getBengaliDate, getBengaliTime } from "@/lib/bengali-utils";
+import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { formatCurrency, toBengaliNumber, getBengaliDate } from "@/lib/bengali-utils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const collectionSchema = z.object({
   customer_id: z.string().min(1, "গ্রাহক নির্বাচন করুন"),
-  amount: z.string().min(1, "টাকার পরিমাণ লিখুন"),
+  amount: z.string().min(1, "টাকার পরিমাণ লিখুন").refine((val) => parseFloat(val) > 0, "টাকার পরিমাণ শূন্যের চেয়ে বেশি হতে হবে"),
   payment_method: z.string().min(1, "পেমেন্ট পদ্ধতি নির্বাচন করুন"),
   notes: z.string().optional(),
 });
@@ -25,366 +24,353 @@ const collectionSchema = z.object({
 type CollectionFormData = z.infer<typeof collectionSchema>;
 
 export default function Collection() {
-  const [location, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
-  
-  // Get customer ID from URL parameters
-  const urlParams = new URLSearchParams(location.split('?')[1] || '');
-  const preSelectedCustomerId = urlParams.get('customer');
+  const queryClient = useQueryClient();
 
-  const { data: customers = [], isLoading: customersLoading } = useQuery({
+  const { data: customers = [] } = useQuery({
     queryKey: ['customers', CURRENT_USER_ID],
     queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
   });
 
-  const { data: dueCustomers = [] } = useQuery({
-    queryKey: ['customers', CURRENT_USER_ID, 'due'],
-    queryFn: async () => {
-      try {
-        // Get all customers and recent sales to calculate actual due amounts
-        const [allCustomers, allSales] = await Promise.all([
-          supabaseService.getCustomers(CURRENT_USER_ID),
-          supabaseService.getSales(CURRENT_USER_ID, 100) // Get more sales to calculate due amounts
-        ]);
-
-        // Calculate due amounts from sales
-        const customerDueMap = new Map();
-        
-        allSales.forEach((sale: any) => {
-          if (sale.customer_id && sale.due_amount && parseFloat(sale.due_amount) > 0) {
-            const currentDue = customerDueMap.get(sale.customer_id) || 0;
-            customerDueMap.set(sale.customer_id, currentDue + parseFloat(sale.due_amount));
-          }
-        });
-
-        // Filter customers with due amounts
-        return allCustomers
-          .map(customer => ({
-            ...customer,
-            calculated_due: customerDueMap.get(customer.id) || parseFloat(customer.total_credit || '0') || 0
-          }))
-          .filter(customer => customer.calculated_due > 0);
-      } catch (error) {
-        console.error('Error fetching due customers:', error);
-        return [];
-      }
-    },
+  const { data: sales = [] } = useQuery({
+    queryKey: ['sales', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getSales(CURRENT_USER_ID),
   });
 
   const form = useForm<CollectionFormData>({
     resolver: zodResolver(collectionSchema),
     defaultValues: {
-      customer_id: preSelectedCustomerId || "",
+      customer_id: "",
       amount: "",
       payment_method: "",
       notes: "",
     },
   });
-  
-  // Pre-select customer if provided in URL
-  useEffect(() => {
-    if (preSelectedCustomerId && form.watch("customer_id") !== preSelectedCustomerId) {
-      form.setValue("customer_id", preSelectedCustomerId);
-    }
-  }, [preSelectedCustomerId, form]);
+
+  // Calculate customers with due amounts
+  const customersWithDue = customers.map(customer => {
+    const customerSales = sales.filter(sale => sale.customer_id === customer.id);
+    const totalDue = customerSales.reduce((sum, sale) => sum + (parseFloat(sale.due_amount) || 0), 0);
+    return {
+      ...customer,
+      totalDue: totalDue + (parseFloat(customer.total_credit) || 0)
+    };
+  }).filter(customer => customer.totalDue > 0);
+
+  // Get selected customer's due amount
+  const selectedCustomerId = form.watch("customer_id");
+  const selectedCustomer = customersWithDue.find(c => c.id === selectedCustomerId);
+  const maxCollectableAmount = selectedCustomer?.totalDue || 0;
 
   const createCollectionMutation = useMutation({
     mutationFn: async (data: CollectionFormData) => {
-      console.log('🔥 Creating collection:', data);
+      const collectionAmount = parseFloat(data.amount);
       
-      // Since we don't have a collections table, we'll simulate by updating customer due amounts
-      // and creating a sale record with negative amount for tracking purposes
-      
-      // Update customer's due amount
-      const customer = customers.find(c => c.id === data.customer_id);
-      if (!customer) {
-        throw new Error('গ্রাহক পাওয়া যায়নি');
-      }
-
-      const newCredit = Math.max(0, parseFloat(customer.total_credit || '0') - parseFloat(data.amount));
-      await supabaseService.updateCustomer(data.customer_id, {
-        total_credit: newCredit.toString(),
-      });
-
-      // Create a collection record as a special sale with negative amount for tracking
-      const collectionSale = {
+      // Create a sale record with negative amount to represent collection
+      const saleData = {
         customer_id: data.customer_id,
-        customer_name: customer.name,
-        total_amount: (-parseFloat(data.amount)).toString(), // Negative to indicate collection
-        paid_amount: parseFloat(data.amount).toString(),
-        due_amount: '0',
-        payment_method: data.payment_method || 'নগদ',
+        customer_name: selectedCustomer?.name || "",
+        total_amount: -collectionAmount, // Negative amount for collection
+        paid_amount: collectionAmount,
+        due_amount: 0,
+        payment_method: `${data.payment_method} (সংগ্রহ)`,
         items: [{
+          productName: `সংগ্রহ - ${selectedCustomer?.name || "গ্রাহক"}`,
           quantity: 1,
-          unitPrice: data.amount,
-          totalPrice: data.amount,
-          productName: `সংগ্রহ - ${customer.name}`
-        }],
-        sale_date: new Date().toISOString(),
+          unitPrice: collectionAmount.toString(),
+          totalPrice: collectionAmount.toString()
+        }]
       };
 
-      const result = await supabaseService.createSale(CURRENT_USER_ID, collectionSale);
-      console.log('✅ Collection created as sale:', result);
-      
-      return result;
+      return await supabaseService.createSale(CURRENT_USER_ID, saleData);
     },
     onSuccess: () => {
       toast({
         title: "সফল!",
-        description: "বাকি আদায় সফলভাবে সংরক্ষিত হয়েছে",
+        description: "টাকা সফলভাবে সংগ্রহ করা হয়েছে",
       });
-      // Invalidate all related queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      queryClient.invalidateQueries({ queryKey: ['sales'] });
-      queryClient.invalidateQueries({ queryKey: ['collections'] });
-      form.reset();
-      setLocation("/");
+      setLocation("/dashboard");
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Collection error:', error);
       toast({
         title: "ত্রুটি!",
-        description: "বাকি আদায় সংরক্ষণে সমস্যা হয়েছে",
+        description: "টাকা সংগ্রহ করতে সমস্যা হয়েছে",
         variant: "destructive",
       });
     },
   });
 
-  const selectedCustomer = dueCustomers.find((c: any) => c.id === form.watch("customer_id"));
-
-  // Get today's collections
-  const { data: todayCollections = [] } = useQuery({
-    queryKey: ['collections', CURRENT_USER_ID, 'today'],
-    queryFn: async () => {
-      try {
-        const today = new Date();
-        const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
-
-        const { data, error } = await supabase
-          .from('collections')
-          .select(`
-            *,
-            customers(name)
-          `)
-          .eq('user_id', CURRENT_USER_ID)
-          .gte('created_at', startOfDay.toISOString())
-          .lt('created_at', endOfDay.toISOString())
-          .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        return data || [];
-      } catch (error) {
-        console.error('Error fetching today collections:', error);
-        return [];
-      }
-    },
-  });
-
   const onSubmit = (data: CollectionFormData) => {
+    const amount = parseFloat(data.amount);
+    if (amount > maxCollectableAmount) {
+      toast({
+        title: "ত্রুটি!",
+        description: `সর্বোচ্চ ${formatCurrency(maxCollectableAmount)} টাকা সংগ্রহ করতে পারবেন`,
+        variant: "destructive",
+      });
+      return;
+    }
     createCollectionMutation.mutate(data);
   };
 
+  const paymentMethods = [
+    "নগদ",
+    "বিকাশ",
+    "নগদ (Nagad)",
+    "রকেট",
+    "ব্যাংক ট্রান্সফার",
+    "চেক"
+  ];
+
   return (
-    <>
-      {/* Header */}
+    <div className="min-h-screen bg-background-app">
+      {/* Premium Header */}
       <div className="header-bar">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Link to="/">
-              <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+            <Link to="/dashboard">
+              <button className="w-10 h-10 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300 hover:scale-110 border border-white/20">
                 <i className="fas fa-arrow-left text-white"></i>
               </button>
             </Link>
             <div>
-              <h1 className="text-lg font-semibold text-white">বাকি আদায়</h1>
-              <p className="text-sm text-green-100">{getBengaliDate()}</p>
+              <h1 className="heading-2 text-white mb-0.5">টাকা সংগ্রহ</h1>
+              <div className="flex items-center space-x-2">
+                <p className="text-sm text-white/90 bengali-font">{getBengaliDate()}</p>
+                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-xs text-green-200 font-semibold">পেমেন্ট সংগ্রহ</span>
+              </div>
             </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button 
+              form="collection-form"
+              type="submit"
+              disabled={createCollectionMutation.isPending}
+              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-105"
+            >
+              {createCollectionMutation.isPending ? (
+                <i className="fas fa-spinner fa-spin mr-2"></i>
+              ) : (
+                <i className="fas fa-hand-holding-usd mr-2"></i>
+              )}
+              সংগ্রহ করুন
+            </Button>
           </div>
         </div>
       </div>
 
-      <div className="pb-20 px-4 py-4">
-        {/* Today's Collections Summary */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <i className="fas fa-hand-holding-usd text-success mr-2"></i>
-              আজকের আদায়
-            </CardTitle>
-            <CardDescription>
-              আজ পর্যন্ত মোট {toBengaliNumber(todayCollections.length)} টি আদায়
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-success number-font">
-                {formatCurrency(todayCollections.reduce((sum, collection: any) => sum + parseFloat(collection.amount), 0))}
-              </p>
-              <p className="text-sm text-gray-600">আজকের মোট আদায়</p>
-            </div>
-            {todayCollections.length > 0 && (
-              <div className="mt-4 space-y-2">
-                {todayCollections.slice(0, 3).map((collection: any, index: number) => (
-                  <div key={index} className="flex items-center justify-between text-sm">
-                    <span>{collection.customers?.name || 'গ্রাহক'}</span>
-                    <span className="text-success font-medium">
-                      {formatCurrency(parseFloat(collection.amount))}
-                    </span>
+      <div className="p-4 pb-20">
+        <form id="collection-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Due Customers Summary */}
+          {customersWithDue.length > 0 && (
+            <Card className="enhanced-card bg-gradient-to-r from-orange-50 to-amber-50 border-orange-200">
+              <CardHeader className="enhanced-card-header">
+                <CardTitle className="flex items-center bengali-font">
+                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
+                    <i className="fas fa-exclamation-triangle text-orange-600"></i>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Due Customers Summary */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <i className="fas fa-clock text-warning mr-2"></i>
-              বকেয়া গ্রাহকগণ
-            </CardTitle>
-            <CardDescription>
-              মোট {toBengaliNumber(dueCustomers.length)} জন গ্রাহকের কাছ থেকে টাকা পাওনা
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {dueCustomers.slice(0, 3).map((customer: any) => (
-                <div key={customer.id} className="flex items-center justify-between">
-                  <span className="font-medium">{customer.name}</span>
-                  <span className="text-error font-bold">
-                    {formatCurrency(customer.calculated_due)}
-                  </span>
+                  বাকি পাওনা গ্রাহক
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {customersWithDue.slice(0, 5).map((customer) => (
+                    <div key={customer.id} className="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
+                      <div>
+                        <p className="font-semibold text-gray-900 bengali-font">{customer.name}</p>
+                        <p className="text-sm text-gray-600 bengali-font">
+                          {customer.phone_number && `📞 ${customer.phone_number}`}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-orange-700 number-font">
+                          {formatCurrency(customer.totalDue)}
+                        </p>
+                        <p className="text-xs text-orange-600 bengali-font">বাকি</p>
+                      </div>
+                    </div>
+                  ))}
+                  {customersWithDue.length > 5 && (
+                    <p className="text-center text-orange-600 bengali-font text-sm">
+                      আরো {toBengaliNumber(customersWithDue.length - 5)} জন গ্রাহকের বাকি আছে
+                    </p>
+                  )}
                 </div>
-              ))}
-              {dueCustomers.length === 0 && (
-                <p className="text-center text-gray-500 py-4">
-                  কোনো বকেয়া পাওনা নেই
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          )}
 
-        {/* Collection Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <i className="fas fa-money-bill-wave text-success mr-2"></i>
-              বাকি আদায় করুন
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {/* Customer Selection */}
+          {/* Collection Form */}
+          <Card className="enhanced-card">
+            <CardHeader className="enhanced-card-header">
+              <CardTitle className="flex items-center bengali-font">
+                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                  <i className="fas fa-hand-holding-usd text-green-600"></i>
+                </div>
+                টাকা সংগ্রহের তথ্য
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="customer_id">গ্রাহক নির্বাচন করুন *</Label>
-                <Select
-                  value={form.watch("customer_id")}
+                <Label className="bengali-font">গ্রাহক নির্বাচন করুন *</Label>
+                <Select 
+                  value={form.watch("customer_id")} 
                   onValueChange={(value) => form.setValue("customer_id", value)}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="গ্রাহক নির্বাচন করুন" />
+                  <SelectTrigger className="enhanced-select mt-1">
+                    <SelectValue placeholder="গ্রাহক নির্বাচন করুন..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {dueCustomers.map((customer: any) => (
+                    {customersWithDue.map((customer) => (
                       <SelectItem key={customer.id} value={customer.id}>
-                        {customer.name} - {formatCurrency(customer.calculated_due)} বাকি
+                        <div className="flex items-center justify-between w-full">
+                          <span className="bengali-font">{customer.name}</span>
+                          <span className="text-sm text-red-600 ml-2 bengali-font">
+                            বাকি: {formatCurrency(customer.totalDue)}
+                          </span>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 {form.formState.errors.customer_id && (
-                  <p className="text-sm text-error mt-1">
+                  <p className="text-sm text-red-600 mt-1 bengali-font">
                     {form.formState.errors.customer_id.message}
                   </p>
                 )}
               </div>
 
-              {/* Amount */}
-              <div>
-                <Label htmlFor="amount">আদায়ের পরিমাণ *</Label>
-                {selectedCustomer && (
-                  <p className="text-sm text-gray-600 mb-2">
-                    বকেয়া: {formatCurrency(selectedCustomer.calculated_due)}
-                  </p>
-                )}
-                <Input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  placeholder="০.০০"
-                  {...form.register("amount")}
-                />
-                {form.formState.errors.amount && (
-                  <p className="text-sm text-error mt-1">
-                    {form.formState.errors.amount.message}
-                  </p>
-                )}
+              {selectedCustomer && (
+                <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-blue-900 bengali-font">{selectedCustomer.name}</p>
+                      <p className="text-sm text-blue-700 bengali-font">মোট বাকি পরিমাণ</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-blue-900 number-font">
+                        {formatCurrency(maxCollectableAmount)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="responsive-grid-2 gap-4">
+                <div>
+                  <Label className="bengali-font">সংগ্রহের পরিমাণ (টাকা) *</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    max={maxCollectableAmount}
+                    {...form.register("amount")}
+                    placeholder="০.০০"
+                    className="enhanced-input mt-1"
+                  />
+                  {form.formState.errors.amount && (
+                    <p className="text-sm text-red-600 mt-1 bengali-font">
+                      {form.formState.errors.amount.message}
+                    </p>
+                  )}
+                  {maxCollectableAmount > 0 && (
+                    <p className="text-sm text-gray-500 mt-1 bengali-font">
+                      সর্বোচ্চ: {formatCurrency(maxCollectableAmount)}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <Label className="bengali-font">পেমেন্ট পদ্ধতি *</Label>
+                  <Select 
+                    value={form.watch("payment_method")} 
+                    onValueChange={(value) => form.setValue("payment_method", value)}
+                  >
+                    <SelectTrigger className="enhanced-select mt-1">
+                      <SelectValue placeholder="পেমেন্ট পদ্ধতি নির্বাচন করুন..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {paymentMethods.map((method) => (
+                        <SelectItem key={method} value={method}>
+                          <span className="bengali-font">{method}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {form.formState.errors.payment_method && (
+                    <p className="text-sm text-red-600 mt-1 bengali-font">
+                      {form.formState.errors.payment_method.message}
+                    </p>
+                  )}
+                </div>
               </div>
 
-              {/* Payment Method */}
               <div>
-                <Label htmlFor="payment_method">পেমেন্ট পদ্ধতি *</Label>
-                <Select
-                  value={form.watch("payment_method")}
-                  onValueChange={(value) => form.setValue("payment_method", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="পেমেন্ট পদ্ধতি নির্বাচন করুন" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="নগদ">নগদ</SelectItem>
-                    <SelectItem value="বিকাশ">বিকাশ</SelectItem>
-                    <SelectItem value="নগদ (Nagad)">নগদ (Nagad)</SelectItem>
-                    <SelectItem value="রকেট">রকেট</SelectItem>
-                    <SelectItem value="ব্যাংক">ব্যাংক</SelectItem>
-                    <SelectItem value="চেক">চেক</SelectItem>
-                  </SelectContent>
-                </Select>
-                {form.formState.errors.payment_method && (
-                  <p className="text-sm text-error mt-1">
-                    {form.formState.errors.payment_method.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Notes */}
-              <div>
-                <Label htmlFor="notes">মন্তব্য (ঐচ্ছিক)</Label>
-                <Input
-                  id="notes"
-                  placeholder="অতিরিক্ত তথ্য..."
+                <Label className="bengali-font">অতিরিক্ত নোট (ঐচ্ছিক)</Label>
+                <Textarea
                   {...form.register("notes")}
+                  placeholder="কোনো বিশেষ তথ্য বা মন্তব্য..."
+                  className="enhanced-input mt-1 min-h-[80px]"
+                  rows={3}
                 />
               </div>
+            </CardContent>
+          </Card>
 
-              <Separator />
+          {/* Collection Preview */}
+          {form.watch("amount") && selectedCustomer && (
+            <Card className="enhanced-card bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+              <CardContent className="p-6">
+                <h3 className="heading-3 text-green-900 mb-4 bengali-font">সংগ্রহের সারাংশ</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="body-regular text-green-700 bengali-font">গ্রাহক:</span>
+                    <span className="font-semibold text-green-900 bengali-font">{selectedCustomer.name}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="body-regular text-green-700 bengali-font">সংগ্রহের পরিমাণ:</span>
+                    <span className="currency-display text-xl font-bold text-green-900">
+                      {formatCurrency(parseFloat(form.watch("amount")) || 0)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-green-200 pt-3">
+                    <span className="body-regular text-green-700 bengali-font">অবশিষ্ট বাকি:</span>
+                    <span className="currency-display text-lg font-bold text-orange-700">
+                      {formatCurrency(maxCollectableAmount - (parseFloat(form.watch("amount")) || 0))}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                className="w-full bg-success text-white"
-                disabled={createCollectionMutation.isPending}
-              >
-                {createCollectionMutation.isPending ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    আদায় করা হচ্ছে...
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-save mr-2"></i>
-                    বাকি আদায় করুন
-                  </>
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+          {/* No Due Customers Message */}
+          {customersWithDue.length === 0 && (
+            <Card className="enhanced-card bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i className="fas fa-check-circle text-green-600 text-2xl"></i>
+                </div>
+                <h3 className="heading-3 text-green-900 mb-2 bengali-font">দুর্দান্ত!</h3>
+                <p className="body-regular text-green-700 bengali-font mb-4">
+                  কোনো গ্রাহকের বাকি নেই
+                </p>
+                <Link to="/dashboard">
+                  <Button className="action-btn action-btn-primary">
+                    <i className="fas fa-home mr-2"></i>
+                    ড্যাশবোর্ডে ফিরুন
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+        </form>
       </div>
-    </>
+    </div>
   );
 }

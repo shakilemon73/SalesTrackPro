@@ -68,176 +68,164 @@ export default function CustomerAdd() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-primary text-white px-4 py-3 shadow-md">
+    <div className="min-h-screen bg-background-app">
+      {/* Premium Header */}
+      <div className="header-bar">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Link to="/customers">
-              <button className="p-2">
-                <i className="fas fa-arrow-left"></i>
+              <button className="w-10 h-10 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300 hover:scale-110 border border-white/20">
+                <i className="fas fa-arrow-left text-white"></i>
               </button>
             </Link>
             <div>
-              <h1 className="text-lg font-semibold">নতুন গ্রাহক যোগ করুন</h1>
-              <p className="text-sm text-green-100">{getBengaliDate()}</p>
+              <h1 className="heading-2 text-white mb-0.5">নতুন গ্রাহক</h1>
+              <div className="flex items-center space-x-2">
+                <p className="text-sm text-white/90 bengali-font">{getBengaliDate()}</p>
+                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
+                <span className="text-xs text-blue-200 font-semibold">নতুন এন্ট্রি</span>
+              </div>
             </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button 
+              form="customer-form"
+              type="submit"
+              disabled={createCustomerMutation.isPending}
+              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-105"
+            >
+              {createCustomerMutation.isPending ? (
+                <i className="fas fa-spinner fa-spin mr-2"></i>
+              ) : (
+                <i className="fas fa-user-plus mr-2"></i>
+              )}
+              যোগ করুন
+            </Button>
           </div>
         </div>
       </div>
 
-      <form onSubmit={form.handleSubmit(onSubmit)} className="p-4 space-y-6">
-        {/* Customer Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <i className="fas fa-user text-primary mr-2"></i>
-              গ্রাহকের তথ্য
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="name">গ্রাহকের নাম *</Label>
-              <Input
-                id="name"
-                {...form.register('name')}
-                placeholder="গ্রাহকের পূর্ণ নাম লিখুন"
-                className="mt-1"
-              />
-              {form.formState.errors.name && (
-                <p className="text-red-500 text-sm mt-1">
-                  {form.formState.errors.name.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="phone_number">ফোন নম্বর</Label>
-              <Input
-                id="phone_number"
-                {...form.register('phone_number')}
-                placeholder="০১৭১২৩৪৫৬১৮ (ঐচ্ছিক)"
-                className="mt-1 number-font"
-              />
-              {form.formState.errors.phone_number && (
-                <p className="text-red-500 text-sm mt-1">
-                  {form.formState.errors.phone_number.message}
-                </p>
-              )}
-              <p className="text-gray-500 text-xs mt-1">
-                বাংলাদেশী মোবাইল নম্বর লিখুন (যেমন: ০১৭১২৩৪৫৬১৮)
-              </p>
-            </div>
-
-            <div>
-              <Label htmlFor="address">ঠিকানা</Label>
-              <Textarea
-                id="address"
-                {...form.register('address')}
-                placeholder="গ্রাহকের ঠিকানা লিখুন (ঐচ্ছিক)"
-                className="mt-1"
-                rows={3}
-              />
-              {form.formState.errors.address && (
-                <p className="text-red-500 text-sm mt-1">
-                  {form.formState.errors.address.message}
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Additional Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <i className="fas fa-info-circle text-primary mr-2"></i>
-              অতিরিক্ত তথ্য
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-900 mb-2">
-                <i className="fas fa-lightbulb mr-2"></i>
-                গুরুত্বপূর্ণ তথ্য
-              </h4>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>• গ্রাহক যোগ করার পর আপনি তাদের বাকি খাতা দেখতে পাবেন</li>
-                <li>• ফোন নম্বর দিলে দ্রুত কল করতে পারবেন</li>
-                <li>• ঠিকানা দিলে ডেলিভারি দিতে সুবিধা হবে</li>
-                <li>• প্রয়োজনে পরে এই তথ্য পরিবর্তন করতে পারবেন</li>
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Form Preview */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <i className="fas fa-eye text-primary mr-2"></i>
-              তথ্য পূর্বরূপ
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="flex items-center space-x-3 mb-3">
-                <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center">
-                  <i className="fas fa-user text-primary text-xl"></i>
+      <div className="p-4 pb-20">
+        <form id="customer-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Customer Information */}
+          <Card className="enhanced-card">
+            <CardHeader className="enhanced-card-header">
+              <CardTitle className="flex items-center bengali-font">
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                  <i className="fas fa-user text-blue-600"></i>
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">
-                    {form.watch('name') || 'গ্রাহকের নাম'}
-                  </h3>
-                  {form.watch('phone_number') && (
-                    <p className="text-sm text-gray-600 number-font">
-                      {form.watch('phone_number')}
-                    </p>
-                  )}
-                  {form.watch('address') && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      {form.watch('address')}
-                    </p>
-                  )}
-                </div>
+                গ্রাহকের তথ্য
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="bengali-font">গ্রাহকের নাম *</Label>
+                <Input
+                  {...form.register("name")}
+                  placeholder="গ্রাহকের পূর্ণ নাম লিখুন..."
+                  className="enhanced-input mt-1"
+                  autoFocus
+                />
+                {form.formState.errors.name && (
+                  <p className="text-sm text-red-600 mt-1 bengali-font">
+                    {form.formState.errors.name.message}
+                  </p>
+                )}
               </div>
-              <div className="text-right">
-                <p className="text-success font-medium">
-                  <i className="fas fa-check-circle mr-1"></i>
-                  নতুন গ্রাহক
+
+              <div>
+                <Label className="bengali-font">ফোন নম্বর</Label>
+                <Input
+                  {...form.register("phone_number")}
+                  placeholder="০১৭১২৩৪৫৬৭৮"
+                  className="enhanced-input mt-1"
+                  type="tel"
+                />
+                {form.formState.errors.phone_number && (
+                  <p className="text-sm text-red-600 mt-1 bengali-font">
+                    {form.formState.errors.phone_number.message}
+                  </p>
+                )}
+                <p className="text-sm text-gray-500 mt-1 bengali-font">
+                  ঐচ্ছিক - যোগাযোগের জন্য
                 </p>
               </div>
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Submit Buttons */}
-        <div className="flex space-x-3 pb-20">
-          <Link to="/customers" className="flex-1">
-            <Button type="button" variant="outline" className="w-full">
-              <i className="fas fa-times mr-2"></i>
-              বাতিল
-            </Button>
-          </Link>
-          <Button 
-            type="submit" 
-            className="flex-1 bg-primary"
-            disabled={createCustomerMutation.isPending || !form.watch('name')}
-          >
-            {createCustomerMutation.isPending ? (
-              <>
-                <i className="fas fa-spinner fa-spin mr-2"></i>
-                যোগ হচ্ছে...
-              </>
-            ) : (
-              <>
-                <i className="fas fa-user-plus mr-2"></i>
-                গ্রাহক যোগ করুন
-              </>
-            )}
-          </Button>
-        </div>
-      </form>
+              <div>
+                <Label className="bengali-font">ঠিকানা</Label>
+                <Textarea
+                  {...form.register("address")}
+                  placeholder="গ্রাহকের ঠিকানা লিখুন..."
+                  className="enhanced-input mt-1 min-h-[100px]"
+                  rows={4}
+                />
+                <p className="text-sm text-gray-500 mt-1 bengali-font">
+                  ঐচ্ছিক - ডেলিভারি বা যোগাযোগের জন্য
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Guidelines */}
+          <Card className="enhanced-card bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+            <CardContent className="p-6">
+              <h3 className="flex items-center heading-3 text-blue-900 mb-4 bengali-font">
+                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center mr-2">
+                  <i className="fas fa-lightbulb text-blue-600 text-sm"></i>
+                </div>
+                সহায়ক তথ্য
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                  <p className="body-regular text-blue-800 bengali-font">
+                    গ্রাহকের নাম অবশ্যই দিতে হবে
+                  </p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                  <p className="body-regular text-blue-800 bengali-font">
+                    ফোন নম্বর দিলে সহজে যোগাযোগ করতে পারবেন
+                  </p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                  <p className="body-regular text-blue-800 bengali-font">
+                    ঠিকানা দিলে ডেলিভারি সুবিধা হবে
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions */}
+          <div className="responsive-grid-2 gap-4">
+            <Link to="/sales/new">
+              <Card className="enhanced-card cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-105">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <i className="fas fa-shopping-cart text-green-600 text-xl"></i>
+                  </div>
+                  <h3 className="body-large font-semibold text-gray-900 bengali-font">বিক্রয় করুন</h3>
+                  <p className="caption text-gray-500 bengali-font">নতুন বিক্রয় এন্ট্রি</p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link to="/customers">
+              <Card className="enhanced-card cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-105">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <i className="fas fa-users text-blue-600 text-xl"></i>
+                  </div>
+                  <h3 className="body-large font-semibold text-gray-900 bengali-font">গ্রাহক তালিকা</h3>
+                  <p className="caption text-gray-500 bengali-font">সব গ্রাহক দেখুন</p>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

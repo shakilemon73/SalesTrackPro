@@ -1,22 +1,22 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useRoute, useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import { getBengaliDate, formatCurrency, toBengaliNumber, formatBengaliPhone } from "@/lib/bengali-utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
-import { queryClient } from "@/lib/queryClient";
 
 export default function CustomerDetails() {
   const [match, params] = useRoute("/customers/:id");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const customerId = params?.id;
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -87,7 +87,7 @@ export default function CustomerDetails() {
         description: "গ্রাহক মুছে ফেলা হয়েছে",
       });
       queryClient.invalidateQueries({ queryKey: ['customers'] });
-      setLocation('/customers');
+      setLocation("/customers");
     },
     onError: (error) => {
       toast({
@@ -99,21 +99,16 @@ export default function CustomerDetails() {
     },
   });
 
-  const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleUpdateSubmit = () => {
     updateCustomerMutation.mutate(editForm);
-  };
-
-  const handleDelete = () => {
-    deleteCustomerMutation.mutate();
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background-app flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-gray-600">লোড হচ্ছে...</p>
+          <i className="fas fa-spinner fa-spin text-4xl text-blue-600 mb-4"></i>
+          <p className="text-gray-600 bengali-font">লোড হচ্ছে...</p>
         </div>
       </div>
     );
@@ -121,232 +116,335 @@ export default function CustomerDetails() {
 
   if (!customer) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background-app flex items-center justify-center">
         <div className="text-center">
-          <i className="fas fa-user-times text-6xl text-gray-300 mb-4"></i>
-          <h3 className="text-lg font-semibold text-gray-600 mb-2">গ্রাহক পাওয়া যায়নি</h3>
+          <i className="fas fa-user-slash text-4xl text-gray-400 mb-4"></i>
+          <p className="text-gray-600 bengali-font">গ্রাহক পাওয়া যায়নি</p>
           <Link to="/customers">
-            <Button>গ্রাহক তালিকায় ফিরুন</Button>
+            <Button className="mt-4">গ্রাহক তালিকায় ফিরুন</Button>
           </Link>
         </div>
       </div>
     );
   }
 
-  const totalPurchases = customerSales.reduce((sum: number, sale: any) => 
-    sum + parseFloat(sale.total_amount || '0'), 0
-  );
+  // Calculate customer statistics
+  const totalPurchases = customerSales.reduce((sum, sale) => sum + parseFloat(sale.total_amount), 0);
+  const totalDue = customerSales.reduce((sum, sale) => sum + parseFloat(sale.due_amount || 0), 0);
+  const totalPaid = customerSales.reduce((sum, sale) => sum + parseFloat(sale.paid_amount || 0), 0);
+  const recentSales = customerSales.slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-primary text-white px-4 py-3 shadow-md">
+    <div className="min-h-screen bg-background-app">
+      {/* Premium Header */}
+      <div className="header-bar">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Link to="/customers">
-              <button className="p-2">
-                <i className="fas fa-arrow-left"></i>
+              <button className="w-10 h-10 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300 hover:scale-110 border border-white/20">
+                <i className="fas fa-arrow-left text-white"></i>
               </button>
             </Link>
             <div>
-              <h1 className="text-lg font-semibold">গ্রাহকের বিস্তারিত</h1>
-              <p className="text-sm text-green-100">{getBengaliDate()}</p>
+              <h1 className="heading-2 text-white mb-0.5">গ্রাহকের বিস্তারিত</h1>
+              <div className="flex items-center space-x-2">
+                <p className="text-sm text-white/90 bengali-font">{getBengaliDate()}</p>
+                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
+                <span className="text-xs text-blue-200 font-semibold">প্রোফাইল</span>
+              </div>
             </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button 
+              onClick={() => setIsEditDialogOpen(true)}
+              className="bg-white/15 hover:bg-white/25 text-white border border-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-105"
+            >
+              <i className="fas fa-edit mr-2"></i>
+              সম্পাদনা
+            </Button>
           </div>
         </div>
       </div>
 
-      <div className="p-4">
-        {/* Customer Info */}
-        <Card className="mb-4">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mr-3">
-                <i className="fas fa-user text-primary text-xl"></i>
+      <div className="p-4 pb-20 space-y-6">
+        {/* Customer Profile Card */}
+        <Card className="enhanced-card bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <CardContent className="p-6">
+            <div className="flex items-start space-x-4">
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-user text-white text-3xl"></i>
               </div>
-              <div>
-                <h2 className="text-xl">{customer.name}</h2>
-                {customer.phone_number && (
-                  <p className="text-sm text-gray-600 number-font">
-                    {formatBengaliPhone(customer.phone_number)}
-                  </p>
-                )}
+              <div className="flex-1">
+                <h2 className="heading-2 text-blue-900 mb-2 bengali-font">{customer.name}</h2>
+                <div className="space-y-2">
+                  {customer.phone_number && (
+                    <div className="flex items-center space-x-2">
+                      <i className="fas fa-phone text-blue-600 w-4"></i>
+                      <span className="body-regular text-blue-800">{formatBengaliPhone(customer.phone_number)}</span>
+                    </div>
+                  )}
+                  {customer.address && (
+                    <div className="flex items-start space-x-2">
+                      <i className="fas fa-map-marker-alt text-blue-600 w-4 mt-1"></i>
+                      <span className="body-regular text-blue-800 bengali-font">{customer.address}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center space-x-2">
+                    <i className="fas fa-calendar text-blue-600 w-4"></i>
+                    <span className="body-regular text-blue-800">
+                      সদস্য: {new Date(customer.created_at).toLocaleDateString('bn-BD')}
+                    </span>
+                  </div>
+                </div>
               </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {customer.address && (
-              <div className="mb-4">
-                <h4 className="font-medium text-gray-700 mb-1">ঠিকানা</h4>
-                <p className="text-gray-600">{customer.address}</p>
-              </div>
-            )}
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">মোট কেনাকাটা</p>
-                <p className="text-lg font-bold text-primary number-font">
-                  {formatCurrency(totalPurchases)}
-                </p>
-              </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">বর্তমান বাকি</p>
-                <p className="text-lg font-bold text-warning number-font">
-                  {formatCurrency(parseFloat(customer.total_credit || '0'))}
-                </p>
+              <div className="text-right">
+                <Link to={`/collection?customer=${customer.id}`}>
+                  <Button className="action-btn action-btn-primary mb-2">
+                    <i className="fas fa-hand-holding-usd mr-2"></i>
+                    টাকা সংগ্রহ
+                  </Button>
+                </Link>
+                <Link to={`/sales/new?customer=${customer.name}`}>
+                  <Button variant="outline" className="w-full">
+                    <i className="fas fa-shopping-cart mr-2"></i>
+                    নতুন বিক্রয়
+                  </Button>
+                </Link>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <Button 
-            onClick={() => {
-              if (customer.phone_number) {
-                window.open(`tel:${customer.phone_number}`, '_self');
-              }
-            }}
-            disabled={!customer.phone_number}
-            className="bg-secondary"
-          >
-            <i className="fas fa-phone mr-2"></i>
-            কল করুন
-          </Button>
-          {parseFloat(customer.total_credit || '0') > 0 && (
-            <Link to={`/collection?customer=${customer.id}`}>
-              <Button className="bg-success w-full">
-                <i className="fas fa-money-bill-wave mr-2"></i>
-                বাকি আদায়
-              </Button>
-            </Link>
-          )}
+        {/* Customer Statistics */}
+        <div className="stats-grid grid-cols-3 gap-4">
+          <div className="stats-card bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-shopping-bag text-white"></i>
+              </div>
+              <div className="w-2 h-2 bg-green-500 rounded-full opacity-60"></div>
+            </div>
+            <h3 className="text-sm font-semibold text-green-700 mb-1 bengali-font">মোট কেনাকাটা</h3>
+            <p className="text-2xl font-bold text-green-800 number-font tracking-tight">
+              {formatCurrency(totalPurchases)}
+            </p>
+            <div className="flex items-center mt-2 space-x-1">
+              <div className="w-1 h-1 bg-green-500 rounded-full"></div>
+              <span className="text-xs text-green-600 font-medium bengali-font">
+                {toBengaliNumber(customerSales.length)} টি ক্রয়
+              </span>
+            </div>
+          </div>
+
+          <div className="stats-card bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-coins text-white"></i>
+              </div>
+              <div className="w-2 h-2 bg-blue-500 rounded-full opacity-60"></div>
+            </div>
+            <h3 className="text-sm font-semibold text-blue-700 mb-1 bengali-font">পরিশোধিত</h3>
+            <p className="text-2xl font-bold text-blue-800 number-font tracking-tight">
+              {formatCurrency(totalPaid)}
+            </p>
+            <div className="flex items-center mt-2 space-x-1">
+              <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
+              <span className="text-xs text-blue-600 font-medium bengali-font">প্রাপ্ত</span>
+            </div>
+          </div>
+
+          <div className="stats-card bg-gradient-to-br from-orange-50 to-amber-50 border-orange-200">
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-hand-holding-usd text-white"></i>
+              </div>
+              <div className="w-2 h-2 bg-orange-500 rounded-full opacity-60"></div>
+            </div>
+            <h3 className="text-sm font-semibold text-orange-700 mb-1 bengali-font">বাকি</h3>
+            <p className="text-2xl font-bold text-orange-800 number-font tracking-tight">
+              {formatCurrency(totalDue + (parseFloat(customer.total_credit) || 0))}
+            </p>
+            <div className="flex items-center mt-2 space-x-1">
+              <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
+              <span className="text-xs text-orange-600 font-medium bengali-font">পেন্ডিং</span>
+            </div>
+          </div>
         </div>
 
-        {/* Edit and Delete Buttons */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="w-full">
-                <i className="fas fa-edit mr-2"></i>
-                সম্পাদনা
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>গ্রাহকের তথ্য সম্পাদনা</DialogTitle>
-                <DialogDescription>
-                  গ্রাহকের তথ্য পরিবর্তন করুন
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleEditSubmit}>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                      নাম
-                    </Label>
-                    <Input
-                      id="name"
-                      value={editForm.name}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
-                      className="col-span-3"
-                      required
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="phone" className="text-right">
-                      ফোন
-                    </Label>
-                    <Input
-                      id="phone"
-                      value={editForm.phone_number}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, phone_number: e.target.value }))}
-                      className="col-span-3"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="address" className="text-right">
-                      ঠিকানা
-                    </Label>
-                    <Textarea
-                      id="address"
-                      value={editForm.address}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, address: e.target.value }))}
-                      className="col-span-3"
-                    />
-                  </div>
+        {/* Recent Sales */}
+        <Card className="enhanced-card">
+          <CardHeader className="enhanced-card-header">
+            <CardTitle className="flex items-center justify-between bengali-font">
+              <div className="flex items-center">
+                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                  <i className="fas fa-shopping-cart text-green-600"></i>
                 </div>
-                <DialogFooter>
-                  <Button type="submit" disabled={updateCustomerMutation.isPending}>
-                    {updateCustomerMutation.isPending ? 'সংরক্ষণ করা হচ্ছে...' : 'সংরক্ষণ করুন'}
+                সাম্প্রতিক কেনাকাটা
+              </div>
+              {customerSales.length > 5 && (
+                <Link to="/sales">
+                  <Button variant="outline" size="sm">
+                    সব দেখুন
                   </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" className="w-full">
-                <i className="fas fa-trash mr-2"></i>
-                মুছুন
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>গ্রাহক মুছে ফেলুন</AlertDialogTitle>
-                <AlertDialogDescription>
-                  আপনি কি নিশ্চিত যে আপনি এই গ্রাহককে মুছে ফেলতে চান? এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>বাতিল</AlertDialogCancel>
-                <AlertDialogAction 
-                  onClick={handleDelete}
-                  disabled={deleteCustomerMutation.isPending}
-                  className="bg-destructive text-destructive-foreground"
-                >
-                  {deleteCustomerMutation.isPending ? 'মুছে ফেলা হচ্ছে...' : 'মুছে ফেলুন'}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-
-        {/* Sales History */}
-        <Card>
-          <CardHeader>
-            <CardTitle>ক্রয়ের ইতিহাস</CardTitle>
+                </Link>
+              )}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            {customerSales.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <i className="fas fa-shopping-cart text-3xl mb-2 text-gray-300"></i>
-                <p>এখনো কোনো ক্রয় নেই</p>
-              </div>
-            ) : (
+            {recentSales.length > 0 ? (
               <div className="space-y-3">
-                {customerSales.slice(0, 10).map((sale: any) => (
-                  <div key={sale.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-medium">{new Date(sale.sale_date).toLocaleDateString('bn-BD')}</p>
-                      <p className="text-sm text-gray-600">{sale.payment_method}</p>
+                {recentSales.map((sale) => (
+                  <div key={sale.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i className="fas fa-receipt text-green-600"></i>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900 bengali-font">
+                          {sale.items && sale.items[0]?.productName || 'বিক্রয়'}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {new Date(sale.sale_date).toLocaleDateString('bn-BD')}
+                        </p>
+                      </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold number-font">{formatCurrency(parseFloat(sale.total_amount))}</p>
-                      {parseFloat(sale.due_amount || '0') > 0 && (
-                        <p className="text-sm text-warning number-font">
-                          বাকি: {formatCurrency(parseFloat(sale.due_amount))}
+                      <p className="font-bold text-gray-900 number-font">
+                        {formatCurrency(sale.total_amount)}
+                      </p>
+                      {parseFloat(sale.due_amount) > 0 && (
+                        <p className="text-sm text-red-600 bengali-font">
+                          বাকি: {formatCurrency(sale.due_amount)}
                         </p>
                       )}
                     </div>
                   </div>
                 ))}
               </div>
+            ) : (
+              <div className="text-center py-8">
+                <i className="fas fa-shopping-cart text-4xl text-gray-300 mb-3"></i>
+                <p className="text-gray-500 bengali-font">কোনো কেনাকাটার ইতিহাস নেই</p>
+                <Link to={`/sales/new?customer=${customer.name}`}>
+                  <Button className="mt-3">
+                    <i className="fas fa-plus mr-2"></i>
+                    প্রথম বিক্রয় করুন
+                  </Button>
+                </Link>
+              </div>
             )}
           </CardContent>
         </Card>
+
+        {/* Quick Actions */}
+        <div className="responsive-grid-2 gap-4">
+          <Link to="/customers">
+            <Card className="enhanced-card cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <i className="fas fa-users text-blue-600 text-xl"></i>
+                </div>
+                <h3 className="body-large font-semibold text-gray-900 bengali-font">গ্রাহক তালিকা</h3>
+                <p className="caption text-gray-500 bengali-font">সব গ্রাহক দেখুন</p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Card className="enhanced-card cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-105 border-red-200">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <i className="fas fa-trash text-red-600 text-xl"></i>
+                  </div>
+                  <h3 className="body-large font-semibold text-red-700 bengali-font">গ্রাহক মুছুন</h3>
+                  <p className="caption text-red-500 bengali-font">স্থায়ীভাবে মুছে ফেলুন</p>
+                </CardContent>
+              </Card>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="bengali-font">গ্রাহক মুছে ফেলবেন?</AlertDialogTitle>
+                <AlertDialogDescription className="bengali-font">
+                  এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না। গ্রাহকের সকল তথ্য স্থায়ীভাবে মুছে যাবে।
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="bengali-font">বাতিল</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={() => deleteCustomerMutation.mutate()}
+                  className="bg-red-600 hover:bg-red-700 bengali-font"
+                  disabled={deleteCustomerMutation.isPending}
+                >
+                  {deleteCustomerMutation.isPending ? (
+                    <i className="fas fa-spinner fa-spin mr-2"></i>
+                  ) : (
+                    <i className="fas fa-trash mr-2"></i>
+                  )}
+                  মুছে ফেলুন
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
+
+      {/* Edit Customer Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="enhanced-dialog">
+          <DialogHeader>
+            <DialogTitle className="bengali-font">গ্রাহকের তথ্য সম্পাদনা</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="bengali-font">গ্রাহকের নাম</Label>
+              <Input
+                value={editForm.name}
+                onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+                className="enhanced-input mt-1"
+              />
+            </div>
+            <div>
+              <Label className="bengali-font">ফোন নম্বর</Label>
+              <Input
+                value={editForm.phone_number}
+                onChange={(e) => setEditForm({...editForm, phone_number: e.target.value})}
+                className="enhanced-input mt-1"
+              />
+            </div>
+            <div>
+              <Label className="bengali-font">ঠিকানা</Label>
+              <Textarea
+                value={editForm.address}
+                onChange={(e) => setEditForm({...editForm, address: e.target.value})}
+                className="enhanced-input mt-1 min-h-[80px]"
+                rows={3}
+              />
+            </div>
+            <div className="flex space-x-3 pt-4">
+              <Button 
+                onClick={handleUpdateSubmit}
+                disabled={updateCustomerMutation.isPending}
+                className="action-btn action-btn-primary flex-1"
+              >
+                {updateCustomerMutation.isPending ? (
+                  <i className="fas fa-spinner fa-spin mr-2"></i>
+                ) : (
+                  <i className="fas fa-save mr-2"></i>
+                )}
+                সংরক্ষণ করুন
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => setIsEditDialogOpen(false)}
+                className="flex-1"
+              >
+                বাতিল
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

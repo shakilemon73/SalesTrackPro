@@ -58,7 +58,6 @@ export default function SalesEntry() {
 
   const createSaleMutation = useMutation({
     mutationFn: async (formData: any) => {
-      // Transform to proper database format
       const dbSaleData = {
         customer_id: formData.customer_id,
         customer_name: formData.customer_name,
@@ -74,22 +73,26 @@ export default function SalesEntry() {
     onSuccess: () => {
       toast({
         title: "সফল!",
-        description: "বিক্রয় সফলভাবে সংরক্ষিত হয়েছে",
+        description: "বিক্রয় সফলভাবে রেকর্ড করা হয়েছে",
       });
-      queryClient.invalidateQueries({ queryKey: ['dashboard', CURRENT_USER_ID] });
       queryClient.invalidateQueries({ queryKey: ['sales'] });
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      setLocation("/transactions");
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      setLocation("/sales");
     },
     onError: (error) => {
-      console.error('Sale mutation error:', error);
+      console.error('Sale creation error:', error);
       toast({
         title: "ত্রুটি!",
-        description: "বিক্রয় সংরক্ষণে সমস্যা হয়েছে",
+        description: "বিক্রয় রেকর্ড করতে সমস্যা হয়েছে",
         variant: "destructive",
       });
     },
   });
+
+  // Calculate totals
+  const totalAmount = items.reduce((sum, item) => sum + item.totalPrice, 0);
+  const paidAmount = parseFloat(form.watch("paidAmount")) || 0;
+  const dueAmount = totalAmount - paidAmount;
 
   const addItem = () => {
     setItems([...items, { productName: "", quantity: 1, unitPrice: "", totalPrice: 0 }]);
@@ -105,127 +108,121 @@ export default function SalesEntry() {
     const newItems = [...items];
     newItems[index] = { ...newItems[index], [field]: value };
     
-    // Recalculate total price
     if (field === 'quantity' || field === 'unitPrice') {
-      const quantity = field === 'quantity' ? value : newItems[index].quantity || 1;
-      const unitPrice = field === 'unitPrice' ? value : newItems[index].unitPrice || "0";
-      const numericPrice = parseFloat(unitPrice) || 0;
-      newItems[index].totalPrice = quantity * numericPrice;
+      const quantity = field === 'quantity' ? value : newItems[index].quantity;
+      const unitPrice = field === 'unitPrice' ? parseFloat(value) || 0 : parseFloat(newItems[index].unitPrice) || 0;
+      newItems[index].totalPrice = quantity * unitPrice;
     }
     
     setItems(newItems);
   };
 
-  const selectProduct = (index: number, productId: string) => {
-    const product = products.find((p: any) => p.id === productId);
-    if (product) {
-      updateItem(index, 'productId', productId);
-      updateItem(index, 'productName', product.name);
-      updateItem(index, 'unitPrice', product.selling_price || product.sellingPrice || "0");
-      const quantity = items[index]?.quantity || 1;
-      const price = parseFloat(product.selling_price || product.sellingPrice || "0") || 0;
-      updateItem(index, 'totalPrice', quantity * price);
-    }
-  };
-
-  const selectCustomer = (customerId: string) => {
-    const customer = customers.find((c: any) => c.id === customerId);
-    if (customer) {
-      setSelectedCustomerId(customerId);
-      form.setValue('customerName', customer.name);
-    }
-  };
-
-  const totalAmount = items.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
-  const paidAmount = parseFloat(form.watch('paidAmount') || "0") || 0;
-  const dueAmount = Math.max(0, totalAmount - paidAmount);
-
   const onSubmit = (data: z.infer<typeof saleSchema>) => {
     if (items.some(item => !item.productName || !item.unitPrice)) {
       toast({
-        title: "অসম্পূর্ণ তথ্য!",
-        description: "সব পণ্যের তথ্য পূরণ করুন",
+        title: "ত্রুটি!",
+        description: "সকল পণ্যের তথ্য সম্পূর্ণ করুন",
         variant: "destructive",
       });
       return;
     }
 
+    const selectedCustomer = customers.find(c => c.name === data.customerName);
+    
     const saleData = {
-      customer_id: selectedCustomerId || null,
+      customer_id: selectedCustomer?.id || null,
       customer_name: data.customerName,
-      total_amount: (totalAmount || 0).toString(),
-      paid_amount: (paidAmount || 0).toString(),
-      due_amount: (dueAmount || 0).toString(),
+      total_amount: totalAmount,
+      paid_amount: paidAmount,
+      due_amount: dueAmount,
       payment_method: data.paymentMethod,
       items: items.map(item => ({
-        productId: item.productId,
         productName: item.productName,
-        quantity: item.quantity || 1,
-        unitPrice: item.unitPrice || "0",
-        totalPrice: (item.totalPrice || 0).toString(),
-      })),
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        totalPrice: item.totalPrice.toString()
+      }))
     };
 
-    console.log('Final saleData before mutation:', saleData);
     createSaleMutation.mutate(saleData);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-primary text-white px-4 py-3 shadow-md">
+    <div className="min-h-screen bg-background-app">
+      {/* Premium Header */}
+      <div className="header-bar">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Link to="/sales">
-              <button className="p-2">
-                <i className="fas fa-arrow-left"></i>
+              <button className="w-10 h-10 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300 hover:scale-110 border border-white/20">
+                <i className="fas fa-arrow-left text-white"></i>
               </button>
             </Link>
             <div>
-              <h1 className="text-lg font-semibold">নতুন বিক্রয়</h1>
-              <p className="text-sm text-green-100">{getBengaliDate()}</p>
+              <h1 className="heading-2 text-white mb-0.5">নতুন বিক্রয়</h1>
+              <div className="flex items-center space-x-2">
+                <p className="text-sm text-white/90 bengali-font">{getBengaliDate()}</p>
+                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-xs text-green-200 font-semibold">নতুন এন্ট্রি</span>
+              </div>
             </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button 
+              form="sales-form"
+              type="submit"
+              disabled={createSaleMutation.isPending}
+              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-105"
+            >
+              {createSaleMutation.isPending ? (
+                <i className="fas fa-spinner fa-spin mr-2"></i>
+              ) : (
+                <i className="fas fa-save mr-2"></i>
+              )}
+              সংরক্ষণ
+            </Button>
           </div>
         </div>
       </div>
 
-      <form onSubmit={form.handleSubmit(onSubmit)} className="p-4 space-y-6">
+      <form id="sales-form" onSubmit={form.handleSubmit(onSubmit)} className="p-4 pb-20 space-y-6">
         {/* Customer Selection */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <i className="fas fa-user text-primary mr-2"></i>
+        <Card className="enhanced-card">
+          <CardHeader className="enhanced-card-header">
+            <CardTitle className="flex items-center bengali-font">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                <i className="fas fa-user text-blue-600"></i>
+              </div>
               গ্রাহকের তথ্য
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>বিদ্যমান গ্রাহক নির্বাচন করুন</Label>
-              <Select onValueChange={selectCustomer}>
-                <SelectTrigger>
-                  <SelectValue placeholder="গ্রাহক নির্বাচন করুন (ঐচ্ছিক)" />
+              <Label className="bengali-font">গ্রাহকের নাম *</Label>
+              <Select 
+                value={form.watch("customerName")} 
+                onValueChange={(value) => form.setValue("customerName", value)}
+              >
+                <SelectTrigger className="enhanced-select mt-1">
+                  <SelectValue placeholder="গ্রাহক নির্বাচন করুন..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {customers.map((customer: any) => (
-                    <SelectItem key={customer.id} value={customer.id}>
-                      {customer.name}
-                      {customer.phoneNumber && (
-                        <span className="text-gray-500 ml-2">({customer.phoneNumber})</span>
-                      )}
+                  {customers.map((customer) => (
+                    <SelectItem key={customer.id} value={customer.name}>
+                      <div className="flex items-center space-x-2">
+                        <span className="bengali-font">{customer.name}</span>
+                        {customer.total_credit > 0 && (
+                          <span className="text-xs text-red-600 bengali-font">
+                            (বাকি: {formatCurrency(customer.total_credit)})
+                          </span>
+                        )}
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-
-            <div>
-              <Label>গ্রাহকের নাম *</Label>
-              <Input
-                {...form.register('customerName')}
-                placeholder="গ্রাহকের নাম লিখুন"
-              />
               {form.formState.errors.customerName && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-sm text-red-600 mt-1 bengali-font">
                   {form.formState.errors.customerName.message}
                 </p>
               )}
@@ -233,126 +230,106 @@ export default function SalesEntry() {
           </CardContent>
         </Card>
 
-        {/* Items */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+        {/* Product Items */}
+        <Card className="enhanced-card">
+          <CardHeader className="enhanced-card-header">
+            <CardTitle className="flex items-center justify-between bengali-font">
               <div className="flex items-center">
-                <i className="fas fa-box text-primary mr-2"></i>
+                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                  <i className="fas fa-shopping-cart text-green-600"></i>
+                </div>
                 পণ্যের তালিকা
               </div>
-              <Button type="button" onClick={addItem} size="sm" className="bg-success">
-                <i className="fas fa-plus mr-1"></i>
+              <Button
+                type="button"
+                onClick={addItem}
+                className="action-btn-sm action-btn-secondary"
+              >
+                <i className="fas fa-plus mr-2"></i>
                 যোগ করুন
               </Button>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {items.map((item, index) => (
-              <div key={index} className="p-3 bg-gray-50 rounded-lg space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">পণ্য {toBengaliNumber(index + 1)}</span>
-                  {items.length > 1 && (
-                    <Button
-                      type="button"
-                      onClick={() => removeItem(index)}
-                      size="sm"
-                      variant="destructive"
-                    >
-                      <i className="fas fa-trash"></i>
-                    </Button>
-                  )}
-                </div>
-
-                {/* Product Selection */}
-                <div>
-                  <Label>পণ্য নির্বাচন করুন</Label>
-                  <Select onValueChange={(productId) => selectProduct(index, productId)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="পণ্য নির্বাচন করুন" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {products.map((product: any) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.name} - {formatCurrency(parseFloat(product.selling_price || product.sellingPrice || 0))}
-                          <span className="text-gray-500 ml-2">
-                            (স্টক: {toBengaliNumber(product.current_stock || product.currentStock || 0)})
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Manual Product Entry */}
-                <div>
-                  <Label>অথবা পণ্যের নাম লিখুন</Label>
-                  <Input
-                    value={item.productName}
-                    onChange={(e) => updateItem(index, 'productName', e.target.value)}
-                    placeholder="পণ্যের নাম"
-                  />
-                </div>
-
-                <div className="grid grid-cols-3 gap-3">
+              <div key={index} className="product-item">
+                <div className="responsive-grid-2 gap-4">
                   <div>
-                    <Label>পরিমাণ</Label>
+                    <Label className="bengali-font">পণ্যের নাম *</Label>
                     <Input
-                      type="number"
-                      min="1"
-                      value={item.quantity}
-                      onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 1)}
-                      className="number-font"
+                      value={item.productName}
+                      onChange={(e) => updateItem(index, 'productName', e.target.value)}
+                      placeholder="পণ্যের নাম লিখুন..."
+                      className="enhanced-input mt-1"
                     />
                   </div>
                   <div>
-                    <Label>দাম (টাকা)</Label>
+                    <Label className="bengali-font">পরিমাণ *</Label>
+                    <Input
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 1)}
+                      className="enhanced-input mt-1"
+                      min="1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="bengali-font">একক মূল্য (টাকা) *</Label>
                     <Input
                       type="number"
                       step="0.01"
                       value={item.unitPrice}
                       onChange={(e) => updateItem(index, 'unitPrice', e.target.value)}
-                      placeholder="০"
-                      className="number-font"
+                      placeholder="০.০০"
+                      className="enhanced-input mt-1"
                     />
                   </div>
                   <div>
-                    <Label>মোট</Label>
-                    <div className="p-2 bg-gray-100 rounded text-center number-font font-medium">
-                      {formatCurrency(item.totalPrice)}
+                    <Label className="bengali-font">মোট মূল্য</Label>
+                    <div className="mt-1 p-3 bg-gray-50 rounded-xl border">
+                      <span className="currency-display text-lg font-semibold text-gray-900">
+                        {formatCurrency(item.totalPrice)}
+                      </span>
                     </div>
                   </div>
                 </div>
+                
+                {items.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => removeItem(index)}
+                    className="mt-3 text-red-600 hover:bg-red-50 border-red-200"
+                  >
+                    <i className="fas fa-trash mr-2"></i>
+                    মুছে ফেলুন
+                  </Button>
+                )}
               </div>
             ))}
           </CardContent>
         </Card>
 
-        {/* Payment */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <i className="fas fa-money-bill-wave text-primary mr-2"></i>
+        {/* Payment Information */}
+        <Card className="enhanced-card">
+          <CardHeader className="enhanced-card-header">
+            <CardTitle className="flex items-center bengali-font">
+              <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                <i className="fas fa-credit-card text-purple-600"></i>
+              </div>
               পেমেন্ট তথ্য
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="responsive-grid-2 gap-4">
               <div>
-                <Label>মোট পরিমাণ</Label>
-                <div className="p-3 bg-primary/10 rounded-lg text-center">
-                  <span className="text-lg font-bold text-primary number-font">
-                    {formatCurrency(totalAmount)}
-                  </span>
-                </div>
-              </div>
-              <div>
-                <Label>পেমেন্ট পদ্ধতি *</Label>
+                <Label className="bengali-font">পেমেন্ট পদ্ধতি *</Label>
                 <Select 
-                  value={form.watch('paymentMethod')} 
-                  onValueChange={(value) => form.setValue('paymentMethod', value as any)}
+                  value={form.watch("paymentMethod")} 
+                  onValueChange={(value) => form.setValue("paymentMethod", value as any)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="enhanced-select mt-1">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -362,30 +339,59 @@ export default function SalesEntry() {
                   </SelectContent>
                 </Select>
               </div>
+              
+              <div>
+                <Label className="bengali-font">পরিশোধিত পরিমাণ (টাকা) *</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  {...form.register("paidAmount")}
+                  placeholder="০.০০"
+                  className="enhanced-input mt-1"
+                />
+                {form.formState.errors.paidAmount && (
+                  <p className="text-sm text-red-600 mt-1 bengali-font">
+                    {form.formState.errors.paidAmount.message}
+                  </p>
+                )}
+              </div>
             </div>
+          </CardContent>
+        </Card>
 
-            <div>
-              <Label>পেমেন্ট পরিমাণ (টাকা) *</Label>
-              <Input
-                {...form.register('paidAmount')}
-                type="number"
-                step="0.01"
-                placeholder="পেমেন্ট পরিমাণ"
-                className="number-font"
-              />
-              {form.formState.errors.paidAmount && (
-                <p className="text-red-500 text-sm mt-1">
-                  {form.formState.errors.paidAmount.message}
-                </p>
-              )}
+        {/* Summary */}
+        <Card className="enhanced-card bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <CardContent className="p-6">
+            <h3 className="heading-3 text-blue-900 mb-4 bengali-font">বিক্রয় সারাংশ</h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="body-regular text-blue-700 bengali-font">মোট পরিমাণ:</span>
+                <span className="currency-display text-xl font-bold text-blue-900">
+                  {formatCurrency(totalAmount)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="body-regular text-blue-700 bengali-font">পরিশোধিত:</span>
+                <span className="currency-display text-lg font-semibold text-green-700">
+                  {formatCurrency(paidAmount)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between border-t border-blue-200 pt-3">
+                <span className="body-regular text-blue-700 bengali-font">বাকি পরিমাণ:</span>
+                <span className={`currency-display text-lg font-bold ${
+                  dueAmount > 0 ? 'text-red-700' : 'text-green-700'
+                }`}>
+                  {formatCurrency(dueAmount)}
+                </span>
+              </div>
             </div>
-
+            
             {dueAmount > 0 && (
-              <div className="p-3 bg-warning/10 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium text-warning">বাকি পরিমাণ:</span>
-                  <span className="text-lg font-bold text-warning number-font">
-                    {formatCurrency(dueAmount)}
+              <div className="mt-4 p-3 bg-orange-100 border border-orange-200 rounded-xl">
+                <div className="flex items-center space-x-2">
+                  <i className="fas fa-exclamation-triangle text-orange-600"></i>
+                  <span className="text-sm text-orange-800 bengali-font font-medium">
+                    এই বিক্রয়ে {formatCurrency(dueAmount)} টাকা বাকি থাকবে
                   </span>
                 </div>
               </div>
@@ -393,30 +399,31 @@ export default function SalesEntry() {
           </CardContent>
         </Card>
 
-        {/* Submit Buttons */}
-        <div className="flex space-x-3 pb-20">
-          <Link to="/sales" className="flex-1">
-            <Button type="button" variant="outline" className="w-full">
-              বাতিল
-            </Button>
+        {/* Quick Actions */}
+        <div className="responsive-grid-2 gap-4">
+          <Link to="/customers/new">
+            <Card className="enhanced-card cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <i className="fas fa-user-plus text-blue-600 text-xl"></i>
+                </div>
+                <h3 className="body-large font-semibold text-gray-900 bengali-font">নতুন গ্রাহক</h3>
+                <p className="caption text-gray-500 bengali-font">গ্রাহক যোগ করুন</p>
+              </CardContent>
+            </Card>
           </Link>
-          <Button 
-            type="submit" 
-            className="flex-1 bg-primary"
-            disabled={createSaleMutation.isPending}
-          >
-            {createSaleMutation.isPending ? (
-              <>
-                <i className="fas fa-spinner fa-spin mr-2"></i>
-                সংরক্ষণ হচ্ছে...
-              </>
-            ) : (
-              <>
-                <i className="fas fa-save mr-2"></i>
-                বিক্রয় সংরক্ষণ
-              </>
-            )}
-          </Button>
+
+          <Link to="/inventory">
+            <Card className="enhanced-card cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <i className="fas fa-boxes text-green-600 text-xl"></i>
+                </div>
+                <h3 className="body-large font-semibold text-gray-900 bengali-font">ইনভেন্টরি</h3>
+                <p className="caption text-gray-500 bengali-font">স্টক দেখুন</p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </form>
     </div>

@@ -8,9 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
-import { queryClient } from "@/lib/queryClient";
 
 export default function Settings() {
   const [notifications, setNotifications] = useState(true);
@@ -38,7 +37,6 @@ export default function Settings() {
   });
 
   const handleBusinessInfoSave = () => {
-    // For now, just save to local storage - in a real app this would be saved to user profile
     localStorage.setItem('businessInfo', JSON.stringify(businessInfo));
     setIsBusinessInfoOpen(false);
     toast({
@@ -72,186 +70,181 @@ export default function Settings() {
     {
       title: "ব্যবসার তথ্য",
       icon: "fas fa-store",
+      color: "blue",
       items: [
-        { label: "দোকানের নাম", value: businessInfo.shopName, action: "edit" },
-        { label: "মালিকের নাম", value: businessInfo.ownerName, action: "edit" },
-        { label: "ঠিকানা", value: businessInfo.address, action: "edit" },
-        { label: "ফোন নম্বর", value: businessInfo.phone, action: "edit" }
+        {
+          title: "দোকানের তথ্য",
+          subtitle: "নাম, ঠিকানা ও যোগাযোগের তথ্য",
+          icon: "fas fa-edit",
+          action: () => setIsBusinessInfoOpen(true)
+        }
       ]
     },
     {
-      title: "অ্যাকাউন্ট সেটিংস",
-      icon: "fas fa-user-cog",
+      title: "অ্যাপ সেটিংস",
+      icon: "fas fa-cog",
+      color: "purple",
       items: [
-        { label: "পাসওয়ার্ড পরিবর্তন", action: "navigate" },
-        { label: "প্রোফাইল আপডেট", action: "navigate" },
-        { label: "অ্যাকাউন্ট ডিলিট", action: "danger" }
+        {
+          title: "নোটিফিকেশন",
+          subtitle: "বিক্রয় ও পেমেন্ট সতর্কতা",
+          icon: "fas fa-bell",
+          toggle: { value: notifications, onChange: setNotifications }
+        },
+        {
+          title: "অটো ব্যাকআপ",
+          subtitle: "স্বয়ংক্রিয় ডেটা সংরক্ষণ",
+          icon: "fas fa-cloud-upload-alt",
+          toggle: { value: autoBackup, onChange: setAutoBackup }
+        },
+        {
+          title: "ডার্ক মোড",
+          subtitle: "গাঢ় থিম ব্যবহার করুন",
+          icon: "fas fa-moon",
+          toggle: { value: darkMode, onChange: setDarkMode }
+        }
       ]
     },
     {
-      title: "প্রিন্ট সেটিংস",
-      icon: "fas fa-print",
+      title: "ডেটা ম্যানেজমেন্ট",
+      icon: "fas fa-database",
+      color: "green",
       items: [
-        { label: "প্রিন্টার সংযোগ", action: "navigate" },
-        { label: "বিল টেমপ্লেট", action: "navigate" },
-        { label: "কাগজের সাইজ", value: "A4", action: "select" },
-        { label: "ভাষা", value: "বাংলা", action: "select" }
+        {
+          title: "ডেটা এক্সপোর্ট",
+          subtitle: "সকল তথ্য ডাউনলোড করুন",
+          icon: "fas fa-download",
+          action: handleDataExport
+        }
+      ]
+    },
+    {
+      title: "সাহায্য ও সাপোর্ট",
+      icon: "fas fa-question-circle",
+      color: "orange",
+      items: [
+        {
+          title: "টিউটোরিয়াল",
+          subtitle: "অ্যাপ ব্যবহারের নির্দেশনা",
+          icon: "fas fa-play-circle",
+          action: () => window.open('/tutorial', '_blank')
+        },
+        {
+          title: "সাপোর্ট",
+          subtitle: "সহায়তা ও যোগাযোগ",
+          icon: "fas fa-life-ring",
+          action: () => window.open('mailto:support@dokanhisab.com')
+        }
       ]
     }
   ];
 
+  const getColorClasses = (color: string) => {
+    const colors = {
+      blue: "from-blue-500 to-indigo-600 bg-blue-100 text-blue-600",
+      purple: "from-purple-500 to-violet-600 bg-purple-100 text-purple-600", 
+      green: "from-green-500 to-emerald-600 bg-green-100 text-green-600",
+      orange: "from-orange-500 to-amber-600 bg-orange-100 text-orange-600"
+    };
+    return colors[color as keyof typeof colors] || colors.blue;
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-primary text-white px-4 py-3 shadow-md">
+    <div className="min-h-screen bg-background-app">
+      {/* Premium Header */}
+      <div className="header-bar">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Link to="/">
-              <button className="p-2">
-                <i className="fas fa-arrow-left"></i>
+              <button className="w-10 h-10 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300 hover:scale-110 border border-white/20">
+                <i className="fas fa-arrow-left text-white"></i>
               </button>
             </Link>
             <div>
-              <h1 className="text-lg font-semibold">সেটিংস</h1>
-              <p className="text-sm text-green-100">{getBengaliDate()}</p>
+              <h1 className="heading-2 text-white mb-0.5">সেটিংস</h1>
+              <div className="flex items-center space-x-2">
+                <p className="text-sm text-white/90 bengali-font">{getBengaliDate()}</p>
+                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
+                <span className="text-xs text-blue-200 font-semibold">কনফিগারেশন</span>
+              </div>
             </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button className="bg-white/15 hover:bg-white/25 text-white border border-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-105">
+              <i className="fas fa-save mr-2"></i>
+              সেভ
+            </Button>
           </div>
         </div>
       </div>
 
-      <div className="p-4 space-y-6">
-        {/* App Preferences */}
-        <Card>
-          <CardContent className="p-4">
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <i className="fas fa-cog text-primary mr-2"></i>
-              অ্যাপ পছন্দসমূহ
-            </h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">নোটিফিকেশন</p>
-                  <p className="text-sm text-gray-600">বিক্রয় ও স্টক সম্পর্কে জানান</p>
-                </div>
-                <Switch 
-                  checked={notifications} 
-                  onCheckedChange={setNotifications}
-                />
+      <div className="p-4 pb-20 space-y-6">
+        {/* User Profile Card */}
+        <Card className="enhanced-card bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-user text-white text-2xl"></i>
               </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">অটো ব্যাকআপ</p>
-                  <p className="text-sm text-gray-600">প্রতিদিন ডেটা সংরক্ষণ</p>
-                </div>
-                <Switch 
-                  checked={autoBackup} 
-                  onCheckedChange={setAutoBackup}
-                />
+              <div className="flex-1">
+                <h3 className="heading-3 text-gray-900 mb-1 bengali-font">{businessInfo.ownerName}</h3>
+                <p className="body-regular text-gray-600 bengali-font">{businessInfo.shopName}</p>
+                <p className="caption text-gray-500">{businessInfo.address}</p>
               </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">ডার্ক মোড</p>
-                  <p className="text-sm text-gray-600">রাতের জন্য অন্ধকার থিম</p>
-                </div>
-                <Switch 
-                  checked={darkMode} 
-                  onCheckedChange={setDarkMode}
-                />
-              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setIsBusinessInfoOpen(true)}
+                className="bg-white/80 hover:bg-white border-blue-200 text-blue-700"
+              >
+                <i className="fas fa-edit mr-2"></i>
+                সম্পাদনা
+              </Button>
             </div>
           </CardContent>
         </Card>
 
         {/* Settings Sections */}
-        {settingsSections.map((section, index) => (
-          <Card key={index}>
-            <CardContent className="p-4">
-              <h2 className="text-lg font-semibold mb-4 flex items-center">
-                <i className={`${section.icon} text-primary mr-2`}></i>
-                {section.title}
-              </h2>
+        {settingsSections.map((section, sectionIndex) => (
+          <Card key={sectionIndex} className="enhanced-card">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className={`w-10 h-10 bg-gradient-to-br ${getColorClasses(section.color).split(' ')[0]} ${getColorClasses(section.color).split(' ')[1]} rounded-xl flex items-center justify-center shadow-lg`}>
+                  <i className={`${section.icon} text-white`}></i>
+                </div>
+                <h3 className="heading-3 text-gray-900 bengali-font">{section.title}</h3>
+              </div>
+              
               <div className="space-y-3">
                 {section.items.map((item, itemIndex) => (
-                  <div key={itemIndex} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex-1">
-                      <p className="font-medium">{item.label}</p>
-                      {item.value && (
-                        <p className="text-sm text-gray-600">{item.value}</p>
+                  <div key={itemIndex} className="setting-item">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-8 h-8 ${getColorClasses(section.color).split(' ')[2]} ${getColorClasses(section.color).split(' ')[3]} rounded-lg flex items-center justify-center`}>
+                          <i className={`${item.icon} text-sm`}></i>
+                        </div>
+                        <div>
+                          <p className="body-large font-semibold text-gray-900 bengali-font">{item.title}</p>
+                          <p className="caption text-gray-500 bengali-font">{item.subtitle}</p>
+                        </div>
+                      </div>
+                      
+                      {item.toggle ? (
+                        <Switch
+                          checked={item.toggle.value}
+                          onCheckedChange={item.toggle.onChange}
+                        />
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={item.action}
+                          className="hover:bg-gray-100"
+                        >
+                          <i className="fas fa-chevron-right text-gray-400"></i>
+                        </Button>
                       )}
                     </div>
-                    {item.action === "edit" && section.title === "ব্যবসার তথ্য" && (
-                      <Dialog open={isBusinessInfoOpen} onOpenChange={setIsBusinessInfoOpen}>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm">
-                            <i className="fas fa-edit"></i>
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>ব্যবসার তথ্য সম্পাদনা</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <div>
-                              <Label htmlFor="shopName">দোকানের নাম</Label>
-                              <Input
-                                id="shopName"
-                                value={businessInfo.shopName}
-                                onChange={(e) => setBusinessInfo(prev => ({...prev, shopName: e.target.value}))}
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="ownerName">মালিকের নাম</Label>
-                              <Input
-                                id="ownerName"
-                                value={businessInfo.ownerName}
-                                onChange={(e) => setBusinessInfo(prev => ({...prev, ownerName: e.target.value}))}
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="address">ঠিকানা</Label>
-                              <Input
-                                id="address"
-                                value={businessInfo.address}
-                                onChange={(e) => setBusinessInfo(prev => ({...prev, address: e.target.value}))}
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="phone">ফোন নম্বর</Label>
-                              <Input
-                                id="phone"
-                                value={businessInfo.phone}
-                                onChange={(e) => setBusinessInfo(prev => ({...prev, phone: e.target.value}))}
-                              />
-                            </div>
-                            <Button onClick={handleBusinessInfoSave} className="w-full">
-                              সংরক্ষণ করুন
-                            </Button>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    )}
-                    {item.action === "edit" && section.title !== "ব্যবসার তথ্য" && (
-                      <Button variant="outline" size="sm">
-                        <i className="fas fa-edit"></i>
-                      </Button>
-                    )}
-                    {item.action === "navigate" && (
-                      <Button variant="outline" size="sm">
-                        <i className="fas fa-chevron-right"></i>
-                      </Button>
-                    )}
-                    {item.action === "select" && (
-                      <Button variant="outline" size="sm">
-                        <i className="fas fa-chevron-down"></i>
-                      </Button>
-                    )}
-                    {item.action === "danger" && (
-                      <Button variant="destructive" size="sm">
-                        <i className="fas fa-trash"></i>
-                      </Button>
-                    )}
                   </div>
                 ))}
               </div>
@@ -259,101 +252,77 @@ export default function Settings() {
           </Card>
         ))}
 
-        {/* Data Management */}
-        <Card>
-          <CardContent className="p-4">
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <i className="fas fa-database text-primary mr-2"></i>
-              ডেটা ব্যবস্থাপনা
-            </h2>
-            <div className="space-y-3">
-              <Button onClick={handleDataExport} className="w-full bg-success" variant="outline">
-                <i className="fas fa-download mr-2"></i>
-                ডেটা এক্সপোর্ট করুন
-              </Button>
-              <Button className="w-full bg-warning text-white" variant="outline">
-                <i className="fas fa-upload mr-2"></i>
-                ডেটা ইমপোর্ট করুন
-              </Button>
-              <Button className="w-full bg-primary" variant="outline">
-                <i className="fas fa-sync mr-2"></i>
-                ব্যাকআপ তৈরি করুন
-              </Button>
+        {/* App Info */}
+        <Card className="enhanced-card bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200">
+          <CardContent className="p-6 text-center">
+            <div className="w-12 h-12 bg-gradient-to-br from-gray-500 to-slate-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg">
+              <i className="fas fa-info-circle text-white text-xl"></i>
             </div>
-            
-            {/* Data Statistics */}
-            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-              <h3 className="font-medium mb-2">ডেটা পরিসংখ্যান</h3>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-600">মোট গ্রাহক:</span>
-                  <span className="font-bold ml-1">{customers.length}</span>
-                </div>
-                <div>
-                  <span className="text-gray-600">মোট বিক্রয়:</span>
-                  <span className="font-bold ml-1">{sales.length}</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* About */}
-        <Card>
-          <CardContent className="p-4">
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <i className="fas fa-info-circle text-primary mr-2"></i>
-              অ্যাপ সম্পর্কে
-            </h2>
-            <div className="space-y-3 text-center">
-              <div className="flex items-center justify-center space-x-2">
-                <i className="fas fa-store text-primary text-2xl"></i>
-                <h3 className="text-xl font-bold text-primary">দোকান হিসাব</h3>
-              </div>
-              <p className="text-gray-600">
-                বাংলাদেশী দোকানদারদের জন্য সম্পূর্ণ ব্যবসা ব্যবস্থাপনা সমাধান
-              </p>
-              <p className="text-sm text-gray-500">
-                সংস্করণ: ১.০.০
-              </p>
-              <div className="flex justify-center space-x-4 pt-4">
-                <Button variant="outline" size="sm">
-                  <i className="fas fa-star mr-2"></i>
-                  রেটিং দিন
-                </Button>
-                <Button variant="outline" size="sm">
-                  <i className="fas fa-share mr-2"></i>
-                  শেয়ার করুন
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Support */}
-        <Card>
-          <CardContent className="p-4">
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <i className="fas fa-headset text-primary mr-2"></i>
-              সহায়তা ও যোগাযোগ
-            </h2>
-            <div className="space-y-3">
-              <Button className="w-full" variant="outline">
-                <i className="fas fa-question-circle mr-2"></i>
-                সাহায্য ও নির্দেশনা
-              </Button>
-              <Button className="w-full" variant="outline">
-                <i className="fas fa-envelope mr-2"></i>
-                আমাদের সাথে যোগাযোগ
-              </Button>
-              <Button className="w-full" variant="outline">
-                <i className="fas fa-file-alt mr-2"></i>
-                গোপনীয়তা নীতি
-              </Button>
-            </div>
+            <h3 className="body-large font-semibold text-gray-900 bengali-font mb-2">দোকান হিসাব</h3>
+            <p className="caption text-gray-500 bengali-font mb-2">সংস্করণ ১.০.০</p>
+            <p className="caption text-gray-400 bengali-font">বাংলাদেশী ব্যবসায়ীদের জন্য তৈরি</p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Business Info Dialog */}
+      <Dialog open={isBusinessInfoOpen} onOpenChange={setIsBusinessInfoOpen}>
+        <DialogContent className="enhanced-dialog">
+          <DialogHeader>
+            <DialogTitle className="bengali-font">ব্যবসার তথ্য সম্পাদনা</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="bengali-font">দোকানের নাম</Label>
+              <Input
+                value={businessInfo.shopName}
+                onChange={(e) => setBusinessInfo({...businessInfo, shopName: e.target.value})}
+                className="enhanced-input mt-1"
+              />
+            </div>
+            <div>
+              <Label className="bengali-font">মালিকের নাম</Label>
+              <Input
+                value={businessInfo.ownerName}
+                onChange={(e) => setBusinessInfo({...businessInfo, ownerName: e.target.value})}
+                className="enhanced-input mt-1"
+              />
+            </div>
+            <div>
+              <Label className="bengali-font">ঠিকানা</Label>
+              <Input
+                value={businessInfo.address}
+                onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})}
+                className="enhanced-input mt-1"
+              />
+            </div>
+            <div>
+              <Label className="bengali-font">ফোন নম্বর</Label>
+              <Input
+                value={businessInfo.phone}
+                onChange={(e) => setBusinessInfo({...businessInfo, phone: e.target.value})}
+                className="enhanced-input mt-1"
+              />
+            </div>
+            <div className="flex space-x-3 pt-4">
+              <Button 
+                onClick={handleBusinessInfoSave}
+                className="action-btn action-btn-primary flex-1"
+              >
+                <i className="fas fa-save mr-2"></i>
+                সংরক্ষণ করুন
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => setIsBusinessInfoOpen(false)}
+                className="flex-1"
+              >
+                বাতিল
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

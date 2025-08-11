@@ -103,211 +103,277 @@ export default function Reports() {
   // Calculate revenue and profit based on selected period
   const calculatePeriodStats = () => {
     const totalRevenue = filteredSales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || 0), 0);
-    const totalProfit = filteredSales.reduce((sum, sale) => {
-      if (sale.items && Array.isArray(sale.items)) {
-        return sum + sale.items.reduce((itemSum: number, item: any) => {
-          const quantity = parseInt(item.quantity) || 0;
-          const sellingPrice = parseFloat(item.unitPrice) || 0;
-          // Simplified profit calculation - would need product buying price for accurate calculation
-          return itemSum + (quantity * sellingPrice * 0.2); // Assuming 20% profit margin
-        }, 0);
-      }
-      return sum;
-    }, 0);
+    const totalExpense = expenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0);
+    const totalProfit = totalRevenue - totalExpense;
     
-    return { totalRevenue, totalProfit };
+    return { totalRevenue, totalProfit, totalExpense };
   };
 
-  const { totalRevenue, totalProfit } = calculatePeriodStats();
+  const { totalRevenue, totalProfit, totalExpense } = calculatePeriodStats();
   const totalDue = stats?.pendingCollection || 0;
 
+  const handleDataExport = () => {
+    const exportData = {
+      period: reportPeriod,
+      stats: { totalRevenue, totalProfit, totalExpense, totalDue },
+      topProducts,
+      topCustomers,
+      sales: filteredSales,
+      exportDate: new Date().toISOString()
+    };
+    
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `report-${reportPeriod}-${new Date().getDate()}-${new Date().getMonth() + 1}-${new Date().getFullYear()}.json`;
+    link.click();
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-primary text-white px-4 py-3 shadow-md">
+    <div className="min-h-screen bg-background-app">
+      {/* Premium Header */}
+      <div className="header-bar">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Link to="/">
-              <button className="p-2">
-                <i className="fas fa-arrow-left"></i>
+              <button className="w-10 h-10 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300 hover:scale-110 border border-white/20">
+                <i className="fas fa-arrow-left text-white"></i>
               </button>
             </Link>
             <div>
-              <h1 className="text-lg font-semibold">রিপোর্ট ও বিশ্লেষণ</h1>
-              <p className="text-sm text-green-100">{getBengaliDate()}</p>
+              <h1 className="heading-2 text-white mb-0.5">রিপোর্ট ও বিশ্লেষণ</h1>
+              <div className="flex items-center space-x-2">
+                <p className="text-sm text-white/90 bengali-font">{getBengaliDate()}</p>
+                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-xs text-green-200 font-semibold">ডেটা আপডেট</span>
+              </div>
             </div>
           </div>
-          <Button variant="outline" className="text-primary bg-white">
+          <Button 
+            onClick={handleDataExport}
+            className="bg-white/15 hover:bg-white/25 text-white border border-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-105"
+          >
             <i className="fas fa-download mr-2"></i>
             এক্সপোর্ট
           </Button>
         </div>
       </div>
 
-      {/* Period Filter */}
-      <div className="p-4 bg-white border-b">
-        <Select value={reportPeriod} onValueChange={setReportPeriod}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="today">আজকের রিপোর্ট</SelectItem>
-            <SelectItem value="week">সাপ্তাহিক রিপোর্ট</SelectItem>
-            <SelectItem value="month">মাসিক রিপোর্ট</SelectItem>
-            <SelectItem value="year">বার্ষিক রিপোর্ট</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Enhanced Period Filter */}
+      <div className="p-4 bg-surface border-b border-gray-200">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+            <i className="fas fa-calendar-alt text-blue-600"></i>
+          </div>
+          <div className="flex-1">
+            <Select value={reportPeriod} onValueChange={setReportPeriod}>
+              <SelectTrigger className="enhanced-select">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="today">আজকের রিপোর্ট</SelectItem>
+                <SelectItem value="week">সাপ্তাহিক রিপোর্ট</SelectItem>
+                <SelectItem value="month">মাসিক রিপোর্ট</SelectItem>
+                <SelectItem value="year">বার্ষিক রিপোর্ট</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
 
-      <div className="p-4 space-y-6">
-        {/* Revenue Summary */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <i className="fas fa-chart-line text-primary mr-2"></i>
-              আয়ের সারসংক্ষেপ
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 gap-4">
-              <div className="flex justify-between items-center p-3 bg-primary/5 rounded-lg">
-                <span className="text-gray-700">মোট বিক্রয়</span>
-                <span className="font-bold text-primary number-font">
-                  {formatCurrency(totalRevenue)}
-                </span>
+      <div className="p-4 pb-20 space-y-6">
+        {/* Enhanced Revenue Summary */}
+        <div className="stats-grid grid-cols-2 gap-4">
+          <div className="stats-card bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-chart-line text-white"></i>
               </div>
-              <div className="flex justify-between items-center p-3 bg-success/5 rounded-lg">
-                <span className="text-gray-700">মোট লাভ</span>
-                <span className="font-bold text-success number-font">
-                  {formatCurrency(totalProfit)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-warning/5 rounded-lg">
-                <span className="text-gray-700">বাকি টাকা</span>
-                <span className="font-bold text-warning number-font">
-                  {formatCurrency(totalDue)} টাকা
-                </span>
-              </div>
+              <div className="w-2 h-2 bg-green-500 rounded-full opacity-60"></div>
             </div>
-          </CardContent>
-        </Card>
+            <h3 className="text-sm font-semibold text-green-700 mb-1 bengali-font">মোট বিক্রয়</h3>
+            <p className="text-2xl font-bold text-green-800 number-font tracking-tight">
+              {formatCurrency(totalRevenue)}
+            </p>
+            <div className="flex items-center mt-2 space-x-1">
+              <div className="w-1 h-1 bg-green-500 rounded-full"></div>
+              <span className="text-xs text-green-600 font-medium bengali-font">
+                {toBengaliNumber(filteredSales.length)} টি লেনদেন
+              </span>
+            </div>
+          </div>
+
+          <div className="stats-card bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-coins text-white"></i>
+              </div>
+              <div className="w-2 h-2 bg-blue-500 rounded-full opacity-60"></div>
+            </div>
+            <h3 className="text-sm font-semibold text-blue-700 mb-1 bengali-font">মোট লাভ</h3>
+            <p className="text-2xl font-bold text-blue-800 number-font tracking-tight">
+              {formatCurrency(totalProfit)}
+            </p>
+            <div className="flex items-center mt-2 space-x-1">
+              <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
+              <span className="text-xs text-blue-600 font-medium bengali-font">
+                {totalRevenue > 0 ? `${((totalProfit / totalRevenue) * 100).toFixed(1)}%` : '০%'} লাভের হার
+              </span>
+            </div>
+          </div>
+
+          <div className="stats-card bg-gradient-to-br from-red-50 to-rose-50 border-red-200">
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-receipt text-white"></i>
+              </div>
+              <div className="w-2 h-2 bg-red-500 rounded-full opacity-60"></div>
+            </div>
+            <h3 className="text-sm font-semibold text-red-700 mb-1 bengali-font">মোট খরচ</h3>
+            <p className="text-2xl font-bold text-red-800 number-font tracking-tight">
+              {formatCurrency(totalExpense)}
+            </p>
+            <div className="flex items-center mt-2 space-x-1">
+              <div className="w-1 h-1 bg-red-500 rounded-full"></div>
+              <span className="text-xs text-red-600 font-medium bengali-font">
+                {toBengaliNumber(expenses.length)} টি খরচ
+              </span>
+            </div>
+          </div>
+
+          <div className="stats-card bg-gradient-to-br from-orange-50 to-amber-50 border-orange-200">
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-hand-holding-usd text-white"></i>
+              </div>
+              <div className="w-2 h-2 bg-orange-500 rounded-full opacity-60"></div>
+            </div>
+            <h3 className="text-sm font-semibold text-orange-700 mb-1 bengali-font">বাকি আদায়</h3>
+            <p className="text-2xl font-bold text-orange-800 number-font tracking-tight">
+              {formatCurrency(totalDue)}
+            </p>
+            <div className="flex items-center mt-2 space-x-1">
+              <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
+              <span className="text-xs text-orange-600 font-medium bengali-font">পেন্ডিং</span>
+            </div>
+          </div>
+        </div>
 
         {/* Top Products */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <i className="fas fa-trophy text-warning mr-2"></i>
-              সবচেয়ে বেশি বিক্রিত পণ্য
+        <Card className="enhanced-card">
+          <CardHeader className="enhanced-card-header">
+            <CardTitle className="flex items-center bengali-font">
+              <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                <i className="fas fa-crown text-purple-600"></i>
+              </div>
+              জনপ্রিয় পণ্য
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {topProducts.length === 0 ? (
-                <div className="text-center py-4 text-gray-500">
-                  <i className="fas fa-box text-3xl mb-2 text-gray-300"></i>
-                  <p>এই সময়ের জন্য কোনো বিক্রয় ডেটা নেই</p>
-                </div>
-              ) : (
-                topProducts.map((product, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <CardContent className="space-y-3">
+            {topProducts.length > 0 ? (
+              topProducts.map((product, index) => (
+                <div key={product.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                   <div className="flex items-center space-x-3">
-                    <div className="bg-primary/10 w-8 h-8 rounded-full flex items-center justify-center">
-                      <span className="text-primary font-bold number-font">{toBengaliNumber(index + 1)}</span>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold ${
+                      index === 0 ? 'bg-yellow-500' : 
+                      index === 1 ? 'bg-gray-400' : 
+                      index === 2 ? 'bg-orange-500' : 'bg-blue-500'
+                    }`}>
+                      {toBengaliNumber(index + 1)}
                     </div>
                     <div>
-                      <p className="font-medium">{product.name}</p>
-                      <p className="text-sm text-gray-600">
-                        {toBengaliNumber(product.quantity)} পিস বিক্রি
+                      <p className="font-semibold text-gray-900 bengali-font">{product.name}</p>
+                      <p className="text-sm text-gray-600 bengali-font">
+                        বিক্রি: {toBengaliNumber(product.quantity)} টি
                       </p>
                     </div>
                   </div>
-                  <span className="font-bold text-primary number-font">
-                    {formatCurrency(product.revenue)} টাকা
-                  </span>
+                  <div className="text-right">
+                    <p className="font-bold text-gray-900 number-font">{formatCurrency(product.revenue)}</p>
+                    <p className="text-sm text-gray-600 bengali-font">আয়</p>
+                  </div>
                 </div>
-                ))
-              )}
-            </div>
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <i className="fas fa-box-open text-4xl text-gray-300 mb-3"></i>
+                <p className="text-gray-500 bengali-font">এই সময়ে কোনো বিক্রয় নেই</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Top Customers */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <i className="fas fa-users text-secondary mr-2"></i>
+        <Card className="enhanced-card">
+          <CardHeader className="enhanced-card-header">
+            <CardTitle className="flex items-center bengali-font">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                <i className="fas fa-star text-blue-600"></i>
+              </div>
               সেরা গ্রাহক
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {topCustomers.length === 0 ? (
-                <div className="text-center py-4 text-gray-500">
-                  <i className="fas fa-users text-3xl mb-2 text-gray-300"></i>
-                  <p>এই সময়ের জন্য কোনো গ্রাহক ডেটা নেই</p>
-                </div>
-              ) : (
-                topCustomers.map((customer, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <CardContent className="space-y-3">
+            {topCustomers.length > 0 ? (
+              topCustomers.map((customer, index) => (
+                <div key={customer.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                   <div className="flex items-center space-x-3">
-                    <div className="bg-secondary/10 w-8 h-8 rounded-full flex items-center justify-center">
-                      <span className="text-secondary font-bold number-font">{toBengaliNumber(index + 1)}</span>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold ${
+                      index === 0 ? 'bg-yellow-500' : 
+                      index === 1 ? 'bg-gray-400' : 
+                      index === 2 ? 'bg-orange-500' : 'bg-blue-500'
+                    }`}>
+                      {toBengaliNumber(index + 1)}
                     </div>
                     <div>
-                      <p className="font-medium">{customer.name}</p>
-                      <p className="text-sm text-gray-600">
-                        {toBengaliNumber(customer.purchases)} বার কিনেছেন
+                      <p className="font-semibold text-gray-900 bengali-font">{customer.name}</p>
+                      <p className="text-sm text-gray-600 bengali-font">
+                        {toBengaliNumber(customer.purchases)} টি কেনাকাটা
                       </p>
                     </div>
                   </div>
-                  <span className="font-bold text-secondary number-font">
-                    {formatCurrency(customer.amount)} টাকা
-                  </span>
+                  <div className="text-right">
+                    <p className="font-bold text-gray-900 number-font">{formatCurrency(customer.amount)}</p>
+                    <p className="text-sm text-gray-600 bengali-font">মোট কেনাকাটা</p>
+                  </div>
                 </div>
-                ))
-              )}
-            </div>
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <i className="fas fa-users text-4xl text-gray-300 mb-3"></i>
+                <p className="text-gray-500 bengali-font">এই সময়ে কোনো গ্রাহক ক্রয় নেই</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Period Summary */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <i className="fas fa-chart-area text-accent mr-2"></i>
-              সময়কাল সংক্ষেপ
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-primary number-font">
-                  {toBengaliNumber(filteredSales.length)}
+        {/* Quick Actions */}
+        <div className="responsive-grid-2 gap-4">
+          <Link to="/sales">
+            <Card className="enhanced-card cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <i className="fas fa-chart-line text-green-600 text-xl"></i>
                 </div>
-                <div className="text-sm text-gray-600">মোট লেনদেন</div>
-              </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-secondary number-font">
-                  {toBengaliNumber(topCustomers.length)}
-                </div>
-                <div className="text-sm text-gray-600">সক্রিয় গ্রাহক</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                <h3 className="body-large font-semibold text-gray-900 bengali-font">বিক্রয় দেখুন</h3>
+                <p className="caption text-gray-500 bengali-font">সব বিক্রয়ের তথ্য</p>
+              </CardContent>
+            </Card>
+          </Link>
 
-        {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-3">
-          <Button className="bg-primary" asChild>
-            <Link to="/transactions">
-              <i className="fas fa-list mr-2"></i>
-              লেনদেন দেখুন
-            </Link>
-          </Button>
-          <Button variant="outline" className="border-primary text-primary">
-            <i className="fas fa-print mr-2"></i>
-            প্রিন্ট করুন
-          </Button>
+          <Link to="/expenses/new">
+            <Card className="enhanced-card cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <i className="fas fa-receipt text-red-600 text-xl"></i>
+                </div>
+                <h3 className="body-large font-semibold text-gray-900 bengali-font">খরচ যোগ করুন</h3>
+                <p className="caption text-gray-500 bengali-font">নতুন খরচ এন্ট্রি</p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </div>
     </div>
