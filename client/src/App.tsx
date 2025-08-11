@@ -31,7 +31,7 @@ function Router() {
         <Route path="/settings" component={Settings} />
         <Route path="/sales/new" component={SalesEntry} />
         <Route path="/customers/new" component={CustomerAdd} />
-        <Route path="/customers/:id" component={CustomerDetails} />
+        <Route path="/customers/persondetails-:slug" component={CustomerDetails} />
         <Route path="/inventory" component={Inventory} />
         <Route path="/collection" component={Collection} />
         <Route path="/expenses/new" component={ExpenseEntry} />

@@ -156,7 +156,7 @@ export default function Customers() {
                       <i className="fas fa-phone mr-2"></i>
                       কল করুন
                     </Button>
-                    <Link to={`/customers/${customer.id}`} className="flex-1">
+                    <Link to={`/customers/persondetails-${filteredCustomers.findIndex(c => c.id === customer.id) + 1}?id=${customer.id}`} className="flex-1">
                       <Button variant="outline" size="sm" className="w-full">
                         <i className="fas fa-eye mr-2"></i>
                         বিস্তারিত

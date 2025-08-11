@@ -137,33 +137,7 @@ export function formatBengaliPhone(phone: string): string {
   return toBengaliNumber(phone);
 }
 
-// Generate URL slug from customer name
-export const generateSlug = (name: string): string => {
-  return name
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '') // Remove special characters
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/-+/g, '-') // Replace multiple hyphens with single
-    .trim()
-    .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
-};
-
-// Generate unique slug with number suffix if needed
-export const generateUniqueSlug = (name: string, existingCustomers: any[]): string => {
-  const baseSlug = generateSlug(name);
-  const existingSlugs = existingCustomers.map(customer => customer.slug || generateSlug(customer.name));
-  
-  if (!existingSlugs.includes(baseSlug)) {
-    return baseSlug;
-  }
-  
-  let counter = 1;
-  let uniqueSlug = `${baseSlug}-${counter}`;
-  
-  while (existingSlugs.includes(uniqueSlug)) {
-    counter++;
-    uniqueSlug = `${baseSlug}-${counter}`;
-  }
-  
-  return uniqueSlug;
+// Generate sequential person details URL
+export const generatePersonDetailsSlug = (customerIndex: number): string => {
+  return `persondetails-${customerIndex + 1}`;
 };

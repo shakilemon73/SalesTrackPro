@@ -14,10 +14,13 @@ import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
 import { queryClient } from "@/lib/queryClient";
 
 export default function CustomerDetails() {
-  const [match, params] = useRoute("/customers/:id");
-  const [, setLocation] = useLocation();
+  const [match, params] = useRoute("/customers/persondetails-:slug");
+  const [location, setLocation] = useLocation();
   const { toast } = useToast();
-  const customerId = params?.id;
+  
+  // Get customer ID from URL parameters
+  const urlParams = new URLSearchParams(location.split('?')[1] || '');
+  const customerId = urlParams.get('id');
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editForm, setEditForm] = useState({
