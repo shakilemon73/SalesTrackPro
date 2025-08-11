@@ -44,6 +44,7 @@
     "@radix-ui/react-use-previous": "^1.1.1",
     "@radix-ui/react-use-size": "^1.1.1",
     "@radix-ui/react-visually-hidden": "^1.2.3",
+    "@replit/vite-plugin-cartographer": "^0.2.8",
     "@supabase/auth-js": "^2.71.1",
     "@supabase/node-fetch": "^2.6.15",
     "@supabase/realtime-js": "^2.15.0",
@@ -75,7 +76,6 @@
     "zod-validation-error": "^3.4.0"
   },
   "devDependencies": {
-    "@replit/vite-plugin-cartographer": "^0.2.8",
     "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
     "@tailwindcss/typography": "^0.5.15",
     "@tailwindcss/vite": "^4.1.3",
