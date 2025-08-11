@@ -35,14 +35,18 @@ export default function Transactions() {
   if (salesError) console.error('🔥 TRANSACTIONS Sales error:', salesError);
   if (expensesError) console.error('🔥 TRANSACTIONS Expenses error:', expensesError);
 
-  // For collections, use sales data with paid amounts as a simple solution
+  // For collections, filter sales with negative amounts (collection records)
   const { data: collectionsData = [], isLoading: collectionsLoading } = useQuery({
     queryKey: ['collections', CURRENT_USER_ID],
     queryFn: async () => {
       const allSales = await supabaseService.getSales(CURRENT_USER_ID);
-      return allSales.filter(sale => parseFloat(sale.paid_amount || '0') > 0).map(sale => ({
+      // Filter for collection records (negative amounts) and regular collections
+      return allSales.filter(sale => 
+        parseFloat(sale.total_amount || '0') < 0 || // Collection records
+        (parseFloat(sale.paid_amount || '0') > 0 && parseFloat(sale.due_amount || '0') === 0 && parseFloat(sale.total_amount || '0') > 0) // Full payments
+      ).map(sale => ({
         ...sale,
-        amount: sale.paid_amount,
+        amount: Math.abs(parseFloat(sale.total_amount || '0') < 0 ? parseFloat(sale.total_amount || '0') : parseFloat(sale.paid_amount || '0')),
         collection_date: sale.created_at,
         customer_name: sale.customer_name
       }));
@@ -107,10 +111,14 @@ export default function Transactions() {
 
     // Filter by date
     if (dateFilter === "today") {
-      const today = new Date().toDateString();
-      filtered = filtered.filter(transaction =>
-        new Date(transaction.date).toDateString() === today
-      );
+      const today = new Date();
+      const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+      
+      filtered = filtered.filter(transaction => {
+        const transactionDate = new Date(transaction.date);
+        return transactionDate >= startOfDay && transactionDate < endOfDay;
+      });
     } else if (dateFilter === "week") {
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);

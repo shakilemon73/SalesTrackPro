@@ -90,27 +90,42 @@ export default function Collection() {
 
   const createCollectionMutation = useMutation({
     mutationFn: async (data: CollectionFormData) => {
-      const collectionData = {
-        customer_id: data.customer_id,
-        amount: parseFloat(data.amount),
-        collection_date: new Date().toISOString(),
-        notes: data.notes || null,
-      };
-
-      // Create the collection record in database
-      const result = await supabaseService.createCollection(CURRENT_USER_ID, collectionData);
-
+      console.log('🔥 Creating collection:', data);
+      
+      // Since we don't have a collections table, we'll simulate by updating customer due amounts
+      // and creating a sale record with negative amount for tracking purposes
+      
       // Update customer's due amount
       const customer = customers.find(c => c.id === data.customer_id);
-      if (customer) {
-        const newCredit = Math.max(0, parseFloat(customer.total_credit || '0') - parseFloat(data.amount));
-        await supabaseService.updateCustomer(data.customer_id, {
-          total_credit: newCredit.toString(),
-        });
+      if (!customer) {
+        throw new Error('গ্রাহক পাওয়া যায়নি');
       }
 
-      // Note: Reducing due amounts from sales records - this would need additional implementation
+      const newCredit = Math.max(0, parseFloat(customer.total_credit || '0') - parseFloat(data.amount));
+      await supabaseService.updateCustomer(data.customer_id, {
+        total_credit: newCredit.toString(),
+      });
 
+      // Create a collection record as a special sale with negative amount for tracking
+      const collectionSale = {
+        customer_id: data.customer_id,
+        customer_name: customer.name,
+        total_amount: (-parseFloat(data.amount)).toString(), // Negative to indicate collection
+        paid_amount: parseFloat(data.amount).toString(),
+        due_amount: '0',
+        payment_method: data.payment_method || 'নগদ',
+        items: [{
+          quantity: 1,
+          unitPrice: data.amount,
+          totalPrice: data.amount,
+          productName: `সংগ্রহ - ${customer.name}`
+        }],
+        sale_date: new Date().toISOString(),
+      };
+
+      const result = await supabaseService.createSale(CURRENT_USER_ID, collectionSale);
+      console.log('✅ Collection created as sale:', result);
+      
       return result;
     },
     onSuccess: () => {
