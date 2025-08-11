@@ -12,12 +12,12 @@ export interface User {
 
 export interface Customer {
   id: string;
-  userId: string;
+  user_id: string;
   name: string;
-  phoneNumber?: string;
+  phone_number?: string;
   address?: string;
-  totalCredit: string;
-  createdAt?: Date;
+  total_credit: string;
+  created_at?: Date;
 }
 
 export interface Product {
@@ -35,16 +35,16 @@ export interface Product {
 
 export interface Sale {
   id: string;
-  userId: string;
-  customerId?: string;
-  customerName: string;
-  totalAmount: string;
-  paidAmount: string;
-  dueAmount: string;
-  paymentMethod: string;
+  user_id: string;
+  customer_id?: string;
+  customer_name: string;
+  total_amount: string;
+  paid_amount: string;
+  due_amount: string;
+  payment_method: string;
   items: any[];
-  saleDate?: Date;
-  createdAt?: Date;
+  sale_date?: Date;
+  created_at?: Date;
 }
 
 export interface Expense {
@@ -79,8 +79,9 @@ export interface InsertUser {
 
 export interface InsertCustomer {
   name: string;
-  phoneNumber?: string;
+  phone_number?: string;
   address?: string;
+  total_credit?: string;
 }
 
 export interface InsertProduct {
@@ -94,12 +95,12 @@ export interface InsertProduct {
 }
 
 export interface InsertSale {
-  customerId?: string;
-  customerName: string;
-  totalAmount: string;
-  paidAmount: string;
-  dueAmount: string;
-  paymentMethod: string;
+  customer_id?: string;
+  customer_name: string;
+  total_amount: string;
+  paid_amount: string;
+  due_amount: string;
+  payment_method: string;
   items: any[];
 }
 

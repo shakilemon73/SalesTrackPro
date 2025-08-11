@@ -14,7 +14,7 @@ import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
 
 const customerSchema = z.object({
   name: z.string().min(1, "গ্রাহকের নাম আবশ্যক"),
-  phoneNumber: z.string().optional().refine((phone) => {
+  phone_number: z.string().optional().refine((phone) => {
     if (!phone || phone.trim() === "") return true;
     return isValidBengaliPhone(phone);
   }, "সঠিক ফোন নম্বর লিখুন"),
@@ -30,7 +30,7 @@ export default function CustomerAdd() {
     resolver: zodResolver(customerSchema),
     defaultValues: {
       name: "",
-      phoneNumber: "",
+      phone_number: "",
       address: "",
     },
   });
@@ -60,7 +60,7 @@ export default function CustomerAdd() {
   const onSubmit = (data: z.infer<typeof customerSchema>) => {
     const customerData = {
       name: data.name.trim(),
-      phoneNumber: data.phoneNumber?.trim() || undefined,
+      phone_number: data.phone_number?.trim() || undefined,
       address: data.address?.trim() || undefined,
     };
     
@@ -112,16 +112,16 @@ export default function CustomerAdd() {
             </div>
 
             <div>
-              <Label htmlFor="phoneNumber">ফোন নম্বর</Label>
+              <Label htmlFor="phone_number">ফোন নম্বর</Label>
               <Input
-                id="phoneNumber"
-                {...form.register('phoneNumber')}
+                id="phone_number"
+                {...form.register('phone_number')}
                 placeholder="০১৭১২৩৪৫৬১৮ (ঐচ্ছিক)"
                 className="mt-1 number-font"
               />
-              {form.formState.errors.phoneNumber && (
+              {form.formState.errors.phone_number && (
                 <p className="text-red-500 text-sm mt-1">
-                  {form.formState.errors.phoneNumber.message}
+                  {form.formState.errors.phone_number.message}
                 </p>
               )}
               <p className="text-gray-500 text-xs mt-1">
@@ -189,9 +189,9 @@ export default function CustomerAdd() {
                   <h3 className="font-semibold text-gray-900">
                     {form.watch('name') || 'গ্রাহকের নাম'}
                   </h3>
-                  {form.watch('phoneNumber') && (
+                  {form.watch('phone_number') && (
                     <p className="text-sm text-gray-600 number-font">
-                      {form.watch('phoneNumber')}
+                      {form.watch('phone_number')}
                     </p>
                   )}
                   {form.watch('address') && (

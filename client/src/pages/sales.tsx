@@ -18,11 +18,14 @@ export default function Sales() {
   });
 
   const filteredSales = sales.filter((sale: any) => {
-    const matchesSearch = sale.customerName.toLowerCase().includes(searchTerm.toLowerCase());
+    if (!sale || !sale.customer_name) return false;
+    
+    const matchesSearch = sale.customer_name.toLowerCase().includes(searchTerm.toLowerCase());
     
     if (dateFilter === "today") {
       const today = new Date().toDateString();
-      return matchesSearch && new Date(sale.saleDate).toDateString() === today;
+      const saleDate = sale.sale_date || sale.created_at;
+      return matchesSearch && saleDate && new Date(saleDate).toDateString() === today;
     }
     
     return matchesSearch;

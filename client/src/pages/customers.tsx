@@ -17,7 +17,7 @@ export default function Customers() {
 
   const filteredCustomers = customers.filter((customer: any) =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (customer.phoneNumber && customer.phoneNumber.includes(searchTerm))
+    (customer.phone_number && customer.phone_number.includes(searchTerm))
   );
 
   return (
@@ -112,9 +112,9 @@ export default function Customers() {
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900">{customer.name}</h3>
-                        {customer.phoneNumber && (
+                        {customer.phone_number && (
                           <p className="text-sm text-gray-600 number-font">
-                            {formatBengaliPhone(customer.phoneNumber)}
+                            {formatBengaliPhone(customer.phone_number)}
                           </p>
                         )}
                         {customer.address && (
@@ -124,11 +124,11 @@ export default function Customers() {
                     </div>
                     
                     <div className="text-right">
-                      {parseFloat(customer.totalCredit) > 0 ? (
+                      {parseFloat(customer.total_credit) > 0 ? (
                         <>
                           <p className="text-sm text-gray-600">বাকি</p>
                           <p className="font-bold text-warning number-font">
-                            {formatCurrency(parseFloat(customer.totalCredit))} টাকা
+                            {formatCurrency(parseFloat(customer.total_credit))} টাকা
                           </p>
                         </>
                       ) : (
@@ -150,7 +150,7 @@ export default function Customers() {
                       <i className="fas fa-eye mr-2"></i>
                       বিস্তারিত
                     </Button>
-                    {parseFloat(customer.totalCredit) > 0 && (
+                    {parseFloat(customer.total_credit) > 0 && (
                       <Button size="sm" className="bg-success flex-1">
                         <i className="fas fa-money-bill-wave mr-2"></i>
                         আদায়

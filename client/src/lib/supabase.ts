@@ -86,13 +86,19 @@ export const supabaseService = {
   async createCustomer(userId: string, customer: InsertCustomer): Promise<Customer> {
     try {
       console.log('Creating customer:', customer);
+      
+      // Map frontend field names to database field names
+      const dbCustomer = {
+        name: customer.name,
+        phone_number: customer.phone_number || null,
+        address: customer.address || null,
+        user_id: userId,
+        total_credit: customer.total_credit || '0.00'
+      };
+      
       const { data, error } = await supabase
         .from('customers')
-        .insert({
-          ...customer,
-          user_id: userId,
-          total_credit: customer.total_credit || '0.00'
-        })
+        .insert(dbCustomer)
         .select()
         .single();
       
@@ -261,7 +267,7 @@ export const supabaseService = {
     const customers = await this.getCustomers(userId);
     const products = await this.getProducts(userId);
 
-    const todaySalesTotal = todaySales.reduce((sum, sale) => sum + parseFloat(sale.totalAmount), 0);
+    const todaySalesTotal = todaySales.reduce((sum, sale) => sum + parseFloat(sale.total_amount), 0);
     
     // Calculate profit based on buying vs selling price
     let todayProfit = 0;
@@ -277,7 +283,7 @@ export const supabaseService = {
       }
     }
 
-    const pendingCollection = customers.reduce((sum, customer) => sum + parseFloat(customer.totalCredit || '0'), 0);
+    const pendingCollection = customers.reduce((sum, customer) => sum + parseFloat(customer.total_credit || '0'), 0);
 
     return {
       todaySales: todaySalesTotal,
