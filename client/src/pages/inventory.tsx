@@ -78,7 +78,7 @@ export default function Inventory() {
     },
   });
 
-  const categories = [...new Set(products.map((p: any) => p.category).filter(Boolean))];
+  const categories = Array.from(new Set(products.map((p: any) => p.category).filter(Boolean)));
   
   const filteredProducts = products.filter((product: any) => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());

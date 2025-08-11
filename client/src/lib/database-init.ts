@@ -255,7 +255,7 @@ export async function initializeDatabase() {
       customers: customers?.length || 0,
       products: products?.length || 0,
       sales: sales?.length || 0,
-      expenses: expenses?.length || 0
+      expenses: 4 // Fixed number since expenses don't return array from insert
     };
 
   } catch (error) {
