@@ -279,11 +279,15 @@ export const supabaseService = {
       const todaySales = await this.getTodaySales(userId);
       const customers = await this.getCustomers(userId);
       const products = await this.getProducts(userId);
+      
+      // Get all sales for pending collection calculation
+      const allSales = await this.getSales(userId);
 
       console.log('Dashboard stats - Today sales:', todaySales);
       console.log('Dashboard stats - Customers count:', customers.length);
       console.log('Dashboard stats - Products sample:', products.slice(0, 2));
 
+      // Calculate today's sales total
       const todaySalesTotal = todaySales.reduce((sum, sale) => {
         const amount = typeof sale.total_amount === 'string' ? parseFloat(sale.total_amount) : sale.total_amount;
         return sum + (amount || 0);
@@ -294,31 +298,50 @@ export const supabaseService = {
       for (const sale of todaySales) {
         if (Array.isArray(sale.items)) {
           for (const item of sale.items as any[]) {
-            const product = products.find(p => p.id === item.productId || p.name === item.productName);
-            if (product) {
-              const itemPrice = typeof item.unitPrice === 'string' ? parseFloat(item.unitPrice) : item.unitPrice;
-              // Try both camelCase and snake_case field names
-              const buyingPrice = typeof product.buyingPrice === 'string' ? parseFloat(product.buyingPrice) : 
-                                 typeof product.buying_price === 'string' ? parseFloat(product.buying_price) : 
-                                 product.buyingPrice || product.buying_price || 0;
-              const profit = (itemPrice - buyingPrice) * (item.quantity || 0);
-              console.log(`Item: ${item.productName}, Price: ${itemPrice}, Buying: ${buyingPrice}, Quantity: ${item.quantity}, Profit: ${profit}`);
+            // Handle different item structures
+            const productName = item.productName || item.name;
+            const quantity = item.quantity || 1;
+            
+            // Try to get price from different possible fields
+            let itemPrice = 0;
+            if (item.unitPrice) {
+              itemPrice = typeof item.unitPrice === 'string' ? parseFloat(item.unitPrice) : item.unitPrice;
+            } else if (item.price) {
+              itemPrice = typeof item.price === 'string' ? parseFloat(item.price) : item.price;
+            } else if (item.total && quantity > 0) {
+              const total = typeof item.total === 'string' ? parseFloat(item.total) : item.total;
+              itemPrice = total / quantity;
+            }
+            
+            // Find matching product by name or ID
+            const product = products.find(p => 
+              p.id === item.productId || 
+              p.name === productName ||
+              p.name?.toLowerCase() === productName?.toLowerCase()
+            );
+            
+            if (product && itemPrice > 0) {
+              const buyingPrice = typeof product.buying_price === 'string' ? 
+                parseFloat(product.buying_price) : (product.buying_price || 0);
+              const profit = (itemPrice - buyingPrice) * quantity;
+              console.log(`Profit calc - Item: ${productName}, Selling: ${itemPrice}, Buying: ${buyingPrice}, Qty: ${quantity}, Profit: ${profit}`);
               todayProfit += profit || 0;
             } else {
-              console.log(`Product not found for item: ${item.productName}, productId: ${item.productId}`);
+              console.log(`Product not found for item: ${productName}, productId: ${item.productId}`);
             }
           }
         }
       }
 
-      const pendingCollection = customers.reduce((sum, customer) => {
-        const credit = typeof customer.total_credit === 'string' ? parseFloat(customer.total_credit) : customer.total_credit;
-        return sum + (credit || 0);
+      // Calculate pending collection from due amounts in sales
+      const pendingCollection = allSales.reduce((sum, sale) => {
+        const dueAmount = typeof sale.due_amount === 'string' ? parseFloat(sale.due_amount) : sale.due_amount;
+        return sum + (dueAmount || 0);
       }, 0);
 
       const stats = {
         todaySales: todaySalesTotal,
-        todayProfit,
+        todayProfit: Math.round(todayProfit * 100) / 100, // Round to 2 decimal places
         pendingCollection,
         totalCustomers: customers.length
       };
