@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,8 +25,12 @@ const collectionSchema = z.object({
 type CollectionFormData = z.infer<typeof collectionSchema>;
 
 export default function Collection() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { toast } = useToast();
+  
+  // Get customer ID from URL parameters
+  const urlParams = new URLSearchParams(location.split('?')[1] || '');
+  const preSelectedCustomerId = urlParams.get('customer');
 
   const { data: customers = [], isLoading: customersLoading } = useQuery({
     queryKey: ['customers', CURRENT_USER_ID],
@@ -70,12 +74,19 @@ export default function Collection() {
   const form = useForm<CollectionFormData>({
     resolver: zodResolver(collectionSchema),
     defaultValues: {
-      customer_id: "",
+      customer_id: preSelectedCustomerId || "",
       amount: "",
       payment_method: "",
       notes: "",
     },
   });
+  
+  // Pre-select customer if provided in URL
+  useEffect(() => {
+    if (preSelectedCustomerId && form.watch("customer_id") !== preSelectedCustomerId) {
+      form.setValue("customer_id", preSelectedCustomerId);
+    }
+  }, [preSelectedCustomerId, form]);
 
   const createCollectionMutation = useMutation({
     mutationFn: async (data: CollectionFormData) => {

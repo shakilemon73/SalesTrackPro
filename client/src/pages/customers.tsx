@@ -142,19 +142,33 @@ export default function Customers() {
 
                   {/* Action Buttons */}
                   <div className="flex space-x-2 mt-3 pt-3 border-t border-gray-100">
-                    <Button variant="outline" size="sm" className="flex-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => {
+                        if (customer.phone_number) {
+                          window.open(`tel:${customer.phone_number}`, '_self');
+                        }
+                      }}
+                      disabled={!customer.phone_number}
+                    >
                       <i className="fas fa-phone mr-2"></i>
                       কল করুন
                     </Button>
-                    <Button variant="outline" size="sm" className="flex-1">
-                      <i className="fas fa-eye mr-2"></i>
-                      বিস্তারিত
-                    </Button>
-                    {parseFloat(customer.total_credit) > 0 && (
-                      <Button size="sm" className="bg-success flex-1">
-                        <i className="fas fa-money-bill-wave mr-2"></i>
-                        আদায়
+                    <Link to={`/customers/${customer.id}`} className="flex-1">
+                      <Button variant="outline" size="sm" className="w-full">
+                        <i className="fas fa-eye mr-2"></i>
+                        বিস্তারিত
                       </Button>
+                    </Link>
+                    {parseFloat(customer.total_credit || '0') > 0 && (
+                      <Link to={`/collection?customer=${customer.id}`} className="flex-1">
+                        <Button size="sm" className="bg-success w-full">
+                          <i className="fas fa-money-bill-wave mr-2"></i>
+                          আদায়
+                        </Button>
+                      </Link>
                     )}
                   </div>
                 </CardContent>
@@ -179,7 +193,7 @@ export default function Customers() {
               <p className="text-lg font-bold text-warning number-font">
                 {formatCurrency(
                   filteredCustomers.reduce((sum: number, customer: any) => 
-                    sum + parseFloat(customer.totalCredit), 0
+                    sum + parseFloat(customer.total_credit || '0'), 0
                   )
                 )} টাকা
               </p>

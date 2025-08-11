@@ -11,6 +11,7 @@ import Reports from "@/pages/reports";
 import Settings from "@/pages/settings";
 import SalesEntry from "@/pages/sales-entry";
 import CustomerAdd from "@/pages/customer-add";
+import CustomerDetails from "@/pages/customer-details";
 import Inventory from "@/pages/inventory";
 import Collection from "@/pages/collection";
 import ExpenseEntry from "@/pages/expense-entry";
@@ -30,6 +31,7 @@ function Router() {
         <Route path="/settings" component={Settings} />
         <Route path="/sales/new" component={SalesEntry} />
         <Route path="/customers/new" component={CustomerAdd} />
+        <Route path="/customers/:id" component={CustomerDetails} />
         <Route path="/inventory" component={Inventory} />
         <Route path="/collection" component={Collection} />
         <Route path="/expenses/new" component={ExpenseEntry} />

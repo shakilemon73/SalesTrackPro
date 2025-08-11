@@ -139,6 +139,22 @@ export const supabaseService = {
     }
   },
 
+  async getCustomer(customerId: string): Promise<Customer> {
+    try {
+      const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('id', customerId)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('getCustomer failed:', error);
+      throw error;
+    }
+  },
+
   // Products
   async getProducts(userId: string): Promise<Product[]> {
     const { data, error } = await supabase
