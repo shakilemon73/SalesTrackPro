@@ -169,14 +169,26 @@ export const supabaseService = {
   },
 
   async createSale(userId: string, sale: InsertSale): Promise<Sale> {
-    const { data, error } = await supabase
-      .from('sales')
-      .insert({ ...sale, user_id: userId })
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
+    try {
+      console.log('Creating sale:', sale);
+      
+      const { data, error } = await supabase
+        .from('sales')
+        .insert({ ...sale, user_id: userId })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error creating sale:', error);
+        throw error;
+      }
+      
+      console.log('Sale created successfully:', data);
+      return data;
+    } catch (error) {
+      console.error('createSale failed:', error);
+      throw error;
+    }
   },
 
   async getTodaySales(userId: string): Promise<Sale[]> {

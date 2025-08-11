@@ -135,12 +135,12 @@ export default function SalesEntry() {
     }
 
     const saleData = {
-      customerId: selectedCustomerId || undefined,
-      customerName: data.customerName,
-      totalAmount: totalAmount.toString(),
-      paidAmount: data.paidAmount,
-      dueAmount: dueAmount.toString(),
-      paymentMethod: data.paymentMethod,
+      customer_id: selectedCustomerId || null,
+      customer_name: data.customerName,
+      total_amount: totalAmount.toString(),
+      paid_amount: data.paidAmount,
+      due_amount: dueAmount.toString(),
+      payment_method: data.paymentMethod,
       items: items.map(item => ({
         productId: item.productId,
         productName: item.productName,
