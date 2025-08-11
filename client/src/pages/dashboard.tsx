@@ -23,6 +23,18 @@ export default function Dashboard() {
     queryFn: () => supabaseService.getSales(CURRENT_USER_ID, 3),
   });
 
+  // Fetch recent expenses
+  const { data: recentExpenses = [] } = useQuery({
+    queryKey: ['expenses', CURRENT_USER_ID, 'recent'],
+    queryFn: () => supabaseService.getExpenses(CURRENT_USER_ID, 2),
+  });
+
+  // Fetch recent collections
+  const { data: recentCollections = [] } = useQuery({
+    queryKey: ['collections', CURRENT_USER_ID, 'recent'],
+    queryFn: () => supabaseService.getCollections(CURRENT_USER_ID, 2),
+  });
+
   const { data: lowStockProducts = [], isLoading: stockLoading } = useQuery({
     queryKey: ['products', CURRENT_USER_ID, 'low-stock'],
     queryFn: () => supabaseService.getLowStockProducts(CURRENT_USER_ID),
@@ -179,24 +191,62 @@ export default function Dashboard() {
                   </div>
                 ))}
               </div>
-            ) : recentSales.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <i className="fas fa-receipt text-3xl mb-2 text-gray-300"></i>
-                <p>আজ এখনো কোনো লেনদেন হয়নি</p>
-              </div>
-            ) : (
-              recentSales.map((sale: any) => (
-                <TransactionItem
-                  key={sale.id}
-                  customerName={sale.customer_name}
-                  time={getBengaliTime(new Date(sale.created_at))}
-                  amount={formatCurrency(parseFloat(sale.total_amount))}
-                  type={sale.payment_method}
-                  icon="fas fa-shopping-cart"
-                  iconColor="primary"
-                />
-              ))
-            )}
+            ) : (() => {
+              // Combine all transactions
+              const allTransactions = [
+                ...recentSales.map((sale: any) => ({
+                  ...sale,
+                  type: 'sale',
+                  displayName: sale.customer_name,
+                  displayAmount: formatCurrency(parseFloat(sale.total_amount)),
+                  displayType: sale.payment_method,
+                  icon: "fas fa-shopping-cart",
+                  iconColor: "primary",
+                  time: new Date(sale.created_at)
+                })),
+                ...recentExpenses.map((expense: any) => ({
+                  ...expense,
+                  type: 'expense',
+                  displayName: expense.category,
+                  displayAmount: formatCurrency(parseFloat(expense.amount)),
+                  displayType: "খরচ",
+                  icon: "fas fa-minus-circle",
+                  iconColor: "error",
+                  time: new Date(expense.created_at)
+                })),
+                ...recentCollections.map((collection: any) => ({
+                  ...collection,
+                  type: 'collection',
+                  displayName: collection.customers?.name || 'গ্রাহক',
+                  displayAmount: formatCurrency(parseFloat(collection.amount)),
+                  displayType: "আদায়",
+                  icon: "fas fa-hand-holding-usd",
+                  iconColor: "success",
+                  time: new Date(collection.created_at)
+                }))
+              ]
+              .sort((a, b) => b.time.getTime() - a.time.getTime())
+              .slice(0, 5);
+
+              return allTransactions.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <i className="fas fa-receipt text-3xl mb-2 text-gray-300"></i>
+                  <p>আজ এখনো কোনো লেনদেন হয়নি</p>
+                </div>
+              ) : (
+                allTransactions.map((transaction: any, index: number) => (
+                  <TransactionItem
+                    key={`${transaction.type}-${transaction.id || index}`}
+                    customerName={transaction.displayName}
+                    time={getBengaliTime(transaction.time)}
+                    amount={transaction.displayAmount}
+                    type={transaction.displayType}
+                    icon={transaction.icon}
+                    iconColor={transaction.iconColor}
+                  />
+                ))
+              );
+            })()}
           </div>
         </div>
 

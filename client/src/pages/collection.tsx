@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useLocation } from "wouter";
-import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { supabaseService, CURRENT_USER_ID, supabase } from "@/lib/supabase";
 import { queryClient } from "@/lib/queryClient";
 import { formatCurrency, toBengaliNumber, getBengaliDate, getBengaliTime } from "@/lib/bengali-utils";
 import { useToast } from "@/hooks/use-toast";
@@ -36,8 +36,34 @@ export default function Collection() {
   const { data: dueCustomers = [] } = useQuery({
     queryKey: ['customers', CURRENT_USER_ID, 'due'],
     queryFn: async () => {
-      const allCustomers = await supabaseService.getCustomers(CURRENT_USER_ID);
-      return allCustomers.filter(customer => parseFloat(customer.total_credit) > 0);
+      try {
+        // Get all customers and recent sales to calculate actual due amounts
+        const [allCustomers, allSales] = await Promise.all([
+          supabaseService.getCustomers(CURRENT_USER_ID),
+          supabaseService.getSales(CURRENT_USER_ID, 100) // Get more sales to calculate due amounts
+        ]);
+
+        // Calculate due amounts from sales
+        const customerDueMap = new Map();
+        
+        allSales.forEach((sale: any) => {
+          if (sale.customer_id && sale.due_amount && parseFloat(sale.due_amount) > 0) {
+            const currentDue = customerDueMap.get(sale.customer_id) || 0;
+            customerDueMap.set(sale.customer_id, currentDue + parseFloat(sale.due_amount));
+          }
+        });
+
+        // Filter customers with due amounts
+        return allCustomers
+          .map(customer => ({
+            ...customer,
+            calculated_due: customerDueMap.get(customer.id) || parseFloat(customer.total_credit) || 0
+          }))
+          .filter(customer => customer.calculated_due > 0);
+      } catch (error) {
+        console.error('Error fetching due customers:', error);
+        return [];
+      }
     },
   });
 
@@ -91,7 +117,36 @@ export default function Collection() {
     },
   });
 
-  const selectedCustomer = customers.find(c => c.id === form.watch("customer_id"));
+  const selectedCustomer = dueCustomers.find((c: any) => c.id === form.watch("customer_id"));
+
+  // Get today's collections
+  const { data: todayCollections = [] } = useQuery({
+    queryKey: ['collections', CURRENT_USER_ID, 'today'],
+    queryFn: async () => {
+      try {
+        const today = new Date();
+        const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+        const { data, error } = await supabase
+          .from('collections')
+          .select(`
+            *,
+            customers(name)
+          `)
+          .eq('user_id', CURRENT_USER_ID)
+          .gte('collection_date', startOfDay.toISOString())
+          .lt('collection_date', endOfDay.toISOString())
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        return data || [];
+      } catch (error) {
+        console.error('Error fetching today collections:', error);
+        return [];
+      }
+    },
+  });
 
   const onSubmit = (data: CollectionFormData) => {
     createCollectionMutation.mutate(data);
@@ -117,6 +172,39 @@ export default function Collection() {
       </div>
 
       <div className="pb-20 px-4 py-4">
+        {/* Today's Collections Summary */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <i className="fas fa-hand-holding-usd text-success mr-2"></i>
+              আজকের আদায়
+            </CardTitle>
+            <CardDescription>
+              আজ পর্যন্ত মোট {toBengaliNumber(todayCollections.length)} টি আদায়
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-success number-font">
+                {formatCurrency(todayCollections.reduce((sum, collection: any) => sum + parseFloat(collection.amount), 0))}
+              </p>
+              <p className="text-sm text-gray-600">আজকের মোট আদায়</p>
+            </div>
+            {todayCollections.length > 0 && (
+              <div className="mt-4 space-y-2">
+                {todayCollections.slice(0, 3).map((collection: any, index: number) => (
+                  <div key={index} className="flex items-center justify-between text-sm">
+                    <span>{collection.customers?.name || 'গ্রাহক'}</span>
+                    <span className="text-success font-medium">
+                      {formatCurrency(parseFloat(collection.amount))}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Due Customers Summary */}
         <Card className="mb-6">
           <CardHeader>
@@ -130,11 +218,11 @@ export default function Collection() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {dueCustomers.slice(0, 3).map((customer) => (
+              {dueCustomers.slice(0, 3).map((customer: any) => (
                 <div key={customer.id} className="flex items-center justify-between">
                   <span className="font-medium">{customer.name}</span>
                   <span className="text-error font-bold">
-                    {formatCurrency(parseFloat(customer.total_credit))}
+                    {formatCurrency(customer.calculated_due)}
                   </span>
                 </div>
               ))}
@@ -168,9 +256,9 @@ export default function Collection() {
                     <SelectValue placeholder="গ্রাহক নির্বাচন করুন" />
                   </SelectTrigger>
                   <SelectContent>
-                    {dueCustomers.map((customer) => (
+                    {dueCustomers.map((customer: any) => (
                       <SelectItem key={customer.id} value={customer.id}>
-                        {customer.name} - {formatCurrency(parseFloat(customer.total_credit))} বাকি
+                        {customer.name} - {formatCurrency(customer.calculated_due)} বাকি
                       </SelectItem>
                     ))}
                   </SelectContent>
