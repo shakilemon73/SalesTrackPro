@@ -2,11 +2,32 @@
 <html lang="bn">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
     <title>দোকান হিসাব - ব্যবসা ব্যবস্থাপনা</title>
     <meta name="description" content="বাংলাদেশী দোকানদারদের জন্য সম্পূর্ণ ব্যবসা ব্যবস্থাপনা অ্যাপ। বিক্রয় ট্র্যাকিং, গ্রাহক ব্যবস্থাপনা এবং লাভ-ক্ষতি হিসাব।" />
+    
+    <!-- PWA Meta Tags -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#2E7D32" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="দোকান হিসাব" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- iOS Safari PWA Icons -->
+    <link rel="apple-touch-icon" href="/manifest-icon-192.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/manifest-icon-152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/manifest-icon-180.png" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="দোকান হিসাব - ব্যবসা ব্যবস্থাপনা" />
+    <meta property="og:description" content="বাংলাদেশী দোকানদারদের জন্য সম্পূর্ণ ব্যবসা ব্যবস্থাপনা অ্যাপ" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/manifest-icon-512.png" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/src/main.tsx" as="script" />
+    <link rel="preload" href="/src/index.css" as="style" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,8 +35,33 @@
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- Loading fallback -->
+    <noscript>
+      <div style="text-align: center; padding: 50px; font-family: 'Noto Sans Bengali', sans-serif;">
+        <h2>জাভাস্ক্রিপ্ট প্রয়োজন</h2>
+        <p>এই অ্যাপ ব্যবহার করতে জাভাস্ক্রিপ্ট সক্রিয় করুন।</p>
+      </div>
+    </noscript>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+    
     <script type="module" src="/src/main.tsx"></script>
-    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    
+    <!-- Development banner (remove in production) -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
   </body>
 </html>
