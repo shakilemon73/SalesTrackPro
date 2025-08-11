@@ -54,16 +54,14 @@ export default function Collection() {
   const createCollectionMutation = useMutation({
     mutationFn: async (data: CollectionFormData) => {
       const collectionData = {
-        customer_id: data.customer_id,
-        amount: parseFloat(data.amount),
-        payment_method: data.payment_method,
-        notes: data.notes || null,
-        collection_date: new Date().toISOString(),
-        user_id: CURRENT_USER_ID,
+        customerId: data.customer_id,
+        amount: data.amount,
       };
 
-      // Create collection record (we'll need to add this to supabase service)
-      // For now, let's simulate the collection by reducing customer's due amount
+      // Create the collection record in database
+      const result = await supabaseService.createCollection(CURRENT_USER_ID, collectionData);
+
+      // Update customer's due amount
       const customer = customers.find(c => c.id === data.customer_id);
       if (customer) {
         const newCredit = Math.max(0, parseFloat(customer.total_credit) - parseFloat(data.amount));
@@ -72,7 +70,7 @@ export default function Collection() {
         });
       }
 
-      return collectionData;
+      return result;
     },
     onSuccess: () => {
       toast({

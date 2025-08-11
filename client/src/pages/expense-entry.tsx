@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useLocation } from "wouter";
-import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { supabaseService, CURRENT_USER_ID, supabase } from "@/lib/supabase";
 import { queryClient } from "@/lib/queryClient";
 import { formatCurrency, toBengaliNumber, getBengaliDate, getBengaliTime } from "@/lib/bengali-utils";
 import { useToast } from "@/hooks/use-toast";
@@ -29,12 +29,29 @@ export default function ExpenseEntry() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  // Get today's expenses (placeholder - will be implemented when expenses table is added)
+  // Get today's expenses from Supabase
   const { data: todayExpenses = [] } = useQuery({
     queryKey: ['expenses', CURRENT_USER_ID, 'today'],
     queryFn: async () => {
-      // This would fetch expenses for today - we'll need to add this to supabase service
-      return [] as Array<{category: string, amount: number, description: string}>;
+      try {
+        const today = new Date();
+        const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+        const { data, error } = await supabase
+          .from('expenses')
+          .select('*')
+          .eq('user_id', CURRENT_USER_ID)
+          .gte('expense_date', startOfDay.toISOString())
+          .lt('expense_date', endOfDay.toISOString())
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        return data || [];
+      } catch (error) {
+        console.error('Error fetching today expenses:', error);
+        return [];
+      }
     },
   });
 
@@ -52,16 +69,11 @@ export default function ExpenseEntry() {
     mutationFn: async (data: ExpenseFormData) => {
       const expenseData = {
         category: data.category,
-        amount: parseFloat(data.amount),
+        amount: data.amount,
         description: data.description,
-        payment_method: data.payment_method,
-        expense_date: new Date().toISOString(),
-        user_id: CURRENT_USER_ID,
       };
 
-      // For now we'll create a placeholder - we'll need to add expenses table to supabase
-      console.log('Creating expense:', expenseData);
-      return expenseData;
+      return await supabaseService.createExpense(CURRENT_USER_ID, expenseData);
     },
     onSuccess: () => {
       toast({
@@ -87,7 +99,7 @@ export default function ExpenseEntry() {
   };
 
   // Calculate today's total expenses
-  const todayTotal = todayExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const todayTotal = todayExpenses.reduce((sum: number, expense: any) => sum + expense.amount, 0);
 
   const expenseCategories = [
     "দোকান ভাড়া",
@@ -144,7 +156,7 @@ export default function ExpenseEntry() {
             </div>
             {todayExpenses.length > 0 && (
               <div className="mt-4 space-y-2">
-                {todayExpenses.slice(0, 3).map((expense, index) => (
+                {todayExpenses.slice(0, 3).map((expense: any, index: number) => (
                   <div key={index} className="flex items-center justify-between text-sm">
                     <span>{expense.category}</span>
                     <span className="text-error font-medium">

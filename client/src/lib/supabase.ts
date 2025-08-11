@@ -283,7 +283,12 @@ export const supabaseService = {
   async createCollection(userId: string, collection: InsertCollection): Promise<Collection> {
     const { data, error } = await supabase
       .from('collections')
-      .insert({ ...collection, user_id: userId })
+      .insert({ 
+        customer_id: collection.customerId,
+        sale_id: collection.saleId,
+        amount: parseFloat(collection.amount),
+        user_id: userId 
+      })
       .select()
       .single();
     
