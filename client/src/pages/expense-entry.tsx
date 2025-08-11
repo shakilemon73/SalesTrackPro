@@ -42,8 +42,8 @@ export default function ExpenseEntry() {
           .from('expenses')
           .select('*')
           .eq('user_id', CURRENT_USER_ID)
-          .gte('expense_date', startOfDay.toISOString())
-          .lt('expense_date', endOfDay.toISOString())
+          .gte('created_at', startOfDay.toISOString())
+          .lt('created_at', endOfDay.toISOString())
           .order('created_at', { ascending: false });
         
         if (error) throw error;
@@ -71,6 +71,8 @@ export default function ExpenseEntry() {
         category: data.category,
         amount: data.amount,
         description: data.description,
+        payment_method: data.payment_method,
+        expense_date: new Date().toISOString(),
       };
 
       return await supabaseService.createExpense(CURRENT_USER_ID, expenseData);
@@ -99,7 +101,7 @@ export default function ExpenseEntry() {
   };
 
   // Calculate today's total expenses
-  const todayTotal = todayExpenses.reduce((sum: number, expense: any) => sum + expense.amount, 0);
+  const todayTotal = todayExpenses.reduce((sum: number, expense: any) => sum + parseFloat(expense.amount || '0'), 0);
 
   const expenseCategories = [
     "দোকান ভাড়া",

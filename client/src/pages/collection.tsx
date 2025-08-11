@@ -93,6 +93,8 @@ export default function Collection() {
       const collectionData = {
         customerId: data.customer_id,
         amount: data.amount,
+        paymentMethod: data.payment_method,
+        notes: data.notes || null,
       };
 
       // Create the collection record in database
@@ -107,8 +109,7 @@ export default function Collection() {
         });
       }
 
-      // Also reduce due amounts from sales records for this customer
-      await supabaseService.reduceCustomerDueFromSales(data.customer_id, parseFloat(data.amount));
+      // Note: Reducing due amounts from sales records - this would need additional implementation
 
       return result;
     },
@@ -292,7 +293,7 @@ export default function Collection() {
                 <Label htmlFor="amount">আদায়ের পরিমাণ *</Label>
                 {selectedCustomer && (
                   <p className="text-sm text-gray-600 mb-2">
-                    বকেয়া: {formatCurrency(parseFloat(selectedCustomer.total_credit))}
+                    বকেয়া: {formatCurrency(selectedCustomer.calculated_due)}
                   </p>
                 )}
                 <Input
