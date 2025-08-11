@@ -155,6 +155,38 @@ export const supabaseService = {
     }
   },
 
+  async deleteCustomer(customerId: string): Promise<void> {
+    try {
+      console.log('Deleting customer:', customerId);
+      
+      // First check if customer has any sales (optional - you might want to prevent deletion if they have sales)
+      const { data: sales } = await supabase
+        .from('sales')
+        .select('id')
+        .eq('customer_id', customerId)
+        .limit(1);
+      
+      if (sales && sales.length > 0) {
+        throw new Error('Cannot delete customer with existing sales records');
+      }
+      
+      const { error } = await supabase
+        .from('customers')
+        .delete()
+        .eq('id', customerId);
+      
+      if (error) {
+        console.error('Error deleting customer:', error);
+        throw error;
+      }
+      
+      console.log('Customer deleted successfully');
+    } catch (error) {
+      console.error('deleteCustomer failed:', error);
+      throw error;
+    }
+  },
+
   // Products
   async getProducts(userId: string): Promise<Product[]> {
     const { data, error } = await supabase

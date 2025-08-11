@@ -1,19 +1,47 @@
-import { useQuery } from "@tanstack/react-query";
-import { Link, useRoute } from "wouter";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { Link, useRoute, useLocation } from "wouter";
+import { useState, useEffect } from "react";
 import { getBengaliDate, formatCurrency, toBengaliNumber, formatBengaliPhone } from "@/lib/bengali-utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { queryClient } from "@/lib/queryClient";
 
 export default function CustomerDetails() {
   const [match, params] = useRoute("/customers/:id");
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const customerId = params?.id;
+
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    phone_number: "",
+    address: "",
+  });
 
   const { data: customer, isLoading } = useQuery({
     queryKey: ['customer', customerId],
     queryFn: () => supabaseService.getCustomer(customerId!),
     enabled: !!customerId,
   });
+
+  // Update edit form when customer data is loaded
+  useEffect(() => {
+    if (customer) {
+      setEditForm({
+        name: customer.name || "",
+        phone_number: customer.phone_number || "",
+        address: customer.address || "",
+      });
+    }
+  }, [customer]);
 
   const { data: customerSales = [] } = useQuery({
     queryKey: ['sales', CURRENT_USER_ID, 'customer', customerId],
@@ -23,6 +51,62 @@ export default function CustomerDetails() {
     },
     enabled: !!customerId,
   });
+
+  // Update customer mutation
+  const updateCustomerMutation = useMutation({
+    mutationFn: async (updateData: any) => {
+      return await supabaseService.updateCustomer(customerId!, updateData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "সফল!",
+        description: "গ্রাহকের তথ্য আপডেট হয়েছে",
+      });
+      queryClient.invalidateQueries({ queryKey: ['customer', customerId] });
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      setIsEditDialogOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "ত্রুটি!",
+        description: "গ্রাহকের তথ্য আপডেট করতে সমস্যা হয়েছে",
+        variant: "destructive",
+      });
+      console.error('Update customer error:', error);
+    },
+  });
+
+  // Delete customer mutation
+  const deleteCustomerMutation = useMutation({
+    mutationFn: async () => {
+      return await supabaseService.deleteCustomer(customerId!);
+    },
+    onSuccess: () => {
+      toast({
+        title: "সফল!",
+        description: "গ্রাহক মুছে ফেলা হয়েছে",
+      });
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      setLocation('/customers');
+    },
+    onError: (error) => {
+      toast({
+        title: "ত্রুটি!",
+        description: "গ্রাহক মুছে ফেলতে সমস্যা হয়েছে",
+        variant: "destructive",
+      });
+      console.error('Delete customer error:', error);
+    },
+  });
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateCustomerMutation.mutate(editForm);
+  };
+
+  const handleDelete = () => {
+    deleteCustomerMutation.mutate();
+  };
 
   if (isLoading) {
     return (
@@ -137,6 +221,96 @@ export default function CustomerDetails() {
               </Button>
             </Link>
           )}
+        </div>
+
+        {/* Edit and Delete Buttons */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="w-full">
+                <i className="fas fa-edit mr-2"></i>
+                সম্পাদনা
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>গ্রাহকের তথ্য সম্পাদনা</DialogTitle>
+                <DialogDescription>
+                  গ্রাহকের তথ্য পরিবর্তন করুন
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleEditSubmit}>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                      নাম
+                    </Label>
+                    <Input
+                      id="name"
+                      value={editForm.name}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                      className="col-span-3"
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="phone" className="text-right">
+                      ফোন
+                    </Label>
+                    <Input
+                      id="phone"
+                      value={editForm.phone_number}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, phone_number: e.target.value }))}
+                      className="col-span-3"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="address" className="text-right">
+                      ঠিকানা
+                    </Label>
+                    <Textarea
+                      id="address"
+                      value={editForm.address}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, address: e.target.value }))}
+                      className="col-span-3"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button type="submit" disabled={updateCustomerMutation.isPending}>
+                    {updateCustomerMutation.isPending ? 'সংরক্ষণ করা হচ্ছে...' : 'সংরক্ষণ করুন'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" className="w-full">
+                <i className="fas fa-trash mr-2"></i>
+                মুছুন
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>গ্রাহক মুছে ফেলুন</AlertDialogTitle>
+                <AlertDialogDescription>
+                  আপনি কি নিশ্চিত যে আপনি এই গ্রাহককে মুছে ফেলতে চান? এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>বাতিল</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleDelete}
+                  disabled={deleteCustomerMutation.isPending}
+                  className="bg-destructive text-destructive-foreground"
+                >
+                  {deleteCustomerMutation.isPending ? 'মুছে ফেলা হচ্ছে...' : 'মুছে ফেলুন'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         {/* Sales History */}
