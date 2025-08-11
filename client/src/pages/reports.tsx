@@ -12,7 +12,7 @@ export default function Reports() {
 
   const { data: stats } = useQuery({
     queryKey: ['dashboard', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getDashboardStats(CURRENT_USER_ID),
+    queryFn: () => supabaseService.getStats(CURRENT_USER_ID),
   });
 
   const { data: sales = [] } = useQuery({

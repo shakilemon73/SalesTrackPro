@@ -135,6 +135,21 @@ export const supabaseService = {
     return data;
   },
 
+  async getCustomer(id: string): Promise<Customer | null> {
+    const { data, error } = await supabase
+      .from('customers')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) {
+      console.error('❌ Error fetching customer:', error);
+      return null;
+    }
+    
+    return data;
+  },
+
   async updateCustomer(id: string, updates: Partial<InsertCustomer>): Promise<Customer> {
     const { data, error } = await supabase
       .from('customers')
@@ -145,6 +160,18 @@ export const supabaseService = {
     
     if (error) throw error;
     return data;
+  },
+
+  async deleteCustomer(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('customers')
+      .delete()
+      .eq('id', id);
+    
+    if (error) {
+      console.error('❌ Error deleting customer:', error);
+      throw error;
+    }
   },
 
   // Products - ONLY REAL SUPABASE DATA
