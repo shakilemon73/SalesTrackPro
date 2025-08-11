@@ -18,9 +18,11 @@ export default function Sales() {
   });
 
   const filteredSales = sales.filter((sale: any) => {
-    if (!sale || !sale.customer_name) return false;
+    if (!sale) return false;
+    const customerName = sale.customer_name || sale.customerName || '';
+    if (!customerName) return false;
     
-    const matchesSearch = sale.customer_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = customerName.toLowerCase().includes(searchTerm.toLowerCase());
     
     if (dateFilter === "today") {
       const today = new Date().toDateString();
@@ -122,12 +124,12 @@ export default function Sales() {
             {filteredSales.map((sale: any) => (
               <div key={sale.id} className="bg-white rounded-lg card-shadow">
                 <TransactionItem
-                  customerName={sale.customerName}
-                  time={getBengaliTime(new Date(sale.createdAt))}
-                  amount={`${formatCurrency(parseFloat(sale.totalAmount))} টাকা`}
-                  type={sale.paymentMethod}
+                  customerName={sale.customer_name || sale.customerName}
+                  time={getBengaliTime(new Date(sale.created_at || sale.createdAt))}
+                  amount={formatCurrency(parseFloat(sale.total_amount || sale.totalAmount || 0))}
+                  type={sale.payment_method || sale.paymentMethod}
                   icon="fas fa-shopping-cart"
-                  iconColor={sale.paymentMethod === "নগদ" ? "success" : "warning"}
+                  iconColor={(sale.payment_method || sale.paymentMethod) === "নগদ" ? "success" : "warning"}
                 />
                 
                 {/* Sale Details */}
@@ -136,18 +138,18 @@ export default function Sales() {
                     <div>
                       <span className="text-gray-600">মোট:</span>
                       <span className="font-medium number-font ml-2">
-                        {formatCurrency(parseFloat(sale.totalAmount))} টাকা
+                        {formatCurrency(parseFloat(sale.total_amount || sale.totalAmount || 0))}
                       </span>
                     </div>
                     <div>
                       <span className="text-gray-600">পেমেন্ট:</span>
-                      <span className="font-medium ml-2">{sale.paymentMethod}</span>
+                      <span className="font-medium ml-2">{sale.payment_method || sale.paymentMethod}</span>
                     </div>
-                    {parseFloat(sale.dueAmount) > 0 && (
+                    {parseFloat(sale.due_amount || sale.dueAmount || 0) > 0 && (
                       <div className="col-span-2">
                         <span className="text-gray-600">বাকি:</span>
                         <span className="font-medium text-warning number-font ml-2">
-                          {formatCurrency(parseFloat(sale.dueAmount))} টাকা
+                          {formatCurrency(parseFloat(sale.due_amount || sale.dueAmount || 0))}
                         </span>
                       </div>
                     )}
@@ -159,8 +161,8 @@ export default function Sales() {
                     <div className="space-y-1">
                       {Array.isArray(sale.items) && sale.items.map((item: any, index: number) => (
                         <div key={index} className="flex justify-between text-sm text-gray-600">
-                          <span>{item.productName} × {toBengaliNumber(item.quantity)}</span>
-                          <span className="number-font">{formatCurrency(parseFloat(item.totalPrice))} টাকা</span>
+                          <span>{item.productName || item.name} × {toBengaliNumber(item.quantity || 1)}</span>
+                          <span className="number-font">{formatCurrency(parseFloat(item.totalPrice || item.total || 0))}</span>
                         </div>
                       ))}
                     </div>
