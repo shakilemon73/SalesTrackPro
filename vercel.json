@@ -68,9 +68,5 @@
       ]
     }
   ],
-  "functions": {
-    "client/dist/**": {
-      "includeFiles": "client/dist/**"
-    }
-  }
+
 }
