@@ -43,11 +43,18 @@ function App() {
     // Check database connection
     const checkConnection = async () => {
       try {
-        const { data, error } = await supabase.from('customers').select('count', { count: 'exact', head: true });
+        const { data, error } = await supabase
+          .from('customers')
+          .select('*')
+          .eq('user_id', '11111111-1111-1111-1111-111111111111');
+          
         if (error) {
           console.error('Database connection error:', error);
         } else {
           console.log('Database connected successfully. Total customers:', data?.length || 0);
+          if (data && data.length > 0) {
+            console.log('Sample customer:', data[0].name);
+          }
         }
       } catch (error) {
         console.error('Database check failed:', error);

@@ -63,25 +63,50 @@ export const supabaseService = {
 
   // Customers
   async getCustomers(userId: string): Promise<Customer[]> {
-    const { data, error } = await supabase
-      .from('customers')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data || [];
+    try {
+      const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching customers:', error);
+        throw error;
+      }
+      
+      console.log('Customers fetched:', data?.length || 0);
+      return data || [];
+    } catch (error) {
+      console.error('getCustomers failed:', error);
+      return [];
+    }
   },
 
   async createCustomer(userId: string, customer: InsertCustomer): Promise<Customer> {
-    const { data, error } = await supabase
-      .from('customers')
-      .insert({ ...customer, user_id: userId })
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
+    try {
+      console.log('Creating customer:', customer);
+      const { data, error } = await supabase
+        .from('customers')
+        .insert({
+          ...customer,
+          user_id: userId,
+          total_credit: customer.total_credit || '0.00'
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error creating customer:', error);
+        throw error;
+      }
+      
+      console.log('Customer created successfully:', data);
+      return data;
+    } catch (error) {
+      console.error('createCustomer failed:', error);
+      throw error;
+    }
   },
 
   // Products
