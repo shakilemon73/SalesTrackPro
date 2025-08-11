@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dokan-hisab-v2';
+const CACHE_NAME = 'dokan-hisab-v3';
 const API_CACHE_NAME = 'dokan-hisab-api-v1';
 
 // Assets to cache for offline use  
@@ -71,42 +71,37 @@ self.addEventListener('fetch', (event) => {
 
   // Handle static assets and navigation
   event.respondWith(
-    caches.match(request)
-      .then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
+    // For navigation requests (page loads), always serve from network first
+    // This ensures SPA routing works correctly on refresh
+    request.mode === 'navigate' 
+      ? fetch(request).catch(() => caches.match('/'))
+      : caches.match(request)
+          .then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
 
-        // For navigation requests, return index.html
-        if (request.mode === 'navigate') {
-          return caches.match('/');
-        }
-
-        // Try network for other requests
-        return fetch(request)
-          .then((response) => {
-            // Cache successful responses
-            if (response.status === 200) {
-              const responseClone = response.clone();
-              caches.open(CACHE_NAME)
-                .then((cache) => {
-                  cache.put(request, responseClone);
+            // Try network for other requests
+            return fetch(request)
+              .then((response) => {
+                // Cache successful responses (except HTML navigation)
+                if (response.status === 200 && !request.url.includes('.html')) {
+                  const responseClone = response.clone();
+                  caches.open(CACHE_NAME)
+                    .then((cache) => {
+                      cache.put(request, responseClone);
+                    });
+                }
+                return response;
+              })
+              .catch(() => {
+                return new Response('অফলাইন মোডে এই সুবিধা পাওয়া যাচ্ছে না', {
+                  status: 503,
+                  statusText: 'Service Unavailable',
+                  headers: { 'Content-Type': 'text/plain; charset=utf-8' }
                 });
-            }
-            return response;
+              });
           })
-          .catch(() => {
-            // Return offline page or default response
-            if (request.mode === 'navigate') {
-              return caches.match('/');
-            }
-            return new Response('অফলাইন মোডে এই সুবিধা পাওয়া যাচ্ছে না', {
-              status: 503,
-              statusText: 'Service Unavailable',
-              headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-            });
-          });
-      })
   );
 });
 
