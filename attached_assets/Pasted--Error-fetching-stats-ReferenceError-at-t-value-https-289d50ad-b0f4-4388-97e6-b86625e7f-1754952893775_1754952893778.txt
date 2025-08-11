@@ -1,0 +1,28 @@
+❌ Error fetching stats: 
+ReferenceError {}
+
+at t.value (https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
+❌ Error fetching stats: 
+ReferenceError {}
+
+at t.value (https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
+🔥 DASHBOARD Stats error: 
+ReferenceError {}
+
+at t.value (https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
+🔥 DASHBOARD Stats error: 
+ReferenceError {}
+
+at t.value (https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://289d50ad-b0f4-4388-97e6-b86625e7fe23-00-o86jgolom7vi.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400

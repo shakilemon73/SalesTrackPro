@@ -22,6 +22,12 @@ This is a Bengali business management application called "দোকান হি
 - All queries now fetch fresh data directly from Supabase without caching
 - Updated query client to disable all caching for real-time data access
 - Fixed column reference errors in dashboard stats calculation
+- **Fixed Bangladesh timezone handling throughout the entire application**
+  - Implemented proper Asia/Dhaka timezone support for all date/time operations
+  - Created getBangladeshTime(), getBangladeshDateString(), and getBangladeshDateRange() utilities
+  - Updated all database queries to use Bangladesh timezone ranges
+  - Fixed transactions page filtering to use correct Bangladesh dates
+  - All Bengali date/time display now uses proper Bangladesh timezone
 
 # User Preferences
 

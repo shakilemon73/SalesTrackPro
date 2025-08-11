@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "wouter";
-import { getBengaliDate, getBengaliTime, formatCurrency, toBengaliNumber } from "@/lib/bengali-utils";
+import { getBengaliDate, getBengaliTime, formatCurrency, toBengaliNumber, getBangladeshDateString, getBangladeshTime } from "@/lib/bengali-utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -121,11 +121,10 @@ export default function Transactions() {
 
     // Filter by date
     if (dateFilter === "today") {
-      // Only check today's date for more precise filtering
-      const today = new Date();
-      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      // Use Bangladesh timezone for today's date
+      const todayStr = getBangladeshDateString();
       
-      console.log('🔥 FILTERING TODAY ONLY:', todayStr);
+      console.log('🔥 FILTERING TODAY (Bangladesh time):', todayStr);
       console.log('🔥 SAMPLE TRANSACTION DATES:', allTransactions.slice(0, 3).map(t => ({ type: t.type, date: t.date ? t.date.split('T')[0] : 'no-date' })));
       
       filtered = filtered.filter(transaction => {
@@ -142,18 +141,18 @@ export default function Transactions() {
       console.log('🔥 AFTER TODAY FILTER:', filtered.length, 'transactions');
       console.log('🔥 FILTERED SAMPLE:', filtered.slice(0, 2).map(t => ({ type: t.type, title: t.title, date: t.date ? t.date.split('T')[0] : 'no-date' })));
     } else if (dateFilter === "week") {
-      const weekAgo = new Date();
+      const weekAgo = getBangladeshTime();
       weekAgo.setDate(weekAgo.getDate() - 7);
-      const weekAgoStr = weekAgo.toISOString().split('T')[0];
+      const weekAgoStr = getBangladeshDateString(weekAgo);
       
       filtered = filtered.filter(transaction => {
         const transactionDateStr = transaction.date ? transaction.date.split('T')[0] : '';
         return transactionDateStr >= weekAgoStr;
       });
     } else if (dateFilter === "month") {
-      const monthAgo = new Date();
+      const monthAgo = getBangladeshTime();
       monthAgo.setMonth(monthAgo.getMonth() - 1);
-      const monthAgoStr = monthAgo.toISOString().split('T')[0];
+      const monthAgoStr = getBangladeshDateString(monthAgo);
       
       filtered = filtered.filter(transaction => {
         const transactionDateStr = transaction.date ? transaction.date.split('T')[0] : '';

@@ -32,6 +32,9 @@ export function toEnglishNumber(bengaliNum: string): string {
   }).join('');
 }
 
+// Bangladesh timezone configuration
+const BANGLADESH_TIMEZONE = 'Asia/Dhaka';
+
 // Bengali date and time
 const bengaliMonths = [
   'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
@@ -42,25 +45,57 @@ const bengaliDays = [
   'রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'
 ];
 
-export function getBengaliDate(date: Date = new Date()): string {
+// Get current Bangladesh time
+export function getBangladeshTime(date?: Date): Date {
+  const now = date || new Date();
+  // Convert to Bangladesh timezone
+  const bangladeshTime = new Date(now.toLocaleString("en-US", {timeZone: BANGLADESH_TIMEZONE}));
+  return bangladeshTime;
+}
+
+// Get today's date in Bangladesh timezone as YYYY-MM-DD string
+export function getBangladeshDateString(date?: Date): string {
+  const bangladeshTime = getBangladeshTime(date);
+  const year = bangladeshTime.getFullYear();
+  const month = String(bangladeshTime.getMonth() + 1).padStart(2, '0');
+  const day = String(bangladeshTime.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+// Get Bangladesh date range for database queries
+export function getBangladeshDateRange(date?: Date): { start: string; end: string } {
+  const dateStr = getBangladeshDateString(date);
+  return {
+    start: `${dateStr}T00:00:00.000+06:00`, // Bangladesh UTC+6
+    end: `${dateStr}T23:59:59.999+06:00`
+  };
+}
+
+export function getBengaliDate(date?: Date): string {
+  const bangladeshTime = getBangladeshTime(date);
+  
   // Handle invalid dates
-  if (!date || isNaN(date.getTime())) {
-    date = new Date();
+  if (!bangladeshTime || isNaN(bangladeshTime.getTime())) {
+    return getBengaliDate(new Date());
   }
-  const day = toBengaliNumber(date.getDate());
-  const month = bengaliMonths[date.getMonth()];
-  const year = toBengaliNumber(date.getFullYear());
+  
+  const day = toBengaliNumber(bangladeshTime.getDate());
+  const month = bengaliMonths[bangladeshTime.getMonth()];
+  const year = toBengaliNumber(bangladeshTime.getFullYear());
   
   return `${day} ${month}, ${year}`;
 }
 
-export function getBengaliTime(date: Date = new Date()): string {
+export function getBengaliTime(date?: Date): string {
+  const bangladeshTime = getBangladeshTime(date);
+  
   // Handle invalid dates
-  if (!date || isNaN(date.getTime())) {
-    date = new Date();
+  if (!bangladeshTime || isNaN(bangladeshTime.getTime())) {
+    return getBengaliTime(new Date());
   }
-  let hours = date.getHours();
-  const minutes = date.getMinutes();
+  
+  let hours = bangladeshTime.getHours();
+  const minutes = bangladeshTime.getMinutes();
   const period = hours >= 12 ? 'অপরাহ্ন' : 'সকাল';
   
   if (hours > 12) hours -= 12;
@@ -72,8 +107,9 @@ export function getBengaliTime(date: Date = new Date()): string {
   return `${period} ${bengaliHours}:${bengaliMinutes}`;
 }
 
-export function getBengaliDay(date: Date = new Date()): string {
-  return bengaliDays[date.getDay()];
+export function getBengaliDay(date?: Date): string {
+  const bangladeshTime = getBangladeshTime(date);
+  return bengaliDays[bangladeshTime.getDay()];
 }
 
 // Currency formatting
@@ -94,7 +130,8 @@ export function formatCurrency(amount: number | string): string {
 
 // Time period helpers
 export function getBengaliTimePeriod(): string {
-  const hour = new Date().getHours();
+  const bangladeshTime = getBangladeshTime();
+  const hour = bangladeshTime.getHours();
   if (hour < 6) return 'ভোর';
   if (hour < 12) return 'সকাল';
   if (hour < 17) return 'দুপুর';
@@ -104,8 +141,9 @@ export function getBengaliTimePeriod(): string {
 
 // Relative time in Bengali
 export function getRelativeTime(date: Date): string {
-  const now = new Date();
-  const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+  const now = getBangladeshTime();
+  const inputDate = getBangladeshTime(date);
+  const diffInMinutes = Math.floor((now.getTime() - inputDate.getTime()) / (1000 * 60));
   
   if (diffInMinutes < 1) return 'এখনই';
   if (diffInMinutes < 60) return `${toBengaliNumber(diffInMinutes)} মিনিট আগে`;
@@ -116,7 +154,7 @@ export function getRelativeTime(date: Date): string {
   const diffInDays = Math.floor(diffInHours / 24);
   if (diffInDays < 7) return `${toBengaliNumber(diffInDays)} দিন আগে`;
   
-  return getBengaliDate(date);
+  return getBengaliDate(inputDate);
 }
 
 // Validation helpers

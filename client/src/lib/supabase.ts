@@ -242,14 +242,15 @@ export const supabaseService = {
   },
 
   async getTodaySales(userId: string): Promise<Sale[]> {
-    const today = new Date().toISOString().split('T')[0];
+    const { getBangladeshDateRange } = await import('./bengali-utils');
+    const { start: todayStart, end: todayEnd } = getBangladeshDateRange();
     
     const { data, error } = await supabase
       .from('sales')
       .select('*')
       .eq('user_id', userId)
-      .gte('created_at', `${today}T00:00:00.000Z`)
-      .lt('created_at', `${today}T23:59:59.999Z`)
+      .gte('created_at', todayStart)
+      .lt('created_at', todayEnd)
       .order('created_at', { ascending: false });
     
     if (error) {
@@ -341,16 +342,19 @@ export const supabaseService = {
     console.log('🔥 FETCHING STATS for user:', userId);
     
     try {
-      // Get today's date range
-      const today = new Date().toISOString().split('T')[0];
+      // Get today's date range in Bangladesh timezone
+      const { getBangladeshDateRange } = await import('./bengali-utils');
+      const { start: todayStart, end: todayEnd } = getBangladeshDateRange();
+      
+      console.log('🔥 BANGLADESH DATE RANGE:', { todayStart, todayEnd });
       
       // Get today's sales
       const { data: todaySales, error: salesError } = await supabase
         .from('sales')
         .select('total_amount')
         .eq('user_id', userId)
-        .gte('created_at', `${today}T00:00:00.000Z`)
-        .lt('created_at', `${today}T23:59:59.999Z`);
+        .gte('created_at', todayStart)
+        .lt('created_at', todayEnd);
       
       if (salesError) throw salesError;
       
@@ -359,8 +363,8 @@ export const supabaseService = {
         .from('expenses')
         .select('amount')
         .eq('user_id', userId)
-        .gte('created_at', `${today}T00:00:00.000Z`)
-        .lt('created_at', `${today}T23:59:59.999Z`);
+        .gte('created_at', todayStart)
+        .lt('created_at', todayEnd);
       
       if (expensesError) throw expensesError;
       
