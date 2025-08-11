@@ -398,7 +398,7 @@ export const supabaseService = {
       const profit = totalSales - totalExpenses;
       const pendingFromSales = salesWithDue?.reduce((sum, sale) => sum + parseFloat(sale.due_amount || '0'), 0) || 0;
       const pendingFromCustomers = customersWithCredit?.reduce((sum, customer) => sum + parseFloat(customer.total_credit || '0'), 0) || 0;
-      const pendingCollection = Math.max(pendingFromSales, pendingFromCustomers); // Use whichever is higher
+      const pendingCollection = pendingFromSales + pendingFromCustomers; // Add both sources together
       
       const stats = {
         todaySales: totalSales,

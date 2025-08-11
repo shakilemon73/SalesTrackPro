@@ -78,7 +78,8 @@ export default function SalesEntry() {
       });
       queryClient.invalidateQueries({ queryKey: ['dashboard', CURRENT_USER_ID] });
       queryClient.invalidateQueries({ queryKey: ['sales'] });
-      setLocation("/sales");
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      setLocation("/transactions");
     },
     onError: (error) => {
       console.error('Sale mutation error:', error);
