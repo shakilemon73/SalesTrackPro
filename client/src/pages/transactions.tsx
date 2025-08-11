@@ -13,7 +13,7 @@ import jsPDF from 'jspdf';
 import { useToast } from "@/hooks/use-toast";
 
 export default function Transactions() {
-  const [dateFilter, setDateFilter] = useState("today");
+  const [dateFilter, setDateFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const { toast } = useToast();
@@ -47,9 +47,13 @@ export default function Transactions() {
         customer_name: sale.customer_name
       }));
     },
+    staleTime: 0,
+    gcTime: 0,
   });
 
   const collections = collectionsData;
+
+
 
   // Combine all transactions with type indication
   const allTransactions = [
