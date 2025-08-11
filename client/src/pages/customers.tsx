@@ -12,14 +12,19 @@ export default function Customers() {
 
   const { data: customers = [], isLoading, error } = useQuery({
     queryKey: ['customers', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
+    queryFn: () => {
+      console.log('🔥 CUSTOMERS PAGE: Fetching customers for user:', CURRENT_USER_ID);
+      return supabaseService.getCustomers(CURRENT_USER_ID);
+    },
     staleTime: 0, // Always fetch fresh data
     gcTime: 0, // Don't cache
   });
 
   if (error) {
-    console.error('Customers page error:', error);
+    console.error('❌ CUSTOMERS PAGE error:', error);
   }
+
+  console.log('🔥 CUSTOMERS PAGE: Loaded customers:', customers.length, customers);
 
   const filteredCustomers = customers.filter((customer: any) =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

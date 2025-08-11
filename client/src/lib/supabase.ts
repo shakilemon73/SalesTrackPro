@@ -75,6 +75,14 @@ export const supabaseService = {
     try {
       console.log('🔥 FETCHING CUSTOMERS for user:', userId);
       
+      // Test query without limit first
+      const { count, error: countError } = await supabase
+        .from('customers')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
+      
+      console.log('🔥 CUSTOMERS COUNT in database:', count);
+      
       const { data, error } = await supabase
         .from('customers')
         .select('*')
@@ -87,6 +95,7 @@ export const supabaseService = {
       }
       
       console.log('✅ Customers fetched from Supabase:', data?.length || 0, data);
+      console.log('🔥 First customer data:', data?.[0]);
       return data || [];
     } catch (error) {
       console.error('❌ getCustomers failed:', error);
