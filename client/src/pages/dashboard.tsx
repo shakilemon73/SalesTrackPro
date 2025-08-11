@@ -11,7 +11,7 @@ export default function Dashboard() {
     queryKey: ['dashboard', CURRENT_USER_ID],
     queryFn: () => {
       console.log('🔥 DASHBOARD: Fetching dashboard stats for user:', CURRENT_USER_ID);
-      return supabaseService.getDashboardStats(CURRENT_USER_ID);
+      return supabaseService.getStats(CURRENT_USER_ID);
     },
     staleTime: 0,
     gcTime: 0,

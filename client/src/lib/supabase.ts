@@ -337,15 +337,35 @@ export const supabaseService = {
       
       if (expensesError) throw expensesError;
       
+      // Get total customers count
+      const { count: customerCount } = await supabase
+        .from('customers')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
+
+      // Get total due amount (collections needed)
+      const { data: customersWithDue, error: dueError } = await supabase
+        .from('customers')
+        .select('due_amount')
+        .eq('user_id', userId)
+        .gt('due_amount', 0);
+
+      if (dueError) throw dueError;
+
       // Calculate totals
       const totalSales = todaySales?.reduce((sum, sale) => sum + parseFloat(sale.total_amount || '0'), 0) || 0;
       const totalExpenses = todayExpenses?.reduce((sum, expense) => sum + parseFloat(expense.amount || '0'), 0) || 0;
       const profit = totalSales - totalExpenses;
+      const pendingCollection = customersWithDue?.reduce((sum, customer) => sum + parseFloat(customer.due_amount || '0'), 0) || 0;
       
       const stats = {
-        totalSales: totalSales.toString(),
-        totalExpenses: totalExpenses.toString(),
-        profit: profit.toString(),
+        todaySales: totalSales,
+        todayProfit: profit,
+        pendingCollection: pendingCollection,
+        totalCustomers: customerCount || 0,
+        totalSales: totalSales,
+        totalExpenses: totalExpenses,
+        profit: profit,
         salesCount: todaySales?.length || 0
       };
       

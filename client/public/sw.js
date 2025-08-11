@@ -63,10 +63,9 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Handle Supabase API requests
-  if (url.hostname === 'lkhqdqlryjzalsemofdt.supabase.co' && url.pathname.startsWith('/rest/v1/')) {
-    event.respondWith(handleApiRequest(request));
-    return;
+  // Skip ALL Supabase API requests - let them pass through without service worker interference
+  if (url.hostname === 'lkhqdqlryjzalsemofdt.supabase.co') {
+    return; // Let the browser handle Supabase requests natively
   }
 
   // Handle static assets and navigation
