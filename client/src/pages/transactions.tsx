@@ -251,28 +251,35 @@ export default function Transactions() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-primary text-white px-4 py-3 shadow-md">
+    <div className="min-h-screen bg-background-app">
+      {/* Premium Header */}
+      <div className="header-bar">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Link to="/">
-              <button className="p-2">
-                <i className="fas fa-arrow-left"></i>
+              <button className="w-10 h-10 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300 hover:scale-110 border border-white/20">
+                <i className="fas fa-arrow-left text-white"></i>
               </button>
             </Link>
             <div>
-              <h1 className="text-lg font-semibold">সকল লেনদেন</h1>
-              <p className="text-sm text-green-100">{getBengaliDate()}</p>
+              <h1 className="heading-2 text-white mb-0.5">সকল লেনদেন</h1>
+              <div className="flex items-center space-x-2">
+                <p className="text-sm text-white/90 bengali-font">{getBengaliDate()}</p>
+                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-xs text-green-200 font-semibold">লাইভ</span>
+              </div>
             </div>
           </div>
-          <div className="flex space-x-2">
-            <Button onClick={generatePDFReport} variant="outline" className="text-primary bg-white">
+          <div className="flex items-center space-x-2">
+            <Button 
+              onClick={generatePDFReport} 
+              className="bg-white/15 hover:bg-white/25 text-white border border-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-105"
+            >
               <i className="fas fa-download mr-2"></i>
               PDF
             </Button>
             <Link to="/sales/new">
-              <Button className="bg-accent hover:bg-accent/90">
+              <Button className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-105">
                 <i className="fas fa-plus mr-2"></i>
                 নতুন
               </Button>
@@ -281,128 +288,261 @@ export default function Transactions() {
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="p-4 grid grid-cols-2 gap-3">
-        <Card>
-          <CardContent className="p-3">
-            <div className="text-center">
-              <div className="text-lg font-bold text-green-600 number-font">
-                {formatCurrency(totals.sales)}
+      {/* Premium Summary Cards */}
+      <div className="p-4 space-y-4">
+        <div className="responsive-grid-2">
+          <div className="stats-card">
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                <i className="fas fa-chart-line text-green-600 text-lg"></i>
               </div>
-              <div className="text-xs text-gray-600">মোট বিক্রয়</div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-3">
-            <div className="text-center">
-              <div className="text-lg font-bold text-red-600 number-font">
-                {formatCurrency(totals.expenses)}
+              <div className="text-right">
+                <div className="currency-display text-green-600">
+                  {formatCurrency(totals.sales)}
+                </div>
+                <div className="caption bengali-font">মোট বিক্রয়</div>
               </div>
-              <div className="text-xs text-gray-600">মোট খরচ</div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filters */}
-      <div className="px-4 pb-4 space-y-3">
-        <Input
-          placeholder="লেনদেন খুঁজুন..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full"
-        />
-        
-        <Select value={dateFilter} onValueChange={setDateFilter}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">সব সময়</SelectItem>
-            <SelectItem value="today">আজকের</SelectItem>
-            <SelectItem value="week">সাপ্তাহিক</SelectItem>
-            <SelectItem value="month">মাসিক</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Transaction Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="px-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="all">সব ({toBengaliNumber(allTransactions.length)})</TabsTrigger>
-          <TabsTrigger value="sale">বিক্রয় ({toBengaliNumber(sales.length)})</TabsTrigger>
-          <TabsTrigger value="expense">খরচ ({toBengaliNumber(expenses.length)})</TabsTrigger>
-          <TabsTrigger value="collection">সংগ্রহ ({toBengaliNumber(collections.length)})</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={activeTab} className="mt-4">
-          <div className="space-y-3">
-            {filteredTransactions.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <div className="text-gray-400 mb-4">
-                    <i className="fas fa-receipt text-4xl"></i>
-                  </div>
-                  <p className="text-gray-600">কোনো লেনদেন পাওয়া যায়নি</p>
-                </CardContent>
-              </Card>
-            ) : (
-              filteredTransactions.map((transaction, index) => (
-                <Card key={`${transaction.type}-${transaction.id || index}`} className={transaction.bgColor}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className={`p-2 rounded-full ${transaction.bgColor}`}>
-                          <i className={`${transaction.icon} ${transaction.color}`}></i>
-                        </div>
-                        <div>
-                          <p className="font-medium">{transaction.title}</p>
-                          <div className="flex items-center space-x-2">
-                            <Badge variant="outline" className={transaction.color}>
-                              {getTransactionTypeText(transaction.type)}
-                            </Badge>
-                            <span className="text-sm text-gray-500">
-                              {new Date(transaction.date).toLocaleDateString('bn-BD')}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className={`font-bold number-font ${transaction.color}`}>
-                          {transaction.amount >= 0 ? '+' : ''}{formatCurrency(Math.abs(transaction.amount))}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {getBengaliTime(new Date(transaction.date))}
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
+            <div className="flex items-center text-sm text-green-600">
+              <i className="fas fa-arrow-up mr-1"></i>
+              <span className="bengali-font">আয়ের পরিমাণ</span>
+            </div>
           </div>
-        </TabsContent>
-      </Tabs>
+          
+          <div className="stats-card">
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
+                <i className="fas fa-chart-line-down text-red-600 text-lg"></i>
+              </div>
+              <div className="text-right">
+                <div className="currency-display text-red-600">
+                  {formatCurrency(totals.expenses)}
+                </div>
+                <div className="caption bengali-font">মোট খরচ</div>
+              </div>
+            </div>
+            <div className="flex items-center text-sm text-red-600">
+              <i className="fas fa-arrow-down mr-1"></i>
+              <span className="bengali-font">ব্যয়ের পরিমাণ</span>
+            </div>
+          </div>
+        </div>
 
-      {/* Net Amount Summary */}
-      <div className="p-4">
-        <Card className={totals.net >= 0 ? 'bg-green-50' : 'bg-red-50'}>
+        {/* Net Amount Card */}
+        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">নিট পরিমাণ</p>
-                <p className="text-sm text-gray-600">
-                  {dateFilter === 'today' ? 'আজকের' : dateFilter === 'week' ? 'সাপ্তাহিক' : dateFilter === 'month' ? 'মাসিক' : 'সকল'} লেনদেনের সার
-                </p>
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <i className="fas fa-wallet text-blue-600 text-xl"></i>
+                </div>
+                <div>
+                  <div className="heading-3 text-blue-900 bengali-font">নিট আয়</div>
+                  <div className="caption text-blue-600">মোট লাভ/ক্ষতি</div>
+                </div>
               </div>
-              <div className={`text-xl font-bold number-font ${totals.net >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {totals.net >= 0 ? '+' : ''}{formatCurrency(totals.net)}
+              <div className="text-right">
+                <div className={`text-2xl font-bold number-font ${totals.net >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {formatCurrency(totals.net)}
+                </div>
+                <div className="caption text-blue-600 bengali-font">
+                  {totals.net >= 0 ? 'লাভ' : 'ক্ষতি'}
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Enhanced Filters */}
+      <div className="px-4 pb-4 space-y-4">
+        {/* Search Input */}
+        <div className="search-input">
+          <Input
+            placeholder="লেনদেন খুঁজুন..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="enhanced-input"
+          />
+        </div>
+        
+        {/* Filter Pills Row */}
+        <div className="flex items-center space-x-2 overflow-x-auto pb-2">
+          <button 
+            onClick={() => setDateFilter("all")}
+            className={`filter-pill ${dateFilter === "all" ? "active" : ""}`}
+          >
+            সব সময়
+          </button>
+          <button 
+            onClick={() => setDateFilter("today")}
+            className={`filter-pill ${dateFilter === "today" ? "active" : ""}`}
+          >
+            আজকের
+          </button>
+          <button 
+            onClick={() => setDateFilter("week")}
+            className={`filter-pill ${dateFilter === "week" ? "active" : ""}`}
+          >
+            সাপ্তাহিক
+          </button>
+          <button 
+            onClick={() => setDateFilter("month")}
+            className={`filter-pill ${dateFilter === "month" ? "active" : ""}`}
+          >
+            মাসিক
+          </button>
+        </div>
+      </div>
+
+      {/* Enhanced Tabs */}
+      <div className="px-4 mb-4">
+        <div className="enhanced-tabs">
+          <div className="flex space-x-1">
+            <button 
+              onClick={() => setActiveTab("all")}
+              className={`enhanced-tab ${activeTab === "all" ? "active" : ""}`}
+              data-state={activeTab === "all" ? "active" : "inactive"}
+            >
+              <i className="fas fa-list mr-2"></i>
+              সব ({toBengaliNumber(allTransactions.length)})
+            </button>
+            <button 
+              onClick={() => setActiveTab("sale")}
+              className={`enhanced-tab ${activeTab === "sale" ? "active" : ""}`}
+              data-state={activeTab === "sale" ? "active" : "inactive"}
+            >
+              <i className="fas fa-shopping-cart mr-2"></i>
+              বিক্রয় ({toBengaliNumber(sales.length)})
+            </button>
+            <button 
+              onClick={() => setActiveTab("expense")}
+              className={`enhanced-tab ${activeTab === "expense" ? "active" : ""}`}
+              data-state={activeTab === "expense" ? "active" : "inactive"}
+            >
+              <i className="fas fa-minus-circle mr-2"></i>
+              খরচ ({toBengaliNumber(expenses.length)})
+            </button>
+            <button 
+              onClick={() => setActiveTab("collection")}
+              className={`enhanced-tab ${activeTab === "collection" ? "active" : ""}`}
+              data-state={activeTab === "collection" ? "active" : "inactive"}
+            >
+              <i className="fas fa-hand-holding-usd mr-2"></i>
+              সংগ্রহ ({toBengaliNumber(collections.length)})
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Enhanced Transaction List */}
+      <div className="px-4 pb-20 space-y-3">
+        {filteredTransactions.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state-icon">
+              <i className="fas fa-receipt"></i>
+            </div>
+            <h3 className="heading-3 text-gray-900 mb-2 bengali-font">কোনো লেনদেন পাওয়া যায়নি</h3>
+            <p className="body-regular text-gray-500 mb-6 bengali-font">
+              {searchTerm 
+                ? "আপনার খোঁজা লেনদেন খুঁজে পাওয়া যায়নি"
+                : "এই সময়ে কোনো লেনদেন নেই"
+              }
+            </p>
+            <Link to="/sales/new">
+              <Button className="action-btn action-btn-primary">
+                <i className="fas fa-plus mr-2"></i>
+                নতুন বিক্রয় যোগ করুন
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <>
+            {filteredTransactions.map((transaction, index) => (
+              <div key={`${transaction.type}-${transaction.id || index}`} className="transaction-item slide-up">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                      transaction.type === 'sale' ? 'bg-green-100' :
+                      transaction.type === 'expense' ? 'bg-red-100' : 'bg-blue-100'
+                    }`}>
+                      <i className={`${transaction.icon} ${
+                        transaction.type === 'sale' ? 'text-green-600' :
+                        transaction.type === 'expense' ? 'text-red-600' : 'text-blue-600'
+                      } text-lg`}></i>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="body-large font-medium text-gray-900 bengali-font mb-1">
+                        {transaction.title}
+                      </h4>
+                      <div className="flex items-center space-x-3">
+                        <span className={`status-badge ${
+                          transaction.type === 'sale' ? 'success' :
+                          transaction.type === 'expense' ? 'error' : 'warning'
+                        }`}>
+                          {getTransactionTypeText(transaction.type)}
+                        </span>
+                        <span className="caption text-gray-500 bengali-font">
+                          {getBengaliDate(new Date(transaction.date))}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className={`currency-display ${
+                      transaction.type === 'sale' ? 'text-green-600' :
+                      transaction.type === 'expense' ? 'text-red-600' : 'text-blue-600'
+                    }`}>
+                      {transaction.amount >= 0 ? '+' : ''}{formatCurrency(Math.abs(transaction.amount))}
+                    </div>
+                    <div className="caption text-gray-500">
+                      {getBengaliTime(new Date(transaction.date))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* Results Summary */}
+            <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+              <div className="text-center">
+                <div className="body-regular text-gray-600 mb-2 bengali-font">
+                  {dateFilter === 'today' ? 'আজকের' : dateFilter === 'week' ? 'সাপ্তাহিক' : dateFilter === 'month' ? 'মাসিক' : 'সকল'} লেনদেনের সারাংশ
+                </div>
+                <div className="responsive-grid-2 gap-4">
+                  <div>
+                    <div className="number-display text-green-600 text-lg">
+                      +{formatCurrency(totals.sales)}
+                    </div>
+                    <div className="caption text-gray-500 bengali-font">মোট আয়</div>
+                  </div>
+                  <div>
+                    <div className="number-display text-red-600 text-lg">
+                      -{formatCurrency(totals.expenses)}
+                    </div>
+                    <div className="caption text-gray-500 bengali-font">মোট খরচ</div>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-300">
+                  <div className={`text-2xl font-bold number-font ${totals.net >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {totals.net >= 0 ? '+' : ''}{formatCurrency(totals.net)}
+                  </div>
+                  <div className="caption text-gray-600 bengali-font">
+                    নিট {totals.net >= 0 ? 'লাভ' : 'ক্ষতি'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Floating Action Button */}
+      <Link to="/sales/new">
+        <div className="fab">
+          <i className="fas fa-plus text-xl"></i>
+        </div>
+      </Link>
     </div>
   );
 }
