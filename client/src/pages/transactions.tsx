@@ -100,7 +100,6 @@ export default function Transactions() {
     collectionsCount: collections.length,
     totalTransactions: allTransactions.length,
     sampleSaleDate: sales[0]?.sale_date || sales[0]?.created_at,
-    sampleExpenseDate: expenses[0]?.expense_date || expenses[0]?.created_at,
     currentDateFilter: dateFilter
   });
 
@@ -122,22 +121,26 @@ export default function Transactions() {
 
     // Filter by date
     if (dateFilter === "today") {
-      // Get today's date in local timezone
+      // Check both today and yesterday to handle timezone issues
       const today = new Date();
-      const todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
       
-      console.log('🔥 FILTERING TODAY:', todayStr, 'Total transactions before filter:', filtered.length);
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+      
+      console.log('🔥 FILTERING TODAY/YESTERDAY:', todayStr, yesterdayStr);
       
       filtered = filtered.filter(transaction => {
-        // Extract date part from transaction date (ignore time)
         const transactionDateStr = transaction.date ? transaction.date.split('T')[0] : '';
-        const isToday = transactionDateStr === todayStr;
+        // Check if transaction is from today OR yesterday (to handle timezone issues)
+        const isRecentTransaction = transactionDateStr === todayStr || transactionDateStr === yesterdayStr;
         
-        if (isToday) {
-          console.log('✅ TODAY TRANSACTION:', transaction.type, transaction.title, transactionDateStr);
+        if (isRecentTransaction) {
+          console.log('✅ MATCHED RECENT:', transaction.type, transaction.title, transactionDateStr);
         }
         
-        return isToday;
+        return isRecentTransaction;
       });
       
       console.log('🔥 AFTER TODAY FILTER:', filtered.length, 'transactions');
