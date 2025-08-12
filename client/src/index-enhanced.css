@@ -1,0 +1,321 @@
+/* Enhanced CSS for World-Class Dashboard Design */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap');
+
+/* CSS Variables for Design System */
+:root {
+  /* Color Palette - Business Psychology Colors */
+  --trust-green: #10b981;
+  --trust-green-light: #6ee7b7;
+  --trust-green-dark: #047857;
+  
+  --reliability-blue: #3b82f6;
+  --reliability-blue-light: #93c5fd;
+  --reliability-blue-dark: #1e40af;
+  
+  --growth-purple: #8b5cf6;
+  --growth-purple-light: #c4b5fd;
+  --growth-purple-dark: #6d28d9;
+  
+  --energy-orange: #f59e0b;
+  --energy-orange-light: #fbbf24;
+  --energy-orange-dark: #d97706;
+  
+  --alert-red: #ef4444;
+  --alert-red-light: #fca5a5;
+  --alert-red-dark: #dc2626;
+  
+  /* Neutral Palette */
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+  
+  /* Spacing System */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  
+  /* Timing Functions */
+  --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-in-out-cubic: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Global Enhancements */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: 'Inter', 'Noto Sans Bengali', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  font-feature-settings: "cv01", "cv03", "cv04", "cv11";
+  background: linear-gradient(135deg, var(--slate-50) 0%, var(--slate-100) 100%);
+  min-height: 100vh;
+}
+
+/* Bengali Font Optimization */
+.bengali-font {
+  font-family: 'Noto Sans Bengali', 'Inter', system-ui, sans-serif;
+  font-feature-settings: "kern", "liga", "clig", "calt";
+  text-rendering: optimizeLegibility;
+}
+
+.number-font {
+  font-family: 'Inter', 'SF Pro Display', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Enhanced Card Components */
+.dashboard-card {
+  @apply bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm;
+  background: linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+}
+
+.stats-card {
+  @apply bg-white/80 dark:bg-slate-900/80 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-6 shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300 backdrop-blur-lg cursor-pointer;
+  background: linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
+}
+
+.stats-card:hover {
+  background: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%);
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* Glass Morphism Effects */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced Button Styles */
+.btn-primary {
+  @apply bg-gradient-to-r from-emerald-500 to-emerald-400 text-white font-medium px-6 py-3 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300;
+}
+
+.btn-secondary {
+  @apply bg-gradient-to-r from-blue-500 to-blue-400 text-white font-medium px-6 py-3 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300;
+}
+
+/* Loading States */
+.loading-spinner {
+  @apply w-8 h-8 border-4 border-slate-200 border-t-emerald-500 rounded-full animate-spin;
+}
+
+.skeleton {
+  @apply bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 bg-[length:200%_100%] animate-[shimmer_1.5s_infinite];
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Status Indicators */
+.status-online {
+  @apply w-3 h-3 bg-green-500 rounded-full animate-pulse;
+}
+
+.status-offline {
+  @apply w-3 h-3 bg-red-500 rounded-full;
+}
+
+/* Enhanced Animations */
+.fade-in {
+  animation: fadeIn 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.slide-up {
+  animation: slideUp 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.bounce-in {
+  animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceIn {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.3) translateY(20px);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.05) translateY(-10px);
+  }
+  70% { 
+    transform: scale(0.9) translateY(5px);
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Micro-interactions */
+.interactive-card {
+  @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+}
+
+.interactive-button {
+  @apply transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95;
+}
+
+/* Enhanced Mobile Responsiveness */
+@media (max-width: 768px) {
+  .mobile-optimized {
+    @apply px-4 py-3;
+  }
+  
+  .mobile-stack {
+    @apply flex-col space-y-4 space-x-0;
+  }
+  
+  .mobile-grid {
+    @apply grid-cols-1 gap-4;
+  }
+  
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+}
+
+/* Progress Indicators */
+.progress-bar {
+  @apply w-full bg-slate-200 rounded-full h-2 overflow-hidden;
+}
+
+.progress-fill {
+  @apply h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-500;
+}
+
+/* Alert Components */
+.alert-success {
+  @apply bg-green-50 border border-green-200 text-green-800 p-4 rounded-xl;
+}
+
+.alert-warning {
+  @apply bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl;
+}
+
+.alert-error {
+  @apply bg-red-50 border border-red-200 text-red-800 p-4 rounded-xl;
+}
+
+.alert-info {
+  @apply bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl;
+}
+
+/* Gradient Overlays */
+.gradient-overlay {
+  background: linear-gradient(135deg, 
+    rgba(16, 185, 129, 0.1) 0%,
+    rgba(59, 130, 246, 0.1) 25%,
+    rgba(139, 92, 246, 0.1) 50%,
+    rgba(245, 158, 11, 0.1) 75%,
+    rgba(239, 68, 68, 0.1) 100%);
+}
+
+/* Focus States for Accessibility */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white;
+}
+
+/* Dark Mode Enhancements */
+@media (prefers-color-scheme: dark) {
+  .dashboard-card {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
+  }
+  
+  .stats-card {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.6) 100%);
+  }
+  
+  .glass-card {
+    background: rgba(30, 41, 59, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Performance Optimizations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+}

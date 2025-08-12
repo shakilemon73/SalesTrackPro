@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
-import Dashboard from "@/pages/dashboard";
+import DashboardRedesigned from "@/pages/dashboard-redesigned";
 import Transactions from "@/pages/transactions";
 import Customers from "@/pages/customers";
 import Reports from "@/pages/reports";
@@ -16,18 +16,22 @@ import Inventory from "@/pages/inventory";
 import Collection from "@/pages/collection";
 import ExpenseEntry from "@/pages/expense-entry";
 import BottomNavigation from "@/components/ui/bottom-navigation";
+import CommunicationPanel from "@/components/ui/communication-panel";
 import Analytics from "@/pages/analytics";
 import SmartInventory from "@/pages/smart-inventory";
 import Loyalty from "@/pages/loyalty";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 // Removed seed data import - using only live Supabase data
 import { supabase } from "./lib/supabase";
 
 function Router() {
+  const [showCommunicationPanel, setShowCommunicationPanel] = useState(false);
+
   return (
     <div className="mobile-container">
       <Switch>
-        <Route path="/" component={Dashboard} />
+        <Route path="/" component={DashboardRedesigned} />
         <Route path="/transactions" component={Transactions} />
         <Route path="/customers" component={Customers} />
         <Route path="/reports" component={Reports} />
