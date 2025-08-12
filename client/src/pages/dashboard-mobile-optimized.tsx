@@ -410,6 +410,9 @@ export default function DashboardMobileOptimized() {
           </Card>
         </div>
       </div>
+      
+      {/* Add bottom padding to prevent content from hiding behind the navigation */}
+      <div className="h-20"></div>
     </div>
   );
 }

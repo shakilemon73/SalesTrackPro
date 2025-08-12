@@ -13,7 +13,7 @@ export default function BottomNavigation() {
   const [location] = useLocation();
 
   return (
-    <div className="bottom-nav">
+    <div className="hidden">
       <div className="flex justify-around items-center relative">
         {navItems.map((item, index) => {
           const isActive = location === item.path;

@@ -700,38 +700,21 @@
     transform: translateX(4px);
   }
 
-  /* World-Class Mobile Navigation - iOS/Material Design Inspired */
+  /* OLD Navigation Styles - DISABLED for new BottomNavigationOptimized */
   .bottom-nav {
-    @apply fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md px-4 py-2;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border-soft);
-    box-shadow: var(--shadow-xl);
+    display: none !important;
   }
 
   .nav-button {
-    @apply flex flex-col items-center py-3 px-3 rounded-lg relative;
-    color: hsl(210 15% 55%);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    font-weight: 500;
+    display: none !important;
   }
 
   .nav-button.active {
-    color: var(--primary);
-    background: var(--primary-soft);
-    transform: translateY(-2px);
+    display: none !important;
   }
 
   .nav-button.active::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 3px;
-    background: var(--primary);
-    border-radius: 2px;
+    display: none !important;
   }
 
   /* Safe area support for newer devices */
