@@ -1,83 +1,99 @@
 #!/usr/bin/env node
 
 /**
- * Build script for Vercel deployment
- * This script builds the client app and moves the output to the correct location
+ * Build script for deploying দোকান হিসাব to Vercel
+ * This script prepares the React app for production deployment
  */
 
-import { execSync } from 'child_process';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const { execSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-console.log('🚀 Building for Vercel deployment...');
+console.log('🏗️  Building দোকান হিসাব for Vercel deployment...\n');
 
 try {
-  // Clean previous builds
-  console.log('🧹 Cleaning previous builds...');
-  if (fs.existsSync('./dist')) {
-    fs.rmSync('./dist', { recursive: true, force: true });
+  // Step 1: Clean previous builds
+  console.log('1️⃣  Cleaning previous builds...');
+  if (fs.existsSync('dist')) {
+    execSync('rm -rf dist', { stdio: 'inherit' });
   }
-  if (fs.existsSync('./client/dist')) {
-    fs.rmSync('./client/dist', { recursive: true, force: true });
+  if (fs.existsSync('client/dist')) {
+    execSync('rm -rf client/dist', { stdio: 'inherit' });
   }
 
-  // Build the client app
-  console.log('🔨 Building client app...');
-  process.chdir('./client');
+  // Step 2: Install dependencies
+  console.log('2️⃣  Installing dependencies...');
+  execSync('npm install', { stdio: 'inherit' });
+
+  // Step 3: Build React app
+  console.log('3️⃣  Building React application...');
   execSync('npm run build', { stdio: 'inherit' });
+
+  // Step 4: Verify build output
+  console.log('4️⃣  Verifying build output...');
+  const distPath = fs.existsSync('dist') ? 'dist' : 'client/dist';
   
-  // Go back to root
-  process.chdir('..');
-  
-  // The build output is in ./dist/public/ due to vite.config.ts
-  // We need to move it to the root ./dist/ for Vercel
-  console.log('📦 Moving build output for Vercel...');
-  
-  if (fs.existsSync('./dist/public')) {
-    // Copy files from dist/public to dist
-    const publicPath = './dist/public';
-    const targetPath = './dist';
-    
-    // Create target directory if it doesn't exist
-    if (!fs.existsSync(targetPath)) {
-      fs.mkdirSync(targetPath, { recursive: true });
-    }
-    
-    // Copy all files from dist/public to dist
-    const files = fs.readdirSync(publicPath);
-    files.forEach(file => {
-      const srcPath = path.join(publicPath, file);
-      const destPath = path.join(targetPath, file);
-      
-      if (fs.lstatSync(srcPath).isDirectory()) {
-        // Copy directory recursively
-        fs.cpSync(srcPath, destPath, { recursive: true });
-      } else {
-        // Copy file
-        fs.copyFileSync(srcPath, destPath);
-      }
-    });
-    
-    // Remove the public directory
-    fs.rmSync('./dist/public', { recursive: true, force: true });
+  if (!fs.existsSync(distPath)) {
+    throw new Error('Build output directory not found');
   }
 
-  console.log('✅ Build completed successfully!');
-  console.log('📁 Output directory: ./dist/');
+  const buildFiles = fs.readdirSync(distPath);
+  console.log(`   ✅ Build successful! Generated ${buildFiles.length} files in ${distPath}/`);
   
-  // List the contents of the dist directory
-  if (fs.existsSync('./dist')) {
-    console.log('📋 Build output contents:');
-    const files = fs.readdirSync('./dist');
-    files.forEach(file => {
-      console.log(`  - ${file}`);
-    });
+  // Step 5: Create vercel.json if it doesn't exist
+  console.log('5️⃣  Configuring Vercel settings...');
+  const vercelConfig = {
+    "name": "dokan-hisab",
+    "version": 2,
+    "builds": [
+      {
+        "src": "package.json",
+        "use": "@vercel/static-build",
+        "config": {
+          "distDir": distPath
+        }
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/index.html"
+      }
+    ],
+    "env": {
+      "NODE_ENV": "production"
+    }
+  };
+
+  if (!fs.existsSync('vercel.json')) {
+    fs.writeFileSync('vercel.json', JSON.stringify(vercelConfig, null, 2));
+    console.log('   ✅ Created vercel.json configuration');
   }
+
+  // Step 6: Display deployment instructions
+  console.log('\n🚀 Build Complete! Ready for Vercel deployment\n');
+  console.log('📋 Deployment Options:');
+  console.log('');
+  console.log('   Option 1 - Vercel CLI:');
+  console.log('   npm install -g vercel');
+  console.log('   vercel --prod');
+  console.log('');
+  console.log('   Option 2 - Vercel Dashboard:');
+  console.log('   1. Push to GitHub');
+  console.log('   2. Connect repository at vercel.com');
+  console.log('   3. Deploy automatically');
+  console.log('');
+  console.log('   Option 3 - Manual Upload:');
+  console.log(`   1. Upload ${distPath}/ folder to any web host`);
+  console.log('   2. Configure as static site');
+  console.log('');
+  console.log('🎉 Your দোকান হিসাব app will be live and accessible worldwide!');
 
 } catch (error) {
-  console.error('❌ Build failed:', error.message);
+  console.error('\n❌ Build failed:', error.message);
+  console.error('\n🔧 Troubleshooting:');
+  console.error('   1. Ensure Node.js is installed');
+  console.error('   2. Run: npm install');
+  console.error('   3. Check for any error messages above');
   process.exit(1);
 }
