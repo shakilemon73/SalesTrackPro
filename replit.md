@@ -55,6 +55,14 @@ The application features a multi-tenant architecture with comprehensive entities
 - **Payment Methods**: Multiple payment options including mobile banking (bKash, Rocket, Nagad)
 - **Customer Communications**: Log of all customer interactions across channels
 
+### Security Implementation (Added 2025-08-12):
+- **Row Level Security (RLS)**: All 19 tables have RLS enabled with 43 comprehensive policies
+- **Demo User Support**: Special policies allow anonymous access to demo user data (UUID: 11111111-1111-1111-1111-111111111111)
+- **Multi-tenant Isolation**: Each user can only access their own data through user_id filtering
+- **API Integration Security**: Sensitive API keys are encrypted and have restricted access policies
+- **Cross-table Security**: Purchase order items are secured through parent purchase order user_id validation
+- **Graduated Access**: API integrations have read-only access for anonymous users, full access for authenticated users
+
 ## Internationalization
 - **Primary Language**: Bengali (Bangla), with custom utilities for numeral conversion, date/time formatting, and Taka currency display.
 - **Timezone**: Proper handling for Asia/Dhaka timezone across all date/time operations and database queries.

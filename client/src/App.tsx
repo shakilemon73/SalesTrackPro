@@ -24,6 +24,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 // Removed seed data import - using only live Supabase data
 import { supabase } from "./lib/supabase";
+import { testAdvancedFeatures } from "./lib/test-advanced-features";
 
 function Router() {
   const [showCommunicationPanel, setShowCommunicationPanel] = useState(false);
@@ -71,6 +72,11 @@ function App() {
           if (data && data.length > 0) {
             console.log('Sample customer:', data[0].name);
           }
+          
+          // Test advanced features after basic connection is confirmed
+          setTimeout(() => {
+            testAdvancedFeatures().catch(console.error);
+          }, 2000);
         }
       } catch (error) {
         console.error('Database check failed:', error);
