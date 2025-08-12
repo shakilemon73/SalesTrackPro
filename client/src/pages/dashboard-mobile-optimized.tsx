@@ -28,11 +28,13 @@ export default function DashboardMobileOptimized() {
     else setTimeOfDay('শুভ সন্ধ্যা');
   }, []);
 
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useQuery({
     queryKey: ['dashboard', CURRENT_USER_ID],
     queryFn: () => supabaseService.getStats(CURRENT_USER_ID),
     staleTime: 0,
     gcTime: 0,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   const { data: recentSales = [] } = useQuery({
@@ -55,6 +57,32 @@ export default function DashboardMobileOptimized() {
           <p className="text-sm text-slate-600 dark:text-slate-400 bengali-font">
             ড্যাশবোর্ড লোড করা হচ্ছে...
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (statsError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
+        <div className="text-center space-y-4 p-6">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto" />
+          <div className="space-y-2">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white bengali-font">
+              ডেটা লোড করতে সমস্যা হয়েছে
+            </h2>
+            <p className="text-sm text-slate-600 dark:text-slate-400 bengali-font">
+              ইন্টারনেট সংযোগ এবং ডেটাবেস সংযোগ পরীক্ষা করুন
+            </p>
+          </div>
+          <Button 
+            onClick={() => refetchStats()} 
+            className="bg-emerald-600 hover:bg-emerald-700"
+            data-testid="button-retry-stats"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            পুনরায় চেষ্টা করুন
+          </Button>
         </div>
       </div>
     );
@@ -92,6 +120,15 @@ export default function DashboardMobileOptimized() {
             </div>
             
             <div className="flex items-center space-x-1">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 w-8 p-0" 
+                onClick={() => refetchStats()}
+                data-testid="button-refresh-dashboard"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </Button>
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0 relative">
                 <Bell className="w-4 h-4" />
                 {lowStockProducts.length > 0 && (

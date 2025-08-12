@@ -698,25 +698,49 @@ export const supabaseService = {
       
       console.log('🔥 BANGLADESH DATE RANGE:', { todayStart, todayEnd });
       
-      // Get today's sales
+      // Get today's sales - use sale_date not created_at
       const { data: todaySales, error: salesError } = await supabase
         .from('sales')
-        .select('total_amount')
+        .select('total_amount, sale_date, created_at')
         .eq('user_id', userId)
-        .gte('created_at', todayStart)
-        .lt('created_at', todayEnd);
+        .gte('sale_date', todayStart)
+        .lt('sale_date', todayEnd);
+      
+      console.log('🔥 TODAY SALES RAW DATA:', todaySales);
       
       if (salesError) throw salesError;
       
-      // Get today's expenses
-      const { data: todayExpenses, error: expensesError } = await supabase
-        .from('expenses')
-        .select('amount')
-        .eq('user_id', userId)
-        .gte('created_at', todayStart)
-        .lt('created_at', todayEnd);
+      // Get today's expenses - use expense_date if available, otherwise fall back to created_at
+      let todayExpenses: any[] = [];
+      try {
+        const { data: expensesByDate, error: expensesError } = await supabase
+          .from('expenses')
+          .select('amount, expense_date, created_at')
+          .eq('user_id', userId)
+          .gte('expense_date', todayStart)
+          .lt('expense_date', todayEnd);
+        
+        if (expensesError) {
+          console.log('🔥 FALLBACK: expense_date not available, trying created_at');
+          // Fallback to created_at if expense_date doesn't exist
+          const { data: expensesByCreated, error: createdError } = await supabase
+            .from('expenses')
+            .select('amount, created_at')
+            .eq('user_id', userId)
+            .gte('created_at', todayStart)
+            .lt('created_at', todayEnd);
+          
+          if (createdError) throw createdError;
+          todayExpenses = expensesByCreated || [];
+        } else {
+          todayExpenses = expensesByDate || [];
+        }
+      } catch (error) {
+        console.log('🔥 EXPENSES: No expenses found or table not available');
+        todayExpenses = [];
+      }
       
-      if (expensesError) throw expensesError;
+      console.log('🔥 TODAY EXPENSES RAW DATA:', todayExpenses);
       
       // Get total customers count
       const { count: customerCount } = await supabase
