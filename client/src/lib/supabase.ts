@@ -1,18 +1,80 @@
 import { createClient } from '@supabase/supabase-js';
-import type { 
-  User, 
-  Customer, 
-  Product, 
-  Sale, 
-  Expense, 
-  Collection,
-  InsertUser,
-  InsertCustomer,
-  InsertProduct,
-  InsertSale,
-  InsertExpense,
-  InsertCollection
-} from './types';
+// Type definitions for Supabase data models
+interface User {
+  id: string;
+  username: string;
+  business_name: string;
+  email?: string;
+  phone_number?: string;
+  address?: string;
+  created_at: string;
+}
+
+interface Customer {
+  id: string;
+  user_id: string;
+  name: string;
+  phone_number?: string;
+  address?: string;
+  total_credit: number;
+  created_at: string;
+}
+
+interface Product {
+  id: string;
+  user_id: string;
+  name: string;
+  category: string;
+  unit: string;
+  buying_price: number;
+  selling_price: number;
+  current_stock: number;
+  min_stock_level: number;
+  created_at: string;
+}
+
+interface Sale {
+  id: string;
+  user_id: string;
+  customer_id?: string;
+  customer_name: string;
+  total_amount: number;
+  paid_amount: number;
+  due_amount: number;
+  payment_method: string;
+  items: any[];
+  sale_date: string;
+  created_at: string;
+}
+
+interface Expense {
+  id: string;
+  user_id: string;
+  category: string;
+  description: string;
+  amount: number;
+  date: string;
+  created_at: string;
+}
+
+interface Collection {
+  id: string;
+  user_id: string;
+  customer_id?: string;
+  customer_name: string;
+  amount: number;
+  collection_date: string;
+  notes?: string;
+  created_at: string;
+}
+
+// Insert types (for creating new records)
+type InsertUser = Omit<User, 'id' | 'created_at'>;
+type InsertCustomer = Omit<Customer, 'id' | 'user_id' | 'created_at'>;
+type InsertProduct = Omit<Product, 'id' | 'user_id' | 'created_at'>;
+type InsertSale = Omit<Sale, 'id' | 'user_id' | 'created_at'>;
+type InsertExpense = Omit<Expense, 'id' | 'user_id' | 'created_at'>;
+type InsertCollection = Omit<Collection, 'id' | 'user_id' | 'created_at'>;
 
 // Supabase configuration - FORCE hardcoded values for reliability
 const SUPABASE_URL = 'https://lkhqdqlryjzalsemofdt.supabase.co';
@@ -148,18 +210,27 @@ export const supabaseService = {
     return data;
   },
 
-  async getCustomer(id: string): Promise<Customer | null> {
+  async getCustomer(userId: string, customerId: string): Promise<Customer | null> {
+    console.log('🔥 FETCHING CUSTOMER:', customerId, 'for user:', userId);
+    
     const { data, error } = await supabase
       .from('customers')
       .select('*')
-      .eq('id', id)
+      .eq('id', customerId)
+      .eq('user_id', userId)
       .single();
     
     if (error) {
+      // Handle "no rows" error gracefully
+      if (error.code === 'PGRST116') {
+        console.log('❌ Customer not found:', customerId);
+        return null;
+      }
       console.error('❌ Error fetching customer:', error);
-      return null;
+      throw error;
     }
     
+    console.log('✅ Customer fetched:', data);
     return data;
   },
 

@@ -19,7 +19,7 @@ interface CustomerDetailsProps {
 export default function CustomerDetailsMobileOptimized({ params }: CustomerDetailsProps) {
   const customerId = params.id;
 
-  const { data: customer } = useQuery({
+  const { data: customer, isLoading: customerLoading, error: customerError } = useQuery({
     queryKey: ['customer', customerId],
     queryFn: () => supabaseService.getCustomer(CURRENT_USER_ID, customerId),
   });
@@ -34,7 +34,8 @@ export default function CustomerDetailsMobileOptimized({ params }: CustomerDetai
     queryFn: () => supabaseService.getCollections(CURRENT_USER_ID),
   });
 
-  if (!customer) {
+  // Loading state
+  if (customerLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
         <div className="text-center space-y-3">
@@ -43,6 +44,39 @@ export default function CustomerDetailsMobileOptimized({ params }: CustomerDetai
             গ্রাহকের তথ্য লোড করা হচ্ছে...
           </p>
         </div>
+      </div>
+    );
+  }
+
+  // Error or Customer not found state
+  if (customerError || !customer) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white border-0 shadow-lg">
+          <CardContent className="p-6 text-center">
+            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <h1 className="text-xl font-bold text-gray-900 mb-2 bengali-font">
+              গ্রাহক খুঁজে পাওয়া যায়নি
+            </h1>
+            <p className="text-gray-600 mb-6 bengali-font">
+              এই গ্রাহকের তথ্য আর উপলব্ধ নেই বা ভুল আইডি দেওয়া হয়েছে।
+            </p>
+            <div className="space-y-3">
+              <Link to="/customers">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                  <User className="w-4 h-4 mr-2" />
+                  গ্রাহক তালিকায় ফিরে যান
+                </Button>
+              </Link>
+              <Link to="/">
+                <Button variant="outline" className="w-full">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  ড্যাশবোর্ডে ফিরে যান
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
