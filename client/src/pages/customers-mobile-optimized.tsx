@@ -274,6 +274,9 @@ export default function CustomersMobileOptimized() {
             </div>
           </Card>
         )}
+        
+        {/* Professional bottom spacing for navigation */}
+        <div className="h-24"></div>
       </div>
     </div>
   );

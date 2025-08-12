@@ -411,8 +411,8 @@ export default function DashboardMobileOptimized() {
         </div>
       </div>
       
-      {/* Add bottom padding to prevent content from hiding behind the navigation */}
-      <div className="h-20"></div>
+      {/* Professional bottom spacing for navigation */}
+      <div className="h-24"></div>
     </div>
   );
 }

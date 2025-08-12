@@ -170,26 +170,26 @@
     padding-top: max(env(safe-area-inset-top), 24px);
   }
 
-  /* Android Navigation Bar Optimizations */
+  /* Optimized Android Navigation - Clean & Professional */
   .android-nav-spacing {
-    padding-bottom: max(env(safe-area-inset-bottom), 16px);
+    padding-bottom: 0;
   }
 
-  /* Better safe area handling for bottom navigation */
+  /* Modern safe area handling */
   @supports (padding: max(0px)) {
     .bottom-nav-safe {
-      padding-bottom: max(env(safe-area-inset-bottom), 16px);
+      padding-bottom: max(env(safe-area-inset-bottom), 0px);
     }
   }
 
-  /* Keyboard handling for Android */
+  /* Better keyboard handling for forms */
   body.keyboard-open {
     padding-bottom: 0;
   }
 
-  body.keyboard-open .android-nav-spacing,
-  body.keyboard-open .bottom-nav-safe {
-    padding-bottom: 0;
+  /* Ensure content doesn't hide behind navigation */
+  .page-content {
+    padding-bottom: 100px;
   }
 
   /* Android Material Design 3 elevation */

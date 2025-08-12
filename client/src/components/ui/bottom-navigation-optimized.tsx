@@ -54,12 +54,11 @@ export default function BottomNavigationOptimized() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 android-nav-spacing">
-      {/* World-class mobile navigation with backdrop blur and glass morphism */}
-      <div className="bg-white/95 backdrop-blur-lg border-t border-gray-200/50 shadow-2xl"
-           style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 16px)' }}>
+    <div className="fixed bottom-0 left-0 right-0 z-50">
+      {/* Professional Bottom Navigation with Material Design 3 */}
+      <div className="bg-white/98 backdrop-blur-xl border-t border-slate-200/60 shadow-2xl">
         <div className="w-full">
-          <div className="grid grid-cols-5 gap-1 px-4 py-3">
+          <div className="grid grid-cols-5 gap-0 px-2 py-2">
             {navItems.map((item, index) => {
               const isActive = location === item.path;
               const IconComponent = item.icon;
@@ -69,69 +68,31 @@ export default function BottomNavigationOptimized() {
                   <button 
                     onClick={handleNavClick}
                     className={`
-                      relative flex flex-col items-center justify-center py-2 px-1 
-                      rounded-2xl transition-all duration-300 ease-out
-                      group hover:scale-105 active:scale-95 min-h-12 min-w-12
-                      touch-manipulation
-                      ${isActive ? 'transform -translate-y-1' : 'hover:bg-gray-50/80'}
+                      relative flex flex-col items-center justify-center w-full
+                      py-3 px-2 rounded-xl transition-all duration-200 ease-out
+                      touch-manipulation active:scale-95
+                      ${isActive 
+                        ? 'bg-emerald-500 text-white shadow-lg' 
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      }
                     `}
                   >
-                    {/* Background indicator for active state */}
-                    <div className={`
-                      absolute inset-0 rounded-2xl transition-all duration-500 ease-out
-                      ${isActive 
-                        ? `${item.activeColor} shadow-lg shadow-${item.color.split('-')[1]}-500/20 scale-100` 
-                        : 'scale-0'
-                      }
-                    `} />
+                    {/* Clean Icon */}
+                    <IconComponent 
+                      size={20} 
+                      className={`
+                        transition-colors duration-200 mb-1
+                        ${isActive ? 'text-white' : 'text-current'}
+                      `} 
+                    />
                     
-                    {/* Icon container with modern glass effect */}
-                    <div className={`
-                      relative z-10 w-8 h-8 rounded-xl flex items-center justify-center 
-                      transition-all duration-300 ease-out mb-1
-                      ${isActive 
-                        ? 'bg-white/20 backdrop-blur-sm' 
-                        : `${item.bgColor} group-hover:scale-110 group-hover:bg-opacity-80`
-                      }
-                    `}>
-                      <IconComponent 
-                        size={18} 
-                        className={`
-                          transition-all duration-300 ease-out
-                          ${isActive 
-                            ? 'text-white drop-shadow-sm' 
-                            : `${item.color} group-hover:scale-110`
-                          }
-                        `} 
-                      />
-                    </div>
-                    
-                    {/* Label with smart typography */}
+                    {/* Clean Label */}
                     <span className={`
-                      text-xs font-medium bengali-font transition-all duration-300 ease-out
-                      ${isActive 
-                        ? 'text-white drop-shadow-sm scale-105' 
-                        : 'text-gray-600 group-hover:text-gray-900'
-                      }
+                      text-xs font-medium bengali-font transition-colors duration-200
+                      ${isActive ? 'text-white' : 'text-current'}
                     `}>
                       {item.label}
                     </span>
-
-                    {/* Active indicator dot */}
-                    {isActive && (
-                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
-                        <div className="w-1 h-1 bg-white rounded-full shadow-lg animate-pulse" />
-                      </div>
-                    )}
-
-                    {/* Subtle glow effect for active item */}
-                    {isActive && (
-                      <div className={`
-                        absolute inset-0 rounded-2xl opacity-30
-                        bg-gradient-to-t from-${item.color.split('-')[1]}-600/20 to-transparent
-                        animate-pulse
-                      `} />
-                    )}
                   </button>
                 </Link>
               );
@@ -139,14 +100,11 @@ export default function BottomNavigationOptimized() {
           </div>
         </div>
 
-        {/* Home indicator (iPhone-style) */}
-        <div className="flex justify-center pb-1">
-          <div className="w-20 h-1 bg-gray-300 rounded-full opacity-40" />
-        </div>
+        {/* Bottom safe area with proper spacing */}
+        <div className="h-4 bg-white/98"></div>
+        <div style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0px)' }} className="bg-white/98"></div>
       </div>
 
-      {/* Safe area spacing for devices with home indicators */}
-      <div className="h-safe-area-inset-bottom bg-white/95 backdrop-blur-lg" />
     </div>
   );
 }
