@@ -518,17 +518,10 @@ export default function SalesEntryMobileOptimized() {
                   className="flex-1 h-12 bg-emerald-500 hover:bg-emerald-600"
                   disabled={createSaleMutation.isPending}
                 >
-                  {createSaleMutation.isPending ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      সেভ হচ্ছে...
-                    </>
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4 mr-2" />
-                      বিক্রয় সম্পন্ন
-                    </>
-                  )}
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    বিক্রয় সম্পন্ন
+                  </>
                 </Button>
               </div>
             </div>

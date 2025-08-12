@@ -135,19 +135,7 @@ body {
   @apply bg-gradient-to-r from-blue-500 to-blue-400 text-white font-medium px-6 py-3 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300;
 }
 
-/* Loading States */
-.loading-spinner {
-  @apply w-8 h-8 border-4 border-slate-200 border-t-emerald-500 rounded-full animate-spin;
-}
 
-.skeleton {
-  @apply bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 bg-[length:200%_100%] animate-[shimmer_1.5s_infinite];
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
 
 /* Status Indicators */
 .status-online {

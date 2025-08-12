@@ -39,7 +39,7 @@ export default function Customers() {
                 <h1 className="text-lg font-bold text-slate-900 bengali-font">গ্রাহক তালিকা</h1>
                 <div className="text-sm text-slate-500 flex items-center space-x-2">
                   <span>মোট {toBengaliNumber(customers.length)} জন গ্রাহক</span>
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
                   <span className="text-xs text-green-600 font-medium">লাইভ</span>
                 </div>
               </div>
@@ -68,27 +68,7 @@ export default function Customers() {
 
         {/* Customer List */}
         <div className="section-spacing">
-          {isLoading ? (
-            <div className="space-y-3">
-              {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="p-4 bg-white rounded-lg border border-slate-200 animate-pulse">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="bg-slate-200 w-12 h-12 rounded-xl"></div>
-                      <div className="space-y-2">
-                        <div className="h-4 bg-slate-200 rounded w-32"></div>
-                        <div className="h-3 bg-slate-200 rounded w-24"></div>
-                      </div>
-                    </div>
-                    <div className="text-right space-y-2">
-                      <div className="h-4 bg-slate-200 rounded w-20"></div>
-                      <div className="h-3 bg-slate-200 rounded w-16"></div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : filteredCustomers.length === 0 ? (
+          {filteredCustomers.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i className="fas fa-users text-slate-400 text-xl"></i>

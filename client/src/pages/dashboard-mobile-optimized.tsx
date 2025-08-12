@@ -49,18 +49,7 @@ export default function DashboardMobileOptimized() {
     queryFn: () => supabaseService.getLowStockProducts(CURRENT_USER_ID),
   });
 
-  if (statsLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
-        <div className="text-center space-y-3">
-          <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
-          <p className="text-sm text-slate-600 dark:text-slate-400 bengali-font">
-            ড্যাশবোর্ড লোড করা হচ্ছে...
-          </p>
-        </div>
-      </div>
-    );
-  }
+
 
   if (statsError) {
     return (
@@ -173,7 +162,7 @@ export default function DashboardMobileOptimized() {
                 </span>
               </div>
             </div>
-            <div className="absolute top-2 right-2 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+            <div className="absolute top-2 right-2 w-2 h-2 bg-yellow-400 rounded-full"></div>
           </Card>
 
           <Card className="border-0 shadow-md bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-4">

@@ -37,8 +37,8 @@ export default function CustomersMobileOptimized() {
   // Calculate customer stats
   const getCustomerStats = (customerId: string) => {
     const customerSales = sales.filter(sale => sale.customer_id === customerId);
-    const totalPurchases = customerSales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || 0), 0);
-    const totalDue = customerSales.reduce((sum, sale) => sum + parseFloat(sale.due_amount || 0), 0);
+    const totalPurchases = customerSales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || '0'), 0);
+    const totalDue = customerSales.reduce((sum, sale) => sum + parseFloat(sale.due_amount || '0'), 0);
     return { totalPurchases, totalDue, salesCount: customerSales.length };
   };
 
@@ -58,18 +58,7 @@ export default function CustomersMobileOptimized() {
     return stats.totalDue > 0;
   });
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
-        <div className="text-center space-y-3">
-          <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
-          <p className="text-sm text-slate-600 dark:text-slate-400 bengali-font">
-            গ্রাহক তথ্য লোড করা হচ্ছে...
-          </p>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pb-20">
@@ -91,7 +80,7 @@ export default function CustomersMobileOptimized() {
                 <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center space-x-1">
                   <Users className="w-3 h-3" />
                   <span>মোট {toBengaliNumber(customers.length)} জন</span>
-                  <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+                  <div className="w-1 h-1 bg-green-500 rounded-full"></div>
                 </div>
               </div>
             </div>

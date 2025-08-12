@@ -34,19 +34,7 @@ export default function CustomerDetailsMobileOptimized({ params }: CustomerDetai
     queryFn: () => supabaseService.getCollections(CURRENT_USER_ID),
   });
 
-  // Loading state
-  if (customerLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
-        <div className="text-center space-y-3">
-          <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
-          <p className="text-sm text-slate-600 dark:text-slate-400 bengali-font">
-            গ্রাহকের তথ্য লোড করা হচ্ছে...
-          </p>
-        </div>
-      </div>
-    );
-  }
+
 
   // Error or Customer not found state
   if (customerError || !customer) {
@@ -86,11 +74,11 @@ export default function CustomerDetailsMobileOptimized({ params }: CustomerDetai
   const customerCollections = collections.filter(collection => collection.customer_id === customerId);
 
   const stats = {
-    totalPurchases: customerSales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || 0), 0),
-    totalDue: customerSales.reduce((sum, sale) => sum + parseFloat(sale.due_amount || 0), 0),
-    totalCollected: customerCollections.reduce((sum, collection) => sum + parseFloat(collection.amount || 0), 0),
+    totalPurchases: customerSales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || '0'), 0),
+    totalDue: customerSales.reduce((sum, sale) => sum + parseFloat(sale.due_amount || '0'), 0),
+    totalCollected: customerCollections.reduce((sum, collection) => sum + parseFloat(collection.amount || '0'), 0),
     orderCount: customerSales.length,
-    avgOrderValue: customerSales.length > 0 ? customerSales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || 0), 0) / customerSales.length : 0,
+    avgOrderValue: customerSales.length > 0 ? customerSales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || '0'), 0) / customerSales.length : 0,
     lastPurchase: customerSales.length > 0 ? new Date(customerSales.sort((a, b) => new Date(b.sale_date).getTime() - new Date(a.sale_date).getTime())[0].sale_date) : null
   };
 
@@ -297,7 +285,7 @@ export default function CustomerDetailsMobileOptimized({ params }: CustomerDetai
                       </div>
                       <div>
                         <p className="text-sm font-medium text-slate-900 dark:text-white number-font">
-                          {formatCurrency(parseFloat(sale.total_amount))}
+                          {formatCurrency(parseFloat(sale.total_amount || '0'))}
                         </p>
                         <p className="text-xs text-slate-500">
                           {new Date(sale.sale_date).toLocaleDateString('bn-BD')}
@@ -305,9 +293,9 @@ export default function CustomerDetailsMobileOptimized({ params }: CustomerDetai
                       </div>
                     </div>
                     <div className="text-right">
-                      {parseFloat(sale.due_amount) > 0 && (
+                      {parseFloat(sale.due_amount || '0') > 0 && (
                         <Badge variant="outline" className="text-xs h-4 px-1 text-red-600 border-red-200">
-                          বাকি: {formatCurrency(parseFloat(sale.due_amount))}
+                          বাকি: {formatCurrency(parseFloat(sale.due_amount || '0'))}
                         </Badge>
                       )}
                       <p className="text-xs text-slate-500 mt-1">
@@ -319,7 +307,7 @@ export default function CustomerDetailsMobileOptimized({ params }: CustomerDetai
                 
               {customerSales.length > 5 && (
                 <Button variant="ghost" className="w-full text-xs h-8 bengali-font">
-                  আরো {toBengaliNumber(customerSales.length - 5)}টি লেনদেন দেখুন
+                  আরো {toBengaliNumber((customerSales.length - 5).toString())}টি লেনদেন দেখুন
                 </Button>
               )}
             </div>
