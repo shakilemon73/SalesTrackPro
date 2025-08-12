@@ -187,7 +187,8 @@ export default function SalesEntry() {
         </div>
       </div>
 
-      <form id="sales-form" onSubmit={form.handleSubmit(onSubmit)} className="p-4 mobile-safe-area space-y-6">
+      <div className="p-4 mobile-safe-area">
+        <form id="sales-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {/* Customer Selection */}
         <Card className="enhanced-card">
           <CardHeader className="enhanced-card-header">
@@ -427,7 +428,8 @@ export default function SalesEntry() {
             </Card>
           </Link>
         </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

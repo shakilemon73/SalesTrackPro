@@ -129,9 +129,9 @@ export default function CustomerDetails() {
   }
 
   // Calculate customer statistics
-  const totalPurchases = customerSales.reduce((sum, sale) => sum + parseFloat(sale.total_amount), 0);
-  const totalDue = customerSales.reduce((sum, sale) => sum + parseFloat(sale.due_amount || 0), 0);
-  const totalPaid = customerSales.reduce((sum, sale) => sum + parseFloat(sale.paid_amount || 0), 0);
+  const totalPurchases = customerSales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || '0'), 0);
+  const totalDue = customerSales.reduce((sum, sale) => sum + parseFloat(sale.due_amount || '0'), 0);
+  const totalPaid = customerSales.reduce((sum, sale) => sum + parseFloat(sale.paid_amount || '0'), 0);
   const recentSales = customerSales.slice(0, 5);
 
   return (
@@ -192,7 +192,7 @@ export default function CustomerDetails() {
                   <div className="flex items-center space-x-2">
                     <i className="fas fa-calendar text-blue-600 w-4"></i>
                     <span className="body-regular text-blue-800">
-                      সদস্য: {new Date(customer.created_at).toLocaleDateString('bn-BD')}
+                      সদস্য: {customer.created_at ? new Date(customer.created_at).toLocaleDateString('bn-BD') : 'অজানা'}
                     </span>
                   </div>
                 </div>
@@ -304,7 +304,7 @@ export default function CustomerDetails() {
                           {sale.items && sale.items[0]?.productName || 'বিক্রয়'}
                         </p>
                         <p className="text-sm text-gray-600">
-                          {new Date(sale.sale_date).toLocaleDateString('bn-BD')}
+                          {sale.sale_date ? new Date(sale.sale_date).toLocaleDateString('bn-BD') : 'অজানা তারিখ'}
                         </p>
                       </div>
                     </div>

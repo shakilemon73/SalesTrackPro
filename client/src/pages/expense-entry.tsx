@@ -137,7 +137,8 @@ export default function ExpenseEntry() {
         </div>
       </div>
 
-      <div className="p-4 mobile-safe-area space-y-6">
+      <div className="p-4 mobile-safe-area">
+        <div className="space-y-6">
         {/* Today's Expense Summary */}
         <Card className="enhanced-card bg-gradient-to-r from-red-50 to-rose-50 border-red-200">
           <CardContent className="p-6">
@@ -378,6 +379,7 @@ export default function ExpenseEntry() {
               </CardContent>
             </Card>
           </Link>
+        </div>
         </div>
       </div>
     </div>
