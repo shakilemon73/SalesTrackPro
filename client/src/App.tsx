@@ -14,7 +14,7 @@ import CustomerAddMobileOptimized from "@/pages/customer-add-mobile-optimized";
 import CustomerDetailsMobileOptimized from "@/pages/customer-details-mobile-optimized";
 import CollectionMobileOptimized from "@/pages/collection-mobile-optimized";
 import ExpenseEntryMobileOptimized from "@/pages/expense-entry-mobile-optimized";
-import InventoryMobileOptimized from "@/pages/inventory-mobile-optimized";
+import InventoryMobileOptimizedFixed from "@/pages/inventory-mobile-optimized-fixed";
 import BottomNavigation from "@/components/ui/bottom-navigation";
 import CommunicationPanel from "@/components/ui/communication-panel";
 import Analytics from "@/pages/analytics";
@@ -39,7 +39,7 @@ function Router() {
         <Route path="/sales/new" component={SalesEntryMobileOptimized} />
         <Route path="/customers/new" component={CustomerAddMobileOptimized} />
         <Route path="/customers/:id" component={CustomerDetailsMobileOptimized} />
-        <Route path="/inventory" component={InventoryMobileOptimized} />
+        <Route path="/inventory" component={InventoryMobileOptimizedFixed} />
         <Route path="/collection" component={CollectionMobileOptimized} />
         <Route path="/expenses/new" component={ExpenseEntryMobileOptimized} />
         <Route path="/analytics" component={Analytics} />

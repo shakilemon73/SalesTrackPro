@@ -27,7 +27,7 @@ const productSchema = z.object({
   minStockLevel: z.string().refine((val) => parseInt(val) >= 1, "সর্বনিম্ন স্টক আবশ্যক"),
 });
 
-export default function InventoryMobileOptimized() {
+export default function InventoryMobileOptimizedFixed() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -143,6 +143,8 @@ export default function InventoryMobileOptimized() {
               <h1 className="text-lg font-bold text-gray-900">স্টক ম্যানেজমেন্ট</h1>
             </div>
           </div>
+          
+          {/* Add Product Dialog */}
           <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full">
@@ -150,15 +152,12 @@ export default function InventoryMobileOptimized() {
                 যোগ করুন
               </Button>
             </DialogTrigger>
-            
-            {/* Streamlined Add Product Modal */}
             <DialogContent className="sm:max-w-md mx-auto max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-lg text-center">নতুন পণ্য যোগ করুন</DialogTitle>
               </DialogHeader>
               
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                {/* Essential Fields Only - No overwhelming forms */}
                 <div>
                   <Label className="text-sm font-medium">পণ্যের নাম *</Label>
                   <Input
@@ -379,8 +378,6 @@ export default function InventoryMobileOptimized() {
           </div>
         )}
       </div>
-
-
     </div>
   );
 }
