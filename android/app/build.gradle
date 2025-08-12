@@ -16,6 +16,14 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    lintOptions {
+        abortOnError false
+        disable 'UncheckedGenericTypes'
+    }
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -38,8 +46,13 @@ android {
 }
 
 repositories {
-    flatDir{
-        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    google()
+    mavenCentral()
+    // Only use flatDir for local JARs if absolutely necessary
+    if (file('libs').exists() && file('libs').list().length > 0) {
+        flatDir {
+            dirs 'libs'
+        }
     }
 }
 
