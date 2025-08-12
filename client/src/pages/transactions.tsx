@@ -251,45 +251,50 @@ export default function Transactions() {
   };
 
   return (
-    <div className="min-h-screen bg-background-app">
-      {/* Premium Header */}
-      <div className="header-bar">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Link to="/">
-              <button className="w-10 h-10 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300 hover:scale-110 border border-white/20">
-                <i className="fas fa-arrow-left text-white"></i>
-              </button>
-            </Link>
-            <div>
-              <h1 className="heading-2 text-white mb-0.5">সকল লেনদেন</h1>
-              <div className="flex items-center space-x-2">
-                <p className="text-sm text-white/90 bengali-font">{getBengaliDate()}</p>
-                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-xs text-green-200 font-semibold">লাইভ</span>
+    <div className="page-layout">
+      {/* Modern Header with Status */}
+      <div className="page-header">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-3">
+              <Link to="/">
+                <Button variant="ghost" size="sm" className="w-10 h-10">
+                  <i className="fas fa-arrow-left text-slate-600"></i>
+                </Button>
+              </Link>
+              <div>
+                <h1 className="text-lg font-bold text-slate-900 bengali-font">সকল লেনদেন</h1>
+                <div className="text-sm text-slate-500 flex items-center space-x-2">
+                  <span>{getBengaliDate()}</span>
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-green-600 font-medium">লাইভ</span>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button 
-              onClick={generatePDFReport} 
-              className="bg-white/15 hover:bg-white/25 text-white border border-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-105"
-            >
-              <i className="fas fa-download mr-2"></i>
-              PDF
-            </Button>
-            <Link to="/sales/new">
-              <Button className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-105">
-                <i className="fas fa-plus mr-2"></i>
-                নতুন
+            <div className="flex items-center space-x-2">
+              <Button 
+                onClick={generatePDFReport} 
+                variant="outline"
+                size="sm"
+              >
+                <i className="fas fa-download mr-2"></i>
+                PDF
               </Button>
-            </Link>
+              <Link to="/sales/new">
+                <Button size="sm">
+                  <i className="fas fa-plus mr-2"></i>
+                  নতুন
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Premium Summary Cards */}
-      <div className="p-4 space-y-4">
+      {/* Main Content */}
+      <div className="page-content content-max-width">
+        {/* Summary Cards */}
+        <div className="section-spacing">
         <div className="responsive-grid-2">
           <div className="stats-card">
             <div className="flex items-center justify-between mb-3">
