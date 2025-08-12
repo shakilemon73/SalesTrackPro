@@ -240,15 +240,14 @@ class BangladeshAuthService {
     }
   }
 
-  // Generate consistent user ID from phone number
+  // Generate proper UUID for new user
   private generateUserId(phone: string): string {
-    // Create a consistent UUID-like ID from phone number
-    const hash = phone.split('').reduce((acc, char) => {
-      return ((acc << 5) - acc + char.charCodeAt(0)) & 0xffffffff;
-    }, 0);
-    
-    const hex = Math.abs(hash).toString(16).padStart(8, '0');
-    return `bd${hex}-${hex.slice(0,4)}-${hex.slice(4,8)}-${hex.slice(0,4)}-${hex}${hex.slice(0,4)}`;
+    // Generate a proper UUID v4 format
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
   }
 
   // Detect mobile operator from phone number
@@ -289,27 +288,49 @@ class BangladeshAuthService {
       }
 
       if (!existingUser) {
-        // Create new user profile
+        // Create new user profile with proper data
         const { error: insertError } = await supabase
           .from('users')
           .insert({
             id: this.currentUser.id,
-            username: this.currentUser.phone.replace('+88', ''),
+            username: `user_${this.currentUser.phone.replace('+88', '').slice(-4)}`,
             business_name: 'আমার দোকান',
             phone_number: this.currentUser.phone,
+            email: null,
+            address: null,
             created_at: this.currentUser.created_at
           });
 
         if (insertError) {
           console.error('Failed to create user profile:', insertError);
-          // Don't throw - user can still use the app
+          throw new Error('Failed to create user profile');
         } else {
-          console.log('✅ User profile created in Supabase');
+          console.log('✅ New user profile created in Supabase for:', this.currentUser.phone);
+          
+          // Create default subscription for new user
+          const { error: subscriptionError } = await supabase
+            .from('subscriptions')
+            .insert({
+              user_id: this.currentUser.id,
+              plan_name: 'free_trial',
+              plan_name_local: 'ফ্রি ট্রায়াল',
+              status: 'active',
+              trial_ends_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+              created_at: new Date().toISOString()
+            });
+
+          if (subscriptionError) {
+            console.warn('Failed to create subscription:', subscriptionError);
+          } else {
+            console.log('✅ Default subscription created for new user');
+          }
         }
+      } else {
+        console.log('✅ Existing user profile found:', this.currentUser.phone);
       }
     } catch (error) {
-      console.warn('Profile sync failed:', error);
-      // Don't throw - user can still use the app
+      console.error('Profile sync failed:', error);
+      throw error; // Throw so authentication fails if profile creation fails
     }
   }
 }

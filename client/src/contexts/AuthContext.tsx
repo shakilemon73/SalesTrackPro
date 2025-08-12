@@ -32,12 +32,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
+    // Get initial session - check both Supabase and Bangladesh auth
     const getInitialSession = async () => {
       try {
+        // First check Supabase session
         const { data: { session } } = await supabase.auth.getSession();
-        setSession(session);
-        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          setSession(session);
+          setUser(session.user);
+        } else {
+          // Check Bangladesh auth service for existing session
+          const { bangladeshAuthService } = await import('../lib/bangladesh-auth-service');
+          const bdUser = bangladeshAuthService.getCurrentUser();
+          
+          if (bdUser) {
+            setUser(bdUser as any);
+            setSession({ user: bdUser } as any);
+            console.log('🔄 Restored Bangladesh auth session for:', bdUser.phone);
+          }
+        }
       } catch (error) {
         console.error('Error getting initial session:', error);
       } finally {
@@ -84,14 +98,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const result = await bangladeshAuthService.verifyOTP(phone, token);
       
       if (result.success && result.user) {
-        // Create/update user profile and ensure Supabase profile exists
-        await bangladeshAuthService.ensureUserProfile();
-        
-        // Set the authenticated user
-        setUser(result.user as any);
-        setSession({ user: result.user } as any);
-        
-        return { error: null, user: result.user };
+        try {
+          // Create/update user profile and ensure Supabase profile exists
+          await bangladeshAuthService.ensureUserProfile();
+          
+          // Set the authenticated user
+          setUser(result.user as any);
+          setSession({ user: result.user } as any);
+          
+          console.log('✅ Authentication complete for new user:', result.user.phone);
+          return { error: null, user: result.user };
+        } catch (profileError: any) {
+          console.error('Profile creation failed:', profileError);
+          return { error: { message: 'Failed to create user profile. Please try again.' }, user: null };
+        }
       } else {
         return { error: { message: result.error || 'Invalid OTP' }, user: null };
       }
