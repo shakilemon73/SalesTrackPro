@@ -56,9 +56,28 @@ export function getBangladeshTime(date?: Date): Date {
 // Get current Bangladesh time as ISO string for database storage
 export function getBangladeshTimeISO(date?: Date): string {
   const now = date || new Date();
-  // Get the time in Bangladesh timezone and format as ISO string
-  const bangladeshTime = new Date(now.toLocaleString("en-US", {timeZone: BANGLADESH_TIMEZONE}));
-  return bangladeshTime.toISOString();
+  // Create a date in Bangladesh timezone
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: BANGLADESH_TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+  
+  const parts = formatter.formatToParts(now);
+  const year = parts.find(p => p.type === 'year')?.value;
+  const month = parts.find(p => p.type === 'month')?.value;
+  const day = parts.find(p => p.type === 'day')?.value;
+  const hour = parts.find(p => p.type === 'hour')?.value;
+  const minute = parts.find(p => p.type === 'minute')?.value;
+  const second = parts.find(p => p.type === 'second')?.value;
+  
+  // Return ISO string in Bangladesh timezone
+  return `${year}-${month}-${day}T${hour}:${minute}:${second}`;
 }
 
 // Get today's date in Bangladesh timezone as YYYY-MM-DD string
@@ -73,19 +92,20 @@ export function getBangladeshDateString(date?: Date): string {
 // Get Bangladesh date range for database queries
 export function getBangladeshDateRange(date?: Date): { start: string; end: string } {
   const now = date || new Date();
-  const bangladeshTime = new Date(now.toLocaleString("en-US", {timeZone: BANGLADESH_TIMEZONE}));
   
-  // Get start of day in Bangladesh
-  const startOfDay = new Date(bangladeshTime);
-  startOfDay.setHours(0, 0, 0, 0);
+  // Get the date string in Bangladesh timezone
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: BANGLADESH_TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
   
-  // Get end of day in Bangladesh
-  const endOfDay = new Date(bangladeshTime);
-  endOfDay.setHours(23, 59, 59, 999);
+  const dateStr = formatter.format(now);
   
   return {
-    start: startOfDay.toISOString(),
-    end: endOfDay.toISOString()
+    start: `${dateStr}T00:00:00`,
+    end: `${dateStr}T23:59:59`
   };
 }
 
@@ -105,24 +125,25 @@ export function getBengaliDate(date?: Date): string {
 }
 
 export function getBengaliTime(date?: Date): string {
-  const bangladeshTime = getBangladeshTime(date);
+  const now = date || new Date();
   
   // Handle invalid dates
-  if (!bangladeshTime || isNaN(bangladeshTime.getTime())) {
+  if (!now || isNaN(now.getTime())) {
     return getBengaliTime(new Date());
   }
   
-  let hours = bangladeshTime.getHours();
-  const minutes = bangladeshTime.getMinutes();
-  const period = hours >= 12 ? 'অপরাহ্ন' : 'সকাল';
+  // Format time in Bangladesh timezone
+  const formatter = new Intl.DateTimeFormat('bn-BD', {
+    timeZone: BANGLADESH_TIMEZONE,
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
   
-  if (hours > 12) hours -= 12;
-  if (hours === 0) hours = 12;
+  const timeStr = formatter.format(now);
   
-  const bengaliHours = toBengaliNumber(hours);
-  const bengaliMinutes = toBengaliNumber(minutes.toString().padStart(2, '0'));
-  
-  return `${period} ${bengaliHours}:${bengaliMinutes}`;
+  // Convert to Bengali numerals while preserving the Bengali AM/PM format
+  return timeStr.replace(/\d/g, (match) => toBengaliNumber(parseInt(match)).toString());
 }
 
 export function getBengaliDay(date?: Date): string {
