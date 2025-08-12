@@ -1,227 +1,106 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "wouter";
-import { getBengaliDate, getBengaliTime, formatCurrency, toBengaliNumber, getBangladeshDateString, getBangladeshTime } from "@/lib/bengali-utils";
+import { getBengaliDate, formatCurrency, toBengaliNumber } from "@/lib/bengali-utils";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
 import jsPDF from 'jspdf';
-import { useToast } from "@/hooks/use-toast";
 
 export default function Transactions() {
-  const [dateFilter, setDateFilter] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
   const { toast } = useToast();
 
-  const { data: sales = [], isLoading: salesLoading, error: salesError } = useQuery({
+  const { data: sales = [], isLoading: salesLoading } = useQuery({
     queryKey: ['sales', CURRENT_USER_ID],
     queryFn: () => supabaseService.getSales(CURRENT_USER_ID),
-    staleTime: 0,
-    gcTime: 0,
   });
 
-  const { data: expenses = [], isLoading: expensesLoading, error: expensesError } = useQuery({
+  const { data: expenses = [], isLoading: expensesLoading } = useQuery({
     queryKey: ['expenses', CURRENT_USER_ID],
     queryFn: () => supabaseService.getExpenses(CURRENT_USER_ID),
-    staleTime: 0,
-    gcTime: 0,
   });
 
-  if (salesError) console.error('🔥 TRANSACTIONS Sales error:', salesError);
-  if (expensesError) console.error('🔥 TRANSACTIONS Expenses error:', expensesError);
-
-  // For collections, filter sales with negative amounts (collection records)
-  const { data: collectionsData = [], isLoading: collectionsLoading } = useQuery({
+  const { data: collections = [], isLoading: collectionsLoading } = useQuery({
     queryKey: ['collections', CURRENT_USER_ID],
-    queryFn: async () => {
-      const allSales = await supabaseService.getSales(CURRENT_USER_ID);
-      // Filter for collection records (negative amounts) and regular collections
-      return allSales.filter(sale => 
-        parseFloat(sale.total_amount || '0') < 0 || // Collection records
-        (parseFloat(sale.paid_amount || '0') > 0 && parseFloat(sale.due_amount || '0') === 0 && parseFloat(sale.total_amount || '0') > 0) // Full payments
-      ).map(sale => ({
-        ...sale,
-        amount: Math.abs(parseFloat(sale.total_amount || '0') < 0 ? parseFloat(sale.total_amount || '0') : parseFloat(sale.paid_amount || '0')),
-        collection_date: sale.created_at,
-        customer_name: sale.customer_name
-      }));
-    },
-    staleTime: 0,
-    gcTime: 0,
+    queryFn: () => supabaseService.getCollections(CURRENT_USER_ID),
   });
 
-  const collections = collectionsData;
+  const isLoading = salesLoading || expensesLoading || collectionsLoading;
 
-
-
-  // Combine all transactions with type indication
+  // Combine all transactions
   const allTransactions = [
-    ...sales.map((sale: any) => ({
+    ...sales.map(sale => ({
       ...sale,
       type: 'sale',
-      title: sale.customer_name || 'অজানা গ্রাহক',
+      date: sale.sale_date,
       amount: parseFloat(sale.total_amount || 0),
-      date: sale.sale_date || sale.created_at,
-      icon: 'fas fa-shopping-cart',
-      color: 'text-green-600',
-      bgColor: 'bg-green-50'
+      description: `বিক্রয় - ${sale.customer_name}`,
     })),
-    ...expenses.map((expense: any) => ({
+    ...expenses.map(expense => ({
       ...expense,
       type: 'expense',
-      title: expense.description || 'খরচ',
-      amount: -parseFloat(expense.amount || 0), // Negative for expenses
-      date: expense.expense_date || expense.created_at,
-      icon: 'fas fa-minus-circle',
-      color: 'text-red-600',
-      bgColor: 'bg-red-50'
+      date: expense.expense_date,
+      amount: parseFloat(expense.amount || 0),
+      description: expense.description,
     })),
-    ...collections.map((collection: any) => ({
+    ...collections.map(collection => ({
       ...collection,
       type: 'collection',
-      title: collection.customer_name || 'সংগ্রহ',
+      date: collection.collection_date,
       amount: parseFloat(collection.amount || 0),
-      date: collection.collection_date || collection.created_at,
-      icon: 'fas fa-hand-holding-usd',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50'
+      description: `সংগ্রহ - ${collection.customer_name}`,
     }))
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-  // Debug logging
-  console.log('🔥 ALL TRANSACTIONS DATA:', {
-    salesCount: sales.length,
-    expensesCount: expenses.length,
-    collectionsCount: collections.length,
-    totalTransactions: allTransactions.length,
-    sampleSaleDate: sales[0]?.sale_date || sales[0]?.created_at,
-    currentDateFilter: dateFilter
-  });
-
-  // Filter transactions
-  const getFilteredTransactions = () => {
-    let filtered = allTransactions;
-
-    // Filter by type
-    if (activeTab !== 'all') {
-      filtered = filtered.filter(transaction => transaction.type === activeTab);
-    }
-
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(transaction =>
-        transaction.title.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Filter by date
-    if (dateFilter === "today") {
-      // Use Bangladesh timezone for today's date
-      const todayStr = getBangladeshDateString();
-      
-      console.log('🔥 FILTERING TODAY (Bangladesh time):', todayStr);
-      console.log('🔥 SAMPLE TRANSACTION DATES:', allTransactions.slice(0, 3).map(t => ({ type: t.type, date: t.date ? t.date.split('T')[0] : 'no-date' })));
-      
-      filtered = filtered.filter(transaction => {
-        const transactionDateStr = transaction.date ? transaction.date.split('T')[0] : '';
-        const isTodayTransaction = transactionDateStr === todayStr;
-        
-        if (isTodayTransaction) {
-          console.log('✅ MATCHED TODAY:', transaction.type, transaction.title, transactionDateStr);
-        }
-        
-        return isTodayTransaction;
-      });
-      
-      console.log('🔥 AFTER TODAY FILTER:', filtered.length, 'transactions');
-      console.log('🔥 FILTERED SAMPLE:', filtered.slice(0, 2).map(t => ({ type: t.type, title: t.title, date: t.date ? t.date.split('T')[0] : 'no-date' })));
-    } else if (dateFilter === "week") {
-      const weekAgo = getBangladeshTime();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      const weekAgoStr = getBangladeshDateString(weekAgo);
-      
-      filtered = filtered.filter(transaction => {
-        const transactionDateStr = transaction.date ? transaction.date.split('T')[0] : '';
-        return transactionDateStr >= weekAgoStr;
-      });
-    } else if (dateFilter === "month") {
-      const monthAgo = getBangladeshTime();
-      monthAgo.setMonth(monthAgo.getMonth() - 1);
-      const monthAgoStr = getBangladeshDateString(monthAgo);
-      
-      filtered = filtered.filter(transaction => {
-        const transactionDateStr = transaction.date ? transaction.date.split('T')[0] : '';
-        return transactionDateStr >= monthAgoStr;
-      });
-    }
-
-    return filtered;
-  };
-
-  const filteredTransactions = getFilteredTransactions();
-
   // Calculate totals
   const totals = {
-    sales: filteredTransactions.filter(t => t.type === 'sale').reduce((sum, t) => sum + t.amount, 0),
-    expenses: Math.abs(filteredTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0)),
-    collections: filteredTransactions.filter(t => t.type === 'collection').reduce((sum, t) => sum + t.amount, 0),
-    net: filteredTransactions.reduce((sum, t) => sum + t.amount, 0)
+    sales: sales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || 0), 0),
+    expenses: expenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0),
+    collections: collections.reduce((sum, collection) => sum + parseFloat(collection.amount || 0), 0),
+    get net() {
+      return this.sales - this.expenses;
+    }
   };
 
-  // Generate PDF Report
   const generatePDFReport = () => {
     const doc = new jsPDF();
     
-    // Add UTF-8 support for Bengali text
-    doc.setFont('helvetica');
-    
-    // Header
+    // Title
     doc.setFontSize(20);
     doc.text('Transaction Report - দোকান হিসাব', 20, 30);
     
+    // Date
     doc.setFontSize(12);
-    doc.text(`Generated on: ${getBengaliDate()}`, 20, 45);
-    doc.text(`Period: ${dateFilter === 'today' ? 'আজকের' : dateFilter === 'week' ? 'সাপ্তাহিক' : dateFilter === 'month' ? 'মাসিক' : 'সকল'} লেনদেন`, 20, 55);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 45);
     
-    // Summary Box
-    doc.setFillColor(240, 240, 240);
-    doc.rect(20, 70, 170, 40, 'F');
-    
+    // Summary
     doc.setFontSize(14);
-    doc.text('Summary / সারসংক্ষেপ:', 25, 85);
-    
+    doc.text('Summary:', 20, 65);
     doc.setFontSize(10);
-    doc.text(`Total Sales / মোট বিক্রয়: ${formatCurrency(totals.sales)}`, 25, 95);
-    doc.text(`Total Expenses / মোট খরচ: ${formatCurrency(totals.expenses)}`, 25, 102);
-    doc.text(`Total Collections / মোট সংগ্রহ: ${formatCurrency(totals.collections)}`, 100, 95);
-    doc.text(`Net Amount / নিট পরিমাণ: ${formatCurrency(totals.net)}`, 100, 102);
+    doc.text(`Total Sales: ৳${totals.sales.toFixed(2)}`, 20, 75);
+    doc.text(`Total Expenses: ৳${totals.expenses.toFixed(2)}`, 20, 85);
+    doc.text(`Net Amount: ৳${totals.net.toFixed(2)}`, 20, 95);
     
-    // Transaction Details
-    let yPosition = 130;
-    doc.setFontSize(12);
-    doc.text('Transaction Details / লেনদেনের বিস্তারিত:', 20, yPosition);
-    yPosition += 15;
+    // Transactions
+    doc.setFontSize(14);
+    doc.text('Recent Transactions:', 20, 115);
     
-    doc.setFontSize(9);
-    filteredTransactions.slice(0, 25).forEach((transaction, index) => {
-      if (yPosition > 270) {
+    let yPosition = 125;
+    allTransactions.slice(0, 20).forEach((transaction, index) => {
+      if (yPosition > 250) {
         doc.addPage();
         yPosition = 30;
       }
       
-      const typeText = transaction.type === 'sale' ? 'Sale/বিক্রয়' : 
-                      transaction.type === 'expense' ? 'Expense/খরচ' : 'Collection/সংগ্রহ';
+      doc.setFontSize(8);
+      const date = new Date(transaction.date).toLocaleDateString();
+      const type = getTransactionTypeText(transaction.type);
+      const amount = `৳${transaction.amount.toFixed(2)}`;
       
-      doc.text(`${index + 1}. ${typeText}: ${transaction.title}`, 20, yPosition);
-      doc.text(`Amount: ${formatCurrency(Math.abs(transaction.amount))}`, 120, yPosition);
-      doc.text(`Date: ${new Date(transaction.date).toLocaleDateString()}`, 20, yPosition + 7);
-      
-      yPosition += 20;
+      doc.text(`${index + 1}. ${date} - ${type} - ${amount}`, 20, yPosition);
+      doc.text(transaction.description, 30, yPosition + 8);
+      yPosition += 18;
     });
     
     // Footer
@@ -247,6 +126,15 @@ export default function Transactions() {
       case 'expense': return 'খরচ';
       case 'collection': return 'সংগ্রহ';
       default: return 'অজানা';
+    }
+  };
+
+  const getTransactionIcon = (type: string) => {
+    switch (type) {
+      case 'sale': return 'fas fa-shopping-cart text-green-600';
+      case 'expense': return 'fas fa-receipt text-red-600';
+      case 'collection': return 'fas fa-hand-holding-usd text-blue-600';
+      default: return 'fas fa-question text-gray-600';
     }
   };
 
@@ -295,259 +183,131 @@ export default function Transactions() {
       <div className="page-content content-max-width">
         {/* Summary Cards */}
         <div className="section-spacing">
-        <div className="responsive-grid-2">
-          <div className="stats-card">
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                <i className="fas fa-chart-line text-green-600 text-lg"></i>
-              </div>
-              <div className="text-right">
-                <div className="currency-display text-green-600">
-                  {formatCurrency(totals.sales)}
-                </div>
-                <div className="caption bengali-font">মোট বিক্রয়</div>
-              </div>
-            </div>
-            <div className="flex items-center text-sm text-green-600">
-              <i className="fas fa-arrow-up mr-1"></i>
-              <span className="bengali-font">আয়ের পরিমাণ</span>
-            </div>
-          </div>
-          
-          <div className="stats-card">
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-                <i className="fas fa-chart-line-down text-red-600 text-lg"></i>
-              </div>
-              <div className="text-right">
-                <div className="currency-display text-red-600">
-                  {formatCurrency(totals.expenses)}
-                </div>
-                <div className="caption bengali-font">মোট খরচ</div>
-              </div>
-            </div>
-            <div className="flex items-center text-sm text-red-600">
-              <i className="fas fa-arrow-down mr-1"></i>
-              <span className="bengali-font">ব্যয়ের পরিমাণ</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Net Amount Card */}
-        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <i className="fas fa-wallet text-blue-600 text-xl"></i>
-                </div>
-                <div>
-                  <div className="heading-3 text-blue-900 bengali-font">নিট আয়</div>
-                  <div className="caption text-blue-600">মোট লাভ/ক্ষতি</div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className={`text-2xl font-bold number-font ${totals.net >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {formatCurrency(totals.net)}
-                </div>
-                <div className="caption text-blue-600 bengali-font">
-                  {totals.net >= 0 ? 'লাভ' : 'ক্ষতি'}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Enhanced Filters */}
-      <div className="px-4 pb-4 space-y-4">
-        {/* Search Input */}
-        <div className="search-input">
-          <Input
-            placeholder="লেনদেন খুঁজুন..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="enhanced-input"
-          />
-        </div>
-        
-        {/* Filter Pills Row */}
-        <div className="flex items-center space-x-2 overflow-x-auto pb-2">
-          <button 
-            onClick={() => setDateFilter("all")}
-            className={`filter-pill ${dateFilter === "all" ? "active" : ""}`}
-          >
-            সব সময়
-          </button>
-          <button 
-            onClick={() => setDateFilter("today")}
-            className={`filter-pill ${dateFilter === "today" ? "active" : ""}`}
-          >
-            আজকের
-          </button>
-          <button 
-            onClick={() => setDateFilter("week")}
-            className={`filter-pill ${dateFilter === "week" ? "active" : ""}`}
-          >
-            সাপ্তাহিক
-          </button>
-          <button 
-            onClick={() => setDateFilter("month")}
-            className={`filter-pill ${dateFilter === "month" ? "active" : ""}`}
-          >
-            মাসিক
-          </button>
-        </div>
-      </div>
-
-      {/* Enhanced Tabs */}
-      <div className="px-4 mb-4">
-        <div className="enhanced-tabs">
-          <div className="flex space-x-1">
-            <button 
-              onClick={() => setActiveTab("all")}
-              className={`enhanced-tab ${activeTab === "all" ? "active" : ""}`}
-              data-state={activeTab === "all" ? "active" : "inactive"}
-            >
-              <i className="fas fa-list mr-2"></i>
-              সব ({toBengaliNumber(allTransactions.length)})
-            </button>
-            <button 
-              onClick={() => setActiveTab("sale")}
-              className={`enhanced-tab ${activeTab === "sale" ? "active" : ""}`}
-              data-state={activeTab === "sale" ? "active" : "inactive"}
-            >
-              <i className="fas fa-shopping-cart mr-2"></i>
-              বিক্রয় ({toBengaliNumber(sales.length)})
-            </button>
-            <button 
-              onClick={() => setActiveTab("expense")}
-              className={`enhanced-tab ${activeTab === "expense" ? "active" : ""}`}
-              data-state={activeTab === "expense" ? "active" : "inactive"}
-            >
-              <i className="fas fa-minus-circle mr-2"></i>
-              খরচ ({toBengaliNumber(expenses.length)})
-            </button>
-            <button 
-              onClick={() => setActiveTab("collection")}
-              className={`enhanced-tab ${activeTab === "collection" ? "active" : ""}`}
-              data-state={activeTab === "collection" ? "active" : "inactive"}
-            >
-              <i className="fas fa-hand-holding-usd mr-2"></i>
-              সংগ্রহ ({toBengaliNumber(collections.length)})
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Enhanced Transaction List */}
-      <div className="px-4 mobile-safe-area space-y-3">
-        {filteredTransactions.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-state-icon">
-              <i className="fas fa-receipt"></i>
-            </div>
-            <h3 className="heading-3 text-gray-900 mb-2 bengali-font">কোনো লেনদেন পাওয়া যায়নি</h3>
-            <p className="body-regular text-gray-500 mb-6 bengali-font">
-              {searchTerm 
-                ? "আপনার খোঁজা লেনদেন খুঁজে পাওয়া যায়নি"
-                : "এই সময়ে কোনো লেনদেন নেই"
-              }
-            </p>
-            <Link to="/sales/new">
-              <Button className="action-btn action-btn-primary">
-                <i className="fas fa-plus mr-2"></i>
-                নতুন বিক্রয় যোগ করুন
-              </Button>
-            </Link>
-          </div>
-        ) : (
-          <>
-            {filteredTransactions.map((transaction, index) => (
-              <div key={`${transaction.type}-${transaction.id || index}`} className="transaction-item slide-up">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Sales Card */}
+            <Card>
+              <CardContent className="p-6">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      transaction.type === 'sale' ? 'bg-green-100' :
-                      transaction.type === 'expense' ? 'bg-red-100' : 'bg-blue-100'
-                    }`}>
-                      <i className={`${transaction.icon} ${
-                        transaction.type === 'sale' ? 'text-green-600' :
-                        transaction.type === 'expense' ? 'text-red-600' : 'text-blue-600'
-                      } text-lg`}></i>
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="body-large font-medium text-gray-900 bengali-font mb-1">
-                        {transaction.title}
-                      </h4>
-                      <div className="flex items-center space-x-3">
-                        <span className={`status-badge ${
-                          transaction.type === 'sale' ? 'success' :
-                          transaction.type === 'expense' ? 'error' : 'warning'
-                        }`}>
-                          {getTransactionTypeText(transaction.type)}
-                        </span>
-                        <span className="caption text-gray-500 bengali-font">
-                          {getBengaliDate(new Date(transaction.date))}
-                        </span>
+                  <div>
+                    <p className="text-sm font-medium text-slate-600 bengali-font">মোট বিক্রয়</p>
+                    <p className="text-2xl font-bold text-green-600">{formatCurrency(totals.sales)}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <i className="fas fa-chart-line text-green-600"></i>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Expenses Card */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-slate-600 bengali-font">মোট খরচ</p>
+                    <p className="text-2xl font-bold text-red-600">{formatCurrency(totals.expenses)}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                    <i className="fas fa-receipt text-red-600"></i>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Net Amount Card */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-slate-600 bengali-font">নিট আয়</p>
+                    <p className={`text-2xl font-bold ${totals.net >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {formatCurrency(totals.net)}
+                    </p>
+                  </div>
+                  <div className={`w-12 h-12 ${totals.net >= 0 ? 'bg-green-100' : 'bg-red-100'} rounded-full flex items-center justify-center`}>
+                    <i className={`fas fa-wallet ${totals.net >= 0 ? 'text-green-600' : 'text-red-600'}`}></i>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Transactions List */}
+        <div className="section-spacing">
+          <h2 className="text-lg font-semibold text-slate-900 mb-4 bengali-font">সাম্প্রতিক লেনদেন</h2>
+          
+          {isLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="p-4 bg-white rounded-lg border border-slate-200 animate-pulse">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="bg-slate-200 w-12 h-12 rounded-xl"></div>
+                      <div className="space-y-2">
+                        <div className="h-4 bg-slate-200 rounded w-32"></div>
+                        <div className="h-3 bg-slate-200 rounded w-24"></div>
                       </div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <div className={`currency-display ${
-                      transaction.type === 'sale' ? 'text-green-600' :
-                      transaction.type === 'expense' ? 'text-red-600' : 'text-blue-600'
-                    }`}>
-                      {transaction.amount >= 0 ? '+' : ''}{formatCurrency(Math.abs(transaction.amount))}
-                    </div>
-                    <div className="caption text-gray-500">
-                      {getBengaliTime(new Date(transaction.date))}
-                    </div>
+                    <div className="h-6 bg-slate-200 rounded w-20"></div>
                   </div>
                 </div>
-              </div>
-            ))}
-
-            {/* Results Summary */}
-            <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-              <div className="text-center">
-                <div className="body-regular text-gray-600 mb-2 bengali-font">
-                  {dateFilter === 'today' ? 'আজকের' : dateFilter === 'week' ? 'সাপ্তাহিক' : dateFilter === 'month' ? 'মাসিক' : 'সকল'} লেনদেনের সারাংশ
-                </div>
-                <div className="responsive-grid-2 gap-4">
-                  <div>
-                    <div className="number-display text-green-600 text-lg">
-                      +{formatCurrency(totals.sales)}
-                    </div>
-                    <div className="caption text-gray-500 bengali-font">মোট আয়</div>
-                  </div>
-                  <div>
-                    <div className="number-display text-red-600 text-lg">
-                      -{formatCurrency(totals.expenses)}
-                    </div>
-                    <div className="caption text-gray-500 bengali-font">মোট খরচ</div>
-                  </div>
-                </div>
-                <div className="mt-4 pt-4 border-t border-gray-300">
-                  <div className={`text-2xl font-bold number-font ${totals.net >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {totals.net >= 0 ? '+' : ''}{formatCurrency(totals.net)}
-                  </div>
-                  <div className="caption text-gray-600 bengali-font">
-                    নিট {totals.net >= 0 ? 'লাভ' : 'ক্ষতি'}
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
-          </>
-        )}
-      </div>
-
-      {/* Floating Action Button */}
-      <Link to="/sales/new">
-        <div className="fab">
-          <i className="fas fa-plus text-xl"></i>
+          ) : allTransactions.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i className="fas fa-receipt text-slate-400 text-xl"></i>
+              </div>
+              <h3 className="text-lg font-medium text-slate-900 mb-2 bengali-font">কোনো লেনদেন নেই</h3>
+              <p className="text-slate-500 mb-6 bengali-font">এখনো কোনো লেনদেন রেকর্ড করা হয়নি</p>
+              <Link to="/sales/new">
+                <Button>
+                  <i className="fas fa-plus mr-2"></i>
+                  প্রথম বিক্রয় যোগ করুন
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {allTransactions.map((transaction, index) => (
+                <Card key={`${transaction.type}-${transaction.id}-${index}`} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
+                          <i className={getTransactionIcon(transaction.type)}></i>
+                        </div>
+                        <div>
+                          <p className="font-medium text-slate-900 bengali-font">{transaction.description}</p>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm text-slate-500">
+                              {new Date(transaction.date).toLocaleDateString('bn-BD')}
+                            </span>
+                            <span className="text-xs px-2 py-1 bg-slate-100 rounded-full text-slate-600 bengali-font">
+                              {getTransactionTypeText(transaction.type)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className={`font-bold ${
+                          transaction.type === 'sale' || transaction.type === 'collection' 
+                            ? 'text-green-600' 
+                            : 'text-red-600'
+                        }`}>
+                          {transaction.type === 'sale' || transaction.type === 'collection' ? '+' : '-'}
+                          {formatCurrency(transaction.amount)}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
-      </Link>
+      </div>
     </div>
   );
 }
