@@ -98,7 +98,7 @@ export default function ExpenseEntryMobileOptimized() {
     createExpenseMutation.mutate(data);
   };
 
-  const todayTotal = todayExpenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0);
+  const todayTotal = todayExpenses.reduce((sum, expense) => sum + parseFloat(expense.amount.toString() || '0'), 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pb-20">
@@ -357,7 +357,7 @@ export default function ExpenseEntryMobileOptimized() {
                     </div>
                   </div>
                   <p className="text-sm font-bold text-red-600 number-font">
-                    {formatCurrency(parseFloat(expense.amount))}
+                    {formatCurrency(expense.amount)}
                   </p>
                 </div>
               ))}

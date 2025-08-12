@@ -46,7 +46,7 @@ export default function TransactionsMobileOptimized() {
       ...sale,
       type: 'sale',
       date: sale.sale_date,
-      amount: parseFloat(sale.total_amount || 0),
+      amount: parseFloat(sale.total_amount.toString() || '0'),
       description: `বিক্রয় - ${sale.customer_name}`,
       method: sale.payment_method
     })),
@@ -54,15 +54,15 @@ export default function TransactionsMobileOptimized() {
       ...expense,
       type: 'expense',
       date: expense.expense_date,
-      amount: parseFloat(expense.amount || 0),
+      amount: parseFloat(expense.amount.toString() || '0'),
       description: expense.description,
-      method: expense.payment_method || 'নগদ'
+      method: 'নগদ' // Expenses don't have payment_method in schema
     })),
     ...collections.map(collection => ({
       ...collection,
       type: 'collection',
       date: collection.collection_date,
-      amount: parseFloat(collection.amount || 0),
+      amount: parseFloat(collection.amount.toString() || '0'),
       description: `সংগ্রহ - ${collection.customer_name}`,
       method: collection.payment_method || 'নগদ'
     }))
@@ -77,9 +77,9 @@ export default function TransactionsMobileOptimized() {
 
   // Calculate totals
   const totals = {
-    sales: sales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || 0), 0),
-    expenses: expenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0),
-    collections: collections.reduce((sum, collection) => sum + parseFloat(collection.amount || 0), 0),
+    sales: sales.reduce((sum, sale) => sum + parseFloat(sale.total_amount.toString() || '0'), 0),
+    expenses: expenses.reduce((sum, expense) => sum + parseFloat(expense.amount.toString() || '0'), 0),
+    collections: collections.reduce((sum, collection) => sum + parseFloat(collection.amount.toString() || '0'), 0),
     get net() {
       return this.sales - this.expenses;
     }

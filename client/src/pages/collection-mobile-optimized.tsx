@@ -57,10 +57,10 @@ export default function CollectionMobileOptimized() {
   // Calculate customers with due amounts
   const customersWithDue = customers.map(customer => {
     const customerSales = sales.filter(sale => sale.customer_id === customer.id);
-    const totalDue = customerSales.reduce((sum, sale) => sum + (parseFloat(sale.due_amount) || 0), 0);
+    const totalDue = customerSales.reduce((sum, sale) => sum + (parseFloat(sale.due_amount.toString()) || 0), 0);
     return {
       ...customer,
-      totalDue: totalDue + (parseFloat(customer.total_credit) || 0)
+      totalDue: totalDue + (parseFloat(customer.total_credit.toString()) || 0)
     };
   }).filter(customer => customer.totalDue > 0);
 

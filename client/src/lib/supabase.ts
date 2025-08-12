@@ -53,7 +53,7 @@ interface Expense {
   category: string;
   description: string;
   amount: number;
-  date: string;
+  expense_date: string;
   created_at: string;
 }
 
@@ -64,6 +64,7 @@ interface Collection {
   customer_name: string;
   amount: number;
   collection_date: string;
+  payment_method?: string;
   notes?: string;
   created_at: string;
 }
