@@ -17,7 +17,7 @@ import {
   HelpCircle, Info, ChevronRight, Store,
   Clock, Activity, BarChart3, LogOut
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+
 
 export default function SettingsMobileOptimized() {
   const [notifications, setNotifications] = useState(true);
@@ -32,7 +32,6 @@ export default function SettingsMobileOptimized() {
   });
   
   const { toast } = useToast();
-  const { signOut } = useAuth();
 
   // Load saved settings
   useEffect(() => {
@@ -146,18 +145,12 @@ export default function SettingsMobileOptimized() {
     input.click();
   };
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
+  const handleAppRefresh = async () => {
+    if (confirm("আপনি কি অ্যাপ রিফ্রেশ করতে চান?")) {
+      window.location.reload(); // Force refresh
       toast({
-        title: "সফলভাবে লগআউট",
-        description: "আপনি সফলভাবে লগআউট হয়েছেন"
-      });
-    } catch (error) {
-      toast({
-        title: "লগআউট ত্রুটি",
-        description: "লগআউট করতে সমস্যা হয়েছে",
-        variant: "destructive"
+        title: "সফলভাবে রিফ্রেশ",
+        description: "অ্যাপ রিফ্রেশ হয়েছে"
       });
     }
   };
@@ -431,7 +424,7 @@ export default function SettingsMobileOptimized() {
 
             <Button 
               variant="destructive" 
-              onClick={handleSignOut}
+              onClick={handleAppRefresh}
               className="w-full justify-center text-sm h-10 mt-4"
               data-testid="button-logout"
             >
