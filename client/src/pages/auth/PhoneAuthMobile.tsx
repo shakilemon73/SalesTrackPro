@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { DemoModeToggle } from '@/components/ui/demo-mode-toggle';
 import { Smartphone, Shield, Clock, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { 
@@ -15,6 +16,7 @@ import {
   getOperatorInfo,
   BANGLADESH_OPERATORS
 } from "@/lib/bangladesh-phone-utils";
+import { DemoModeManager } from "@/lib/demo-mode";
 
 interface PhoneAuthMobileProps {
   onSuccess?: () => void;
@@ -41,8 +43,10 @@ export default function PhoneAuthMobile({ onSuccess }: PhoneAuthMobileProps) {
     }
   }, [countdown]);
 
-  // Redirect if already authenticated
+  // Initialize demo mode and redirect if already authenticated
   useEffect(() => {
+    DemoModeManager.initializeDemoMode();
+    
     if (user) {
       onSuccess?.();
       setLocation('/');
@@ -179,6 +183,9 @@ export default function PhoneAuthMobile({ onSuccess }: PhoneAuthMobileProps) {
           </CardHeader>
 
           <CardContent className="space-y-4">
+            {/* Demo Mode Toggle */}
+            <DemoModeToggle />
+
             {error && (
               <Alert variant="destructive" className="border-error/20 bg-error/10">
                 <AlertDescription className="text-sm">{error}</AlertDescription>

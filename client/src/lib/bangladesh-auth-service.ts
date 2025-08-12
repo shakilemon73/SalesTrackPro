@@ -3,6 +3,7 @@
 
 import { supabase } from './supabase';
 import { validateBangladeshPhone, formatBangladeshPhone } from './bangladesh-phone-utils';
+import { DemoModeManager } from './demo-mode';
 
 export interface BangladeshAuthUser {
   id: string;
@@ -45,20 +46,27 @@ class BangladeshAuthService {
       // SMS message in Bengali
       const message = `আপনার দোকান হিসাব OTP কোড: ${otp}। ৫ মিনিটের মধ্যে ব্যবহার করুন। কোড গোপন রাখুন।`;
       
-      // Check if SMS API key is available
-      const smsApiKey = localStorage.getItem('SMS_API_KEY') || '';
-      const smsApiUser = localStorage.getItem('SMS_API_USER') || '';
-      
-      if (!smsApiKey || !smsApiUser) {
-        // Fallback: Store OTP locally for development
-        console.log(`📱 Bangladesh OTP for ${formattedPhone}: ${otp}`);
-        localStorage.setItem('bd_otp_code', otp);
+      // Check if demo mode is enabled
+      if (DemoModeManager.isDemoMode()) {
+        const demoOtp = DemoModeManager.getDemoOTP();
+        console.log(`🧪 Demo mode: OTP for ${formattedPhone} is ${demoOtp}`);
+        localStorage.setItem('bd_otp_code', demoOtp);
         localStorage.setItem('bd_otp_phone', formattedPhone);
         localStorage.setItem('bd_otp_time', Date.now().toString());
         
         return { 
-          success: true,
-          error: 'SMS API not configured. Check console for OTP code.'
+          success: true
+        };
+      }
+
+      // Check if SMS API key is available for live mode
+      const smsApiKey = localStorage.getItem('SMS_API_KEY') || '';
+      const smsApiUser = localStorage.getItem('SMS_API_USER') || '';
+      
+      if (!smsApiKey || !smsApiUser) {
+        return {
+          success: false,
+          error: 'SMS API credentials not configured. Enable demo mode or provide SMS API credentials.'
         };
       }
 
