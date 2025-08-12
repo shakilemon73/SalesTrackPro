@@ -12,7 +12,7 @@ import {
   Wallet, AlertCircle, Plus, Bell, Eye,
   ArrowUpRight, Package, MessageCircle,
   BarChart3, Settings, Clock, Target,
-  ChevronRight, Activity, RefreshCw
+  ChevronRight, Activity, RefreshCw, Brain, Crown, Zap
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -215,6 +215,43 @@ export default function DashboardMobileOptimized() {
               <Button size="sm" variant="outline" className="flex-shrink-0 h-12 flex flex-col space-y-1 px-4">
                 <Package className="w-4 h-4 text-orange-600" />
                 <span className="text-xs bengali-font">স্টক</span>
+              </Button>
+            </Link>
+            
+            <Link to="/expenses/new">
+              <Button size="sm" variant="outline" className="flex-shrink-0 h-12 flex flex-col space-y-1 px-4">
+                <TrendingDown className="w-4 h-4 text-red-600" />
+                <span className="text-xs bengali-font">খরচ</span>
+              </Button>
+            </Link>
+          </div>
+        </Card>
+
+        {/* Advanced Features Section */}
+        <Card className="border-0 shadow-md p-3">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">উন্নত ফিচার</h3>
+            <Zap className="w-4 h-4 text-indigo-600" />
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <Link to="/analytics">
+              <Button size="sm" variant="outline" className="h-16 flex flex-col space-y-1 px-3 border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50">
+                <BarChart3 className="w-5 h-5 text-blue-600" />
+                <span className="text-xs bengali-font text-center leading-tight">বিজনেস অ্যানালিটিক্স</span>
+              </Button>
+            </Link>
+            
+            <Link to="/smart-inventory">
+              <Button size="sm" variant="outline" className="h-16 flex flex-col space-y-1 px-3 border-2 border-purple-200 hover:border-purple-400 hover:bg-purple-50">
+                <Brain className="w-5 h-5 text-purple-600" />
+                <span className="text-xs bengali-font text-center leading-tight">স্মার্ট ইনভেন্টরি</span>
+              </Button>
+            </Link>
+            
+            <Link to="/loyalty">
+              <Button size="sm" variant="outline" className="h-16 flex flex-col space-y-1 px-3 border-2 border-yellow-200 hover:border-yellow-400 hover:bg-yellow-50">
+                <Crown className="w-5 h-5 text-yellow-600" />
+                <span className="text-xs bengali-font text-center leading-tight">লয়ালটি প্রোগ্রাম</span>
               </Button>
             </Link>
           </div>
