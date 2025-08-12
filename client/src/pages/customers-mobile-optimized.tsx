@@ -1,0 +1,291 @@
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { Link } from "wouter";
+import { formatCurrency, toBengaliNumber } from "@/lib/bengali-utils";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { 
+  ArrowLeft, Search, UserPlus, Phone, MapPin,
+  Users, TrendingUp, AlertCircle, Eye,
+  Wallet, Star, Clock
+} from "lucide-react";
+
+export default function CustomersMobileOptimized() {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const { data: customers = [], isLoading } = useQuery({
+    queryKey: ['customers', CURRENT_USER_ID],
+    queryFn: async () => {
+      const data = await supabaseService.getCustomers(CURRENT_USER_ID);
+      return data || [];
+    }
+  });
+
+  const { data: sales = [] } = useQuery({
+    queryKey: ['sales', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getSales(CURRENT_USER_ID),
+  });
+
+  const filteredCustomers = customers.filter(customer =>
+    customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (customer.phone_number && customer.phone_number.includes(searchTerm))
+  );
+
+  // Calculate customer stats
+  const getCustomerStats = (customerId: string) => {
+    const customerSales = sales.filter(sale => sale.customer_id === customerId);
+    const totalPurchases = customerSales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || 0), 0);
+    const totalDue = customerSales.reduce((sum, sale) => sum + parseFloat(sale.due_amount || 0), 0);
+    return { totalPurchases, totalDue, salesCount: customerSales.length };
+  };
+
+  // Customer segments
+  const regularCustomers = filteredCustomers.filter(customer => {
+    const stats = getCustomerStats(customer.id);
+    return stats.salesCount >= 3;
+  });
+
+  const newCustomers = filteredCustomers.filter(customer => {
+    const stats = getCustomerStats(customer.id);
+    return stats.salesCount <= 2;
+  });
+
+  const customersWithDue = filteredCustomers.filter(customer => {
+    const stats = getCustomerStats(customer.id);
+    return stats.totalDue > 0;
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
+          <p className="text-sm text-slate-600 dark:text-slate-400 bengali-font">
+            গ্রাহক তথ্য লোড করা হচ্ছে...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pb-20">
+      
+      {/* Compact Header */}
+      <div className="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50">
+        <div className="px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Link to="/">
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <ArrowLeft className="w-4 h-4" />
+                </Button>
+              </Link>
+              <div>
+                <h1 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">
+                  গ্রাহক তালিকা
+                </h1>
+                <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center space-x-1">
+                  <Users className="w-3 h-3" />
+                  <span>মোট {toBengaliNumber(customers.length)} জন</span>
+                  <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+            
+            <Link to="/customers/new">
+              <Button size="sm" className="h-8 px-3 text-xs bg-emerald-500 hover:bg-emerald-600">
+                <UserPlus className="w-3 h-3 mr-1" />
+                নতুন
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Container */}
+      <div className="px-4 py-4 space-y-4">
+        
+        {/* Summary Cards - 3 Column Grid */}
+        <div className="grid grid-cols-3 gap-2">
+          <Card className="border-0 shadow-md bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-3">
+            <div className="text-center space-y-1">
+              <Star className="w-4 h-4 mx-auto text-blue-200" />
+              <p className="text-xs text-blue-100 bengali-font">নিয়মিত</p>
+              <p className="text-sm font-bold number-font">
+                {toBengaliNumber(regularCustomers.length)}
+              </p>
+            </div>
+          </Card>
+
+          <Card className="border-0 shadow-md bg-gradient-to-br from-green-500 to-emerald-600 text-white p-3">
+            <div className="text-center space-y-1">
+              <Clock className="w-4 h-4 mx-auto text-green-200" />
+              <p className="text-xs text-green-100 bengali-font">নতুন</p>
+              <p className="text-sm font-bold number-font">
+                {toBengaliNumber(newCustomers.length)}
+              </p>
+            </div>
+          </Card>
+
+          <Card className="border-0 shadow-md bg-gradient-to-br from-orange-500 to-red-500 text-white p-3">
+            <div className="text-center space-y-1">
+              <AlertCircle className="w-4 h-4 mx-auto text-orange-200" />
+              <p className="text-xs text-orange-100 bengali-font">বাকি</p>
+              <p className="text-sm font-bold number-font">
+                {toBengaliNumber(customersWithDue.length)}
+              </p>
+            </div>
+          </Card>
+        </div>
+
+        {/* Search Section */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Input
+            placeholder="গ্রাহকের নাম বা ফোন নম্বর খুঁজুন..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 h-9 text-sm"
+          />
+        </div>
+
+        {/* Customer List - Compact Cards */}
+        <div className="space-y-2">
+          {filteredCustomers.length > 0 ? (
+            filteredCustomers.map((customer) => {
+              const stats = getCustomerStats(customer.id);
+              return (
+                <Card key={customer.id} className="border-0 shadow-sm">
+                  <Link to={`/customers/${customer.id}`}>
+                    <CardContent className="p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3 min-w-0 flex-1">
+                          <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            {customer.name.charAt(0)}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-slate-900 dark:text-white bengali-font text-sm truncate">
+                              {customer.name}
+                            </p>
+                            <div className="flex items-center space-x-2 text-xs text-slate-500">
+                              {customer.phone_number && (
+                                <>
+                                  <Phone className="w-3 h-3" />
+                                  <span>{customer.phone_number}</span>
+                                </>
+                              )}
+                              {customer.address && (
+                                <>
+                                  <span>•</span>
+                                  <MapPin className="w-3 h-3" />
+                                  <span className="truncate">{customer.address}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="text-right space-y-1">
+                          {stats.totalPurchases > 0 && (
+                            <p className="text-sm font-bold text-green-600 number-font">
+                              {formatCurrency(stats.totalPurchases)}
+                            </p>
+                          )}
+                          <div className="flex items-center space-x-1">
+                            {stats.totalDue > 0 && (
+                              <Badge variant="outline" className="text-xs h-4 px-1 text-red-600 border-red-200">
+                                বাকি {formatCurrency(stats.totalDue)}
+                              </Badge>
+                            )}
+                            {stats.salesCount >= 3 && (
+                              <Badge variant="outline" className="text-xs h-4 px-1 text-blue-600 border-blue-200">
+                                নিয়মিত
+                              </Badge>
+                            )}
+                          </div>
+                          {customer.total_credit && Number(customer.total_credit) > 0 && (
+                            <p className="text-xs text-green-600 font-medium">
+                              ক্রেডিট: {formatCurrency(Number(customer.total_credit))}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Link>
+                </Card>
+              );
+            })
+          ) : (
+            <Card className="border-0 shadow-sm p-6 text-center">
+              <Users className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+              <p className="text-sm text-slate-500 bengali-font mb-3">
+                {searchTerm ? 'কোনো গ্রাহক পাওয়া যায়নি' : 'এখনো কোনো গ্রাহক যোগ করা হয়নি'}
+              </p>
+              <Link to="/customers/new">
+                <Button size="sm" variant="outline">
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  প্রথম গ্রাহক যোগ করুন
+                </Button>
+              </Link>
+            </Card>
+          )}
+        </div>
+
+        {/* Quick Actions */}
+        <Card className="border-0 shadow-md p-4">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font mb-3">
+            দ্রুত কাজ
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            <Link to="/customers/new">
+              <Button variant="outline" size="sm" className="w-full h-10 flex items-center space-x-2">
+                <UserPlus className="w-4 h-4 text-green-600" />
+                <span className="text-xs bengali-font">নতুন গ্রাহক</span>
+              </Button>
+            </Link>
+            
+            <Link to="/collection">
+              <Button variant="outline" size="sm" className="w-full h-10 flex items-center space-x-2">
+                <Wallet className="w-4 h-4 text-blue-600" />
+                <span className="text-xs bengali-font">টাকা আদায়</span>
+              </Button>
+            </Link>
+          </div>
+        </Card>
+
+        {/* Customer Insights */}
+        {customers.length > 0 && (
+          <Card className="border-0 shadow-md p-4">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font mb-3 flex items-center space-x-2">
+              <TrendingUp className="w-4 h-4 text-emerald-600" />
+              <span>গ্রাহক পরিসংখ্যান</span>
+            </h3>
+            <div className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+              <div className="flex items-center justify-between">
+                <span className="bengali-font">নিয়মিত গ্রাহক (৩+ ক্রয়)</span>
+                <span className="font-medium">{toBengaliNumber(regularCustomers.length)} জন</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="bengali-font">বাকি রয়েছে</span>
+                <span className="font-medium text-red-600">{toBengaliNumber(customersWithDue.length)} জন</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="bengali-font">মোট বাকি টাকা</span>
+                <span className="font-medium text-red-600">
+                  {formatCurrency(customersWithDue.reduce((sum, customer) => {
+                    const stats = getCustomerStats(customer.id);
+                    return sum + stats.totalDue;
+                  }, 0))}
+                </span>
+              </div>
+            </div>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}

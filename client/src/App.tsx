@@ -5,16 +5,16 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import DashboardMobileOptimized from "@/pages/dashboard-mobile-optimized";
-import Transactions from "@/pages/transactions";
-import Customers from "@/pages/customers";
-import Reports from "@/pages/reports";
-import Settings from "@/pages/settings";
-import SalesEntry from "@/pages/sales-entry";
-import CustomerAdd from "@/pages/customer-add";
-import CustomerDetails from "@/pages/customer-details";
+import TransactionsMobileOptimized from "@/pages/transactions-mobile-optimized";
+import CustomersMobileOptimized from "@/pages/customers-mobile-optimized";
+import ReportsMobileOptimized from "@/pages/reports-mobile-optimized";
+import SettingsMobileOptimized from "@/pages/settings-mobile-optimized";
+import SalesEntryMobileOptimized from "@/pages/sales-entry-mobile-optimized";
+import CustomerAddMobileOptimized from "@/pages/customer-add-mobile-optimized";
+import CustomerDetailsMobileOptimized from "@/pages/customer-details-mobile-optimized";
+import CollectionMobileOptimized from "@/pages/collection-mobile-optimized";
+import ExpenseEntryMobileOptimized from "@/pages/expense-entry-mobile-optimized";
 import Inventory from "@/pages/inventory";
-import Collection from "@/pages/collection";
-import ExpenseEntry from "@/pages/expense-entry";
 import BottomNavigation from "@/components/ui/bottom-navigation";
 import CommunicationPanel from "@/components/ui/communication-panel";
 import Analytics from "@/pages/analytics";
@@ -32,16 +32,16 @@ function Router() {
     <div className="mobile-container">
       <Switch>
         <Route path="/" component={DashboardMobileOptimized} />
-        <Route path="/transactions" component={Transactions} />
-        <Route path="/customers" component={Customers} />
-        <Route path="/reports" component={Reports} />
-        <Route path="/settings" component={Settings} />
-        <Route path="/sales/new" component={SalesEntry} />
-        <Route path="/customers/new" component={CustomerAdd} />
-        <Route path="/customers/:id" component={CustomerDetails} />
+        <Route path="/transactions" component={TransactionsMobileOptimized} />
+        <Route path="/customers" component={CustomersMobileOptimized} />
+        <Route path="/reports" component={ReportsMobileOptimized} />
+        <Route path="/settings" component={SettingsMobileOptimized} />
+        <Route path="/sales/new" component={SalesEntryMobileOptimized} />
+        <Route path="/customers/new" component={CustomerAddMobileOptimized} />
+        <Route path="/customers/:id" component={CustomerDetailsMobileOptimized} />
         <Route path="/inventory" component={Inventory} />
-        <Route path="/collection" component={Collection} />
-        <Route path="/expenses/new" component={ExpenseEntry} />
+        <Route path="/collection" component={CollectionMobileOptimized} />
+        <Route path="/expenses/new" component={ExpenseEntryMobileOptimized} />
         <Route path="/analytics" component={Analytics} />
         <Route path="/smart-inventory" component={SmartInventory} />
         <Route path="/loyalty" component={Loyalty} />
