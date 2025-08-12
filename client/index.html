@@ -35,10 +35,27 @@
   </head>
   <body>
     <div id="root">
-      <!-- Loading fallback for refresh -->
-      <div id="loading-fallback" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Noto Sans Bengali', sans-serif; background: #f8fafc;">
-        <div style="animation: spin 1s linear infinite; width: 32px; height: 32px; border: 2px solid #e2e8f0; border-top: 2px solid #2563eb; border-radius: 50%; margin-bottom: 16px;"></div>
-        <p style="color: #64748b; font-size: 14px;">অ্যাপ লোড হচ্ছে...</p>
+      <!-- Custom App Icon Loading Screen -->
+      <div id="loading-fallback" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Noto Sans Bengali', sans-serif; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+        <div style="background: white; border-radius: 24px; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); margin-bottom: 24px; animation: pulse 2s ease-in-out infinite;">
+          <!-- Custom App Icon -->
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Shop Building -->
+            <rect x="10" y="35" width="60" height="35" fill="#10b981" rx="4"/>
+            <rect x="15" y="40" width="50" height="25" fill="#ffffff" rx="2"/>
+            <!-- Shop Sign -->
+            <rect x="20" y="15" width="40" height="12" fill="#059669" rx="6"/>
+            <!-- Door -->
+            <rect x="35" y="50" width="10" height="20" fill="#10b981" rx="2"/>
+            <!-- Windows -->
+            <rect x="22" y="42" width="8" height="8" fill="#10b981" rx="1"/>
+            <rect x="50" y="42" width="8" height="8" fill="#10b981" rx="1"/>
+            <!-- Bengali Currency Symbol -->
+            <text x="40" y="24" text-anchor="middle" fill="white" style="font-family: 'Noto Sans Bengali', sans-serif; font-size: 8px; font-weight: 600;">৳</text>
+          </svg>
+        </div>
+        <h1 style="color: white; font-size: 24px; font-weight: 700; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">দোকান হিসাব</h1>
+        <p style="color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 400;">ব্যবসা ব্যবস্থাপনা অ্যাপ</p>
       </div>
     </div>
     
@@ -51,9 +68,9 @@
     </noscript>
     
     <style>
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.05); opacity: 0.9; }
       }
     </style>
     
