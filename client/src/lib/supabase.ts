@@ -277,7 +277,9 @@ console.log('🔥 SUPABASE SERVICE: Initialized with hardcoded credentials:', {
 // Create Supabase client with explicit options
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    persistSession: false // Disable session persistence for simplicity
+    persistSession: true, // Enable session persistence for auth
+    autoRefreshToken: true,
+    detectSessionInUrl: true
   },
   global: {
     headers: {
@@ -301,7 +303,12 @@ console.log('🔥 SUPABASE CLIENT: Created, testing connection...');
   }
 })();
 
-// Current user ID (in a real app, this would come from authentication)
+// Current user ID - now dynamically fetched from auth
+export const getCurrentUserId = () => {
+  return supabase.auth.getUser().then(({ data: { user } }) => user?.id || null);
+};
+
+// Legacy constant for backward compatibility (will be removed)
 export const CURRENT_USER_ID = '11111111-1111-1111-1111-111111111111';
 
 // Database service functions - NO OFFLINE FALLBACKS, ONLY REAL DATA
