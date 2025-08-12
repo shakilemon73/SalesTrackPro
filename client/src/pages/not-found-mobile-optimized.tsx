@@ -67,32 +67,7 @@ export default function NotFoundMobileOptimized() {
               </Link>
             </div>
 
-            {/* Advanced Features */}
-            <div className="border-t pt-3 mt-3">
-              <p className="text-sm font-medium text-gray-700 mb-2 bengali-font">উন্নত ফিচার:</p>
-              <div className="grid grid-cols-3 gap-2">
-                <Link to="/analytics">
-                  <Button variant="ghost" size="sm" className="w-full flex flex-col items-center space-y-1 h-12 border border-blue-200">
-                    <BarChart3 className="w-4 h-4 text-blue-600" />
-                    <span className="text-xs bengali-font">অ্যানালিটিক্স</span>
-                  </Button>
-                </Link>
-                
-                <Link to="/smart-inventory">
-                  <Button variant="ghost" size="sm" className="w-full flex flex-col items-center space-y-1 h-12 border border-purple-200">
-                    <Search className="w-4 h-4 text-purple-600" />
-                    <span className="text-xs bengali-font">স্মার্ট স্টক</span>
-                  </Button>
-                </Link>
-                
-                <Link to="/loyalty">
-                  <Button variant="ghost" size="sm" className="w-full flex flex-col items-center space-y-1 h-12 border border-yellow-200">
-                    <MessageCircle className="w-4 h-4 text-yellow-600" />
-                    <span className="text-xs bengali-font">লয়ালটি</span>
-                  </Button>
-                </Link>
-              </div>
-            </div>
+
           </div>
         </CardContent>
       </Card>

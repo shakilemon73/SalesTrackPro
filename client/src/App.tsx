@@ -18,15 +18,13 @@ import ExpenseEntryMobileOptimized from "@/pages/expense-entry-mobile-optimized"
 import InventoryMobileOptimizedFixed from "@/pages/inventory-mobile-optimized-fixed";
 import BottomNavigationOptimized from "@/components/ui/bottom-navigation-optimized";
 import CommunicationPanel from "@/components/ui/communication-panel";
-import AnalyticsMobileOptimized from "@/pages/analytics-mobile-optimized";
-import SmartInventoryMobileOptimized from "@/pages/smart-inventory-mobile-optimized";
-import LoyaltyMobileOptimized from "@/pages/loyalty-mobile-optimized";
+
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 // Removed seed data import - using only live Supabase data
 import { supabase } from "./lib/supabase";
-import { testAdvancedFeatures } from "./lib/test-advanced-features";
+
 
 function Router() {
   const [showCommunicationPanel, setShowCommunicationPanel] = useState(false);
@@ -45,9 +43,7 @@ function Router() {
         <Route path="/inventory" component={InventoryMobileOptimizedFixed} />
         <Route path="/collection" component={CollectionMobileOptimized} />
         <Route path="/expenses/new" component={ExpenseEntryMobileOptimized} />
-        <Route path="/analytics" component={AnalyticsMobileOptimized} />
-        <Route path="/smart-inventory" component={SmartInventoryMobileOptimized} />
-        <Route path="/loyalty" component={LoyaltyMobileOptimized} />
+
 
         <Route component={NotFoundMobileOptimized} />
       </Switch>
@@ -76,10 +72,7 @@ function App() {
             console.log('Sample customer:', data[0].name);
           }
           
-          // Test advanced features after basic connection is confirmed
-          setTimeout(() => {
-            testAdvancedFeatures().catch(console.error);
-          }, 2000);
+
         }
       } catch (error) {
         console.error('Database check failed:', error);
