@@ -122,6 +122,44 @@
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
   }
 
+  /* Mobile-First Optimizations */
+  @media (max-width: 480px) {
+    .mobile-container {
+      @apply max-w-none;
+    }
+    
+    /* Compact spacing for small screens */
+    .mobile-compact-grid {
+      @apply grid-cols-2 gap-2;
+    }
+    
+    .mobile-compact-card {
+      @apply p-3;
+    }
+    
+    .mobile-compact-text {
+      @apply text-xs;
+    }
+    
+    /* Optimized thumb zone buttons */
+    .thumb-zone-action {
+      @apply min-h-12 flex items-center justify-center;
+      touch-action: manipulation;
+    }
+  }
+
+  /* Touch-friendly interactions */
+  .touch-target {
+    @apply min-h-11 min-w-11;
+    touch-action: manipulation;
+  }
+
+  /* Improved scrolling performance */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
   /* Unified Page Layout System */
   .page-layout {
     @apply min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100;

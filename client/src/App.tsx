@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
-import DashboardRedesigned from "@/pages/dashboard-redesigned";
+import DashboardMobileOptimized from "@/pages/dashboard-mobile-optimized";
 import Transactions from "@/pages/transactions";
 import Customers from "@/pages/customers";
 import Reports from "@/pages/reports";
@@ -31,7 +31,7 @@ function Router() {
   return (
     <div className="mobile-container">
       <Switch>
-        <Route path="/" component={DashboardRedesigned} />
+        <Route path="/" component={DashboardMobileOptimized} />
         <Route path="/transactions" component={Transactions} />
         <Route path="/customers" component={Customers} />
         <Route path="/reports" component={Reports} />
