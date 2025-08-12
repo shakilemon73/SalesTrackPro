@@ -62,47 +62,42 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signInWithOTP = async (phone: string) => {
     try {
-      // Ensure phone is in international format
-      const formattedPhone = formatBangladeshPhone(phone);
+      // Use Bangladesh SMS service for real OTP
+      const { bangladeshAuthService } = await import('../lib/bangladesh-auth-service');
+      const result = await bangladeshAuthService.sendOTP(phone);
       
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: formattedPhone,
-        options: {
-          shouldCreateUser: true, // This will create user if they don't exist
-        }
-      });
-
-      return { error };
-    } catch (error) {
+      if (result.success) {
+        return { error: null };
+      } else {
+        return { error: { message: result.error || 'Failed to send OTP' } };
+      }
+    } catch (error: any) {
       console.error('Error sending OTP:', error);
-      return { error };
+      return { error: { message: error.message } };
     }
   };
 
   const verifyOTP = async (phone: string, token: string) => {
     try {
-      const formattedPhone = formatBangladeshPhone(phone);
+      // Use Bangladesh SMS service for OTP verification
+      const { bangladeshAuthService } = await import('../lib/bangladesh-auth-service');
+      const result = await bangladeshAuthService.verifyOTP(phone, token);
       
-      const { data, error } = await supabase.auth.verifyOtp({
-        phone: formattedPhone,
-        token,
-        type: 'sms'
-      });
-
-      if (data.user && !error) {
-        // Check if this is a new user (first time login)
-        const isNewUser = data.user.created_at === data.user.last_sign_in_at;
+      if (result.success && result.user) {
+        // Create/update user profile and ensure Supabase profile exists
+        await bangladeshAuthService.ensureUserProfile();
         
-        if (isNewUser) {
-          // Create user profile in our users table
-          await createUserProfile(data.user);
-        }
+        // Set the authenticated user
+        setUser(result.user as any);
+        setSession({ user: result.user } as any);
+        
+        return { error: null, user: result.user };
+      } else {
+        return { error: { message: result.error || 'Invalid OTP' }, user: null };
       }
-
-      return { error, user: data.user };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error verifying OTP:', error);
-      return { error };
+      return { error: { message: error.message }, user: null };
     }
   };
 
@@ -141,9 +136,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      // Sign out from Bangladesh auth service
+      const { bangladeshAuthService } = await import('../lib/bangladesh-auth-service');
+      await bangladeshAuthService.signOut();
+      
+      // Clear local state
+      setUser(null);
+      setSession(null);
+      
+      return { error: null };
+    } catch (error: any) {
       console.error('Error signing out:', error);
+      return { error: { message: error.message } };
     }
   };
 
