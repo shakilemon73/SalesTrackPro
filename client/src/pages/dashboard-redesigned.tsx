@@ -143,7 +143,7 @@ export default function DashboardRedesigned() {
                 <h1 className="text-lg font-bold text-slate-900 dark:text-white bengali-font">
                   {timeOfDay}, ব্যবসায়ী!
                 </h1>
-                <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center space-x-2">
+                <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center space-x-2">
                   <Clock className="w-3 h-3" />
                   <span>{getBengaliDate()}</span>
                   {!isOffline && (
@@ -152,7 +152,7 @@ export default function DashboardRedesigned() {
                       <span className="text-green-600 text-xs font-medium">লাইভ</span>
                     </>
                   )}
-                </p>
+                </div>
               </div>
             </div>
 
