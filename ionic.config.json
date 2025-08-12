@@ -1,0 +1,7 @@
+{
+  "name": "dokan-hisab",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}

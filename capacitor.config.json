@@ -1,0 +1,16 @@
+{
+  "appId": "com.dokan.hisab",
+  "appName": "দোকান হিসাব",
+  "webDir": "dist/public",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#2E7D32",
+      "showSpinner": false
+    }
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

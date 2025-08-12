@@ -12,7 +12,11 @@
   "dependencies": {
     "@babel/traverse": "^7.28.0",
     "@babel/types": "^7.28.2",
+    "@capacitor/android": "^7.4.2",
+    "@capacitor/cli": "^7.4.2",
+    "@capacitor/core": "^7.4.2",
     "@hookform/resolvers": "^3.10.0",
+    "@ionic/cli": "^7.2.1",
     "@radix-ui/react-accordion": "^1.2.4",
     "@radix-ui/react-alert-dialog": "^1.1.7",
     "@radix-ui/react-aspect-ratio": "^1.1.3",
