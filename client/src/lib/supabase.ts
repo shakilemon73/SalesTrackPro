@@ -61,11 +61,9 @@ interface Collection {
   id: string;
   user_id: string;
   customer_id?: string;
-  customer_name: string;
+  sale_id?: string;
   amount: number;
   collection_date: string;
-  payment_method?: string;
-  notes?: string;
   created_at: string;
 }
 

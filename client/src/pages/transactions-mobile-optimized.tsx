@@ -38,6 +38,11 @@ export default function TransactionsMobileOptimized() {
     queryFn: () => supabaseService.getCollections(CURRENT_USER_ID),
   });
 
+  const { data: customers = [] } = useQuery({
+    queryKey: ['customers', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
+  });
+
   const isLoading = salesLoading || expensesLoading || collectionsLoading;
 
   // Combine all transactions
@@ -58,14 +63,18 @@ export default function TransactionsMobileOptimized() {
       description: expense.description,
       method: 'নগদ' // Expenses don't have payment_method in schema
     })),
-    ...collections.map(collection => ({
-      ...collection,
-      type: 'collection',
-      date: collection.collection_date,
-      amount: parseFloat(collection.amount.toString() || '0'),
-      description: `সংগ্রহ - ${collection.customer_name}`,
-      method: collection.payment_method || 'নগদ'
-    }))
+    ...collections.map(collection => {
+      const customer = customers.find(c => c.id === collection.customer_id);
+      const customerName = customer?.name || 'অজানা গ্রাহক';
+      return {
+        ...collection,
+        type: 'collection',
+        date: collection.collection_date,
+        amount: parseFloat(collection.amount.toString() || '0'),
+        description: `সংগ্রহ - ${customerName}`,
+        method: 'নগদ' // Collections don't have payment_method in schema
+      };
+    })
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   // Filter transactions

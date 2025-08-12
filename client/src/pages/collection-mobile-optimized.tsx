@@ -23,8 +23,6 @@ import {
 const collectionSchema = z.object({
   customer_id: z.string().min(1, "গ্রাহক নির্বাচন করুন"),
   amount: z.string().min(1, "টাকার পরিমাণ লিখুন").refine((val) => parseFloat(val) > 0, "টাকার পরিমাণ শূন্যের চেয়ে বেশি হতে হবে"),
-  payment_method: z.string().min(1, "পেমেন্ট পদ্ধতি নির্বাচন করুন"),
-  notes: z.string().optional(),
 });
 
 type CollectionFormData = z.infer<typeof collectionSchema>;
@@ -49,8 +47,6 @@ export default function CollectionMobileOptimized() {
     defaultValues: {
       customer_id: "",
       amount: "",
-      payment_method: "নগদ",
-      notes: "",
     },
   });
 
@@ -76,10 +72,7 @@ export default function CollectionMobileOptimized() {
       const { getBangladeshTimeISO } = await import('@/lib/bengali-utils');
       const collectionData = {
         customer_id: data.customer_id,
-        customer_name: selectedCustomer?.name || "",
         amount: collectionAmount,
-        payment_method: data.payment_method,
-        notes: data.notes,
         collection_date: getBangladeshTimeISO(),
       };
       
@@ -303,60 +296,7 @@ export default function CollectionMobileOptimized() {
               </div>
             </Card>
 
-            {/* Payment Method */}
-            <Card className="border-0 shadow-md p-4">
-              <div className="flex items-center space-x-2 mb-3">
-                <CreditCard className="w-4 h-4 text-purple-600" />
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">
-                  পেমেন্ট পদ্ধতি
-                </h3>
-              </div>
-
-              <Select value={form.watch("payment_method")} onValueChange={(value) => form.setValue("payment_method", value)}>
-                <SelectTrigger className="h-10 text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="নগদ">
-                    <div className="flex items-center space-x-2">
-                      <Banknote className="w-4 h-4 text-green-600" />
-                      <span className="bengali-font">নগদ</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="বিকাশ">
-                    <div className="flex items-center space-x-2">
-                      <DollarSign className="w-4 h-4 text-pink-600" />
-                      <span className="bengali-font">বিকাশ</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="ব্যাংক">
-                    <div className="flex items-center space-x-2">
-                      <CreditCard className="w-4 h-4 text-blue-600" />
-                      <span className="bengali-font">ব্যাংক</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="অন্যান্য">
-                    <div className="flex items-center space-x-2">
-                      <DollarSign className="w-4 h-4 text-slate-600" />
-                      <span className="bengali-font">অন্যান্য</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </Card>
-
-            {/* Notes */}
-            <Card className="border-0 shadow-md p-4">
-              <div className="space-y-2">
-                <Label className="text-xs bengali-font">অতিরিক্ত নোট (ঐচ্ছিক)</Label>
-                <Textarea
-                  {...form.register("notes")}
-                  placeholder="কোন বিশেষ কথা থাকলে লিখুন..."
-                  className="min-h-[80px] text-sm bengali-font"
-                  rows={3}
-                />
-              </div>
-            </Card>
+            {/* Collection will be recorded as cash payment by default */}
 
             {/* Action Button */}
             <Button 
