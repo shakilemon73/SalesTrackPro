@@ -329,8 +329,9 @@ class BangladeshAuthServiceV2 {
       '011': 'সিটিসেল'
     };
     
-    return operators[prefix] || 'Unknown';
+    return operators[prefix] || 'অজানা অপারেটর';
   }
 }
 
+// Export singleton instance
 export const bangladeshAuthServiceV2 = new BangladeshAuthServiceV2();

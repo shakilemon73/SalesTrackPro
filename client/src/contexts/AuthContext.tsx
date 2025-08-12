@@ -6,9 +6,9 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signOut: () => Promise<void>;
+  signOut: () => Promise<{ error: any } | { error: null }>;
   signInWithOTP: (phone: string) => Promise<{ error: any }>;
-  verifyOTP: (phone: string, token: string) => Promise<{ error: any; user?: User | null }>;
+  verifyOTP: (phone: string, token: string) => Promise<{ error: any; user?: any | null; isNewUser?: boolean }>;
   refreshSession: () => Promise<void>;
 }
 
