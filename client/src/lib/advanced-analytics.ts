@@ -206,13 +206,13 @@ class AdvancedAnalyticsEngine {
         if (totalSold === 0) continue;
         
         const revenue = totalSold * product.selling_price;
-        const cost = totalSold * product.purchase_price;
+        const cost = totalSold * product.buying_price;
         
         totalRevenue += revenue;
         totalCost += cost;
         
         // Analyze demand elasticity and suggest optimal pricing
-        const currentMargin = ((product.selling_price - product.purchase_price) / product.selling_price) * 100;
+        const currentMargin = ((product.selling_price - product.buying_price) / product.selling_price) * 100;
         const suggestedPrice = this.calculateOptimalPrice(product, productSales);
         const expectedImpact = this.estimatePriceImpact(product, suggestedPrice, totalSold);
         

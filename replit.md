@@ -30,13 +30,30 @@ Preferred communication style: Simple, everyday language.
 - **Session Management**: Supabase Auth sessions (when authentication is active).
 
 ## Database Schema Design
-The application features a multi-tenant architecture with key entities:
-- **Users**: Shop owner accounts and business information.
-- **Customers**: Records for customer management and credit tracking.
-- **Products**: Inventory items, including stock levels and pricing.
-- **Sales**: Transaction details with item and payment information.
-- **Expenses**: Tracking of business expenditures.
-- **Collections**: Records for payment collection.
+The application features a multi-tenant architecture with comprehensive entities:
+
+### Core Business Tables:
+- **Users**: Shop owner accounts and business information (enhanced with business_name, email fields)
+- **Customers**: Records for customer management and credit tracking
+- **Products**: Inventory items with enhanced fields (supplier_id, barcode, expiry_date, location)
+- **Sales**: Transaction details with item and payment information
+- **Expenses**: Tracking of business expenditures
+- **Collections**: Records for payment collection
+
+### Advanced Feature Tables (Added 2025-08-12):
+- **Loyalty Points**: Customer loyalty program with points, tiers, lifetime spending tracking
+- **Point Transactions**: Detailed log of points earned, redeemed, expired with reasons
+- **Rewards**: Configurable rewards system with tier-based eligibility
+- **Reward Redemptions**: Track reward usage with coupon codes and expiry
+- **Suppliers**: Vendor management with performance ratings and payment terms
+- **Purchase Orders**: Supply chain management with order tracking
+- **Purchase Order Items**: Line items for purchase orders with received quantities
+- **Notifications**: Multi-channel notification system (SMS, WhatsApp, email, system)
+- **User Preferences**: Flexible key-value configuration storage
+- **Business Insights**: Cached analytics and AI-generated insights
+- **API Integrations**: Third-party service configurations (WhatsApp, SMS, payment gateways)
+- **Payment Methods**: Multiple payment options including mobile banking (bKash, Rocket, Nagad)
+- **Customer Communications**: Log of all customer interactions across channels
 
 ## Internationalization
 - **Primary Language**: Bengali (Bangla), with custom utilities for numeral conversion, date/time formatting, and Taka currency display.

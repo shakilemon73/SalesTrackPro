@@ -67,6 +67,180 @@ interface Collection {
   created_at: string;
 }
 
+// NEW INTERFACES FOR ADVANCED FEATURES
+
+interface LoyaltyPoints {
+  id: string;
+  user_id: string;
+  customer_id: string;
+  total_points: number;
+  available_points: number;
+  redeemed_points: number;
+  current_tier: string;
+  lifetime_spending: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface PointTransaction {
+  id: string;
+  user_id: string;
+  customer_id: string;
+  sale_id?: string;
+  points: number;
+  transaction_type: 'earned' | 'redeemed' | 'expired' | 'bonus' | 'adjustment';
+  reason: string;
+  description?: string;
+  created_at: string;
+}
+
+interface Reward {
+  id: string;
+  user_id: string;
+  name: string;
+  name_local: string;
+  description?: string;
+  points_cost: number;
+  reward_type: 'discount' | 'product' | 'cashback' | 'special_offer';
+  reward_value: number;
+  is_active: boolean;
+  eligible_tiers: string[];
+  expiry_days: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface RewardRedemption {
+  id: string;
+  user_id: string;
+  customer_id: string;
+  reward_id: string;
+  points_used: number;
+  coupon_code?: string;
+  is_used: boolean;
+  used_at?: string;
+  expires_at?: string;
+  created_at: string;
+}
+
+interface Supplier {
+  id: string;
+  user_id: string;
+  name: string;
+  contact_person?: string;
+  phone_number?: string;
+  email?: string;
+  address?: string;
+  payment_terms?: string;
+  credit_limit: number;
+  current_balance: number;
+  performance_rating: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+interface PurchaseOrder {
+  id: string;
+  user_id: string;
+  supplier_id: string;
+  order_number: string;
+  status: 'pending' | 'confirmed' | 'shipped' | 'received' | 'cancelled';
+  total_amount: number;
+  order_date: string;
+  expected_delivery_date?: string;
+  actual_delivery_date?: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface PurchaseOrderItem {
+  id: string;
+  purchase_order_id: string;
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  received_quantity: number;
+  created_at: string;
+}
+
+interface Notification {
+  id: string;
+  user_id: string;
+  customer_id?: string;
+  notification_type: 'sms' | 'whatsapp' | 'system' | 'email';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  title: string;
+  message: string;
+  status: 'pending' | 'sent' | 'delivered' | 'failed' | 'read';
+  scheduled_for?: string;
+  sent_at?: string;
+  delivery_status?: string;
+  error_message?: string;
+  metadata?: any;
+  created_at: string;
+}
+
+interface UserPreference {
+  id: string;
+  user_id: string;
+  preference_key: string;
+  preference_value: any;
+  created_at: string;
+  updated_at: string;
+}
+
+interface BusinessInsight {
+  id: string;
+  user_id: string;
+  insight_type: string;
+  insight_data: any;
+  calculated_at: string;
+  expires_at?: string;
+}
+
+interface ApiIntegration {
+  id: string;
+  user_id: string;
+  integration_type: 'whatsapp' | 'sms' | 'email' | 'payment' | 'accounting';
+  provider_name: string;
+  api_key_encrypted?: string;
+  configuration: any;
+  is_active: boolean;
+  last_used_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface PaymentMethod {
+  id: string;
+  user_id: string;
+  method_name: string;
+  method_type: 'cash' | 'mobile_banking' | 'bank_transfer' | 'card' | 'credit' | 'qr_code';
+  provider?: string;
+  account_number?: string;
+  qr_code_data?: string;
+  is_active: boolean;
+  is_default: boolean;
+  configuration: any;
+  created_at: string;
+}
+
+interface CustomerCommunication {
+  id: string;
+  user_id: string;
+  customer_id: string;
+  communication_type: 'whatsapp' | 'sms' | 'call' | 'email' | 'in_person';
+  subject?: string;
+  message: string;
+  direction: 'inbound' | 'outbound';
+  status: 'draft' | 'sent' | 'delivered' | 'read' | 'failed';
+  metadata: any;
+  created_at: string;
+}
+
 // Insert types (for creating new records)
 type InsertUser = Omit<User, 'id' | 'created_at'>;
 type InsertCustomer = Omit<Customer, 'id' | 'user_id' | 'created_at'>;
@@ -74,6 +248,21 @@ type InsertProduct = Omit<Product, 'id' | 'user_id' | 'created_at'>;
 type InsertSale = Omit<Sale, 'id' | 'user_id' | 'created_at'>;
 type InsertExpense = Omit<Expense, 'id' | 'user_id' | 'created_at'>;
 type InsertCollection = Omit<Collection, 'id' | 'user_id' | 'created_at'>;
+
+// New insert types for advanced features
+type InsertLoyaltyPoints = Omit<LoyaltyPoints, 'id' | 'created_at' | 'updated_at'>;
+type InsertPointTransaction = Omit<PointTransaction, 'id' | 'created_at'>;
+type InsertReward = Omit<Reward, 'id' | 'created_at' | 'updated_at'>;
+type InsertRewardRedemption = Omit<RewardRedemption, 'id' | 'created_at'>;
+type InsertSupplier = Omit<Supplier, 'id' | 'created_at' | 'updated_at'>;
+type InsertPurchaseOrder = Omit<PurchaseOrder, 'id' | 'created_at' | 'updated_at'>;
+type InsertPurchaseOrderItem = Omit<PurchaseOrderItem, 'id' | 'created_at'>;
+type InsertNotification = Omit<Notification, 'id' | 'created_at'>;
+type InsertUserPreference = Omit<UserPreference, 'id' | 'created_at' | 'updated_at'>;
+type InsertBusinessInsight = Omit<BusinessInsight, 'id' | 'calculated_at'>;
+type InsertApiIntegration = Omit<ApiIntegration, 'id' | 'created_at' | 'updated_at'>;
+type InsertPaymentMethod = Omit<PaymentMethod, 'id' | 'created_at'>;
+type InsertCustomerCommunication = Omit<CustomerCommunication, 'id' | 'created_at'>;
 
 // Supabase configuration - FORCE hardcoded values for reliability
 const SUPABASE_URL = 'https://lkhqdqlryjzalsemofdt.supabase.co';
@@ -513,5 +702,228 @@ export const supabaseService = {
       console.error('❌ Error fetching stats:', error);
       throw error; // NEVER fall back to offline data
     }
+  },
+
+  // LOYALTY PROGRAM METHODS
+  async getLoyaltyPoints(userId: string, customerId: string): Promise<LoyaltyPoints | null> {
+    const { data, error } = await supabase
+      .from('loyalty_points')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('customer_id', customerId)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
+  },
+
+  async createOrUpdateLoyaltyPoints(userId: string, loyaltyData: InsertLoyaltyPoints): Promise<LoyaltyPoints> {
+    const { data, error } = await supabase
+      .from('loyalty_points')
+      .upsert({ ...loyaltyData, user_id: userId, updated_at: new Date().toISOString() })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async createPointTransaction(userId: string, transaction: InsertPointTransaction): Promise<PointTransaction> {
+    const { data, error } = await supabase
+      .from('point_transactions')
+      .insert({ ...transaction, user_id: userId })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async getPointTransactions(userId: string, customerId?: string): Promise<PointTransaction[]> {
+    let query = supabase
+      .from('point_transactions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    
+    if (customerId) {
+      query = query.eq('customer_id', customerId);
+    }
+    
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  },
+
+  // REWARDS METHODS
+  async getRewards(userId: string): Promise<Reward[]> {
+    const { data, error } = await supabase
+      .from('rewards')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .order('points_cost', { ascending: true });
+    
+    if (error) throw error;
+    return data || [];
+  },
+
+  async createReward(userId: string, reward: InsertReward): Promise<Reward> {
+    const { data, error } = await supabase
+      .from('rewards')
+      .insert({ ...reward, user_id: userId })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async redeemReward(userId: string, redemption: InsertRewardRedemption): Promise<RewardRedemption> {
+    const { data, error } = await supabase
+      .from('reward_redemptions')
+      .insert({ ...redemption, user_id: userId })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // SUPPLIER METHODS
+  async getSuppliers(userId: string): Promise<Supplier[]> {
+    const { data, error } = await supabase
+      .from('suppliers')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  },
+
+  async createSupplier(userId: string, supplier: InsertSupplier): Promise<Supplier> {
+    const { data, error } = await supabase
+      .from('suppliers')
+      .insert({ ...supplier, user_id: userId })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // NOTIFICATION METHODS
+  async getNotifications(userId: string, limit?: number): Promise<Notification[]> {
+    let query = supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    
+    if (limit) {
+      query = query.limit(limit);
+    }
+    
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  },
+
+  async createNotification(userId: string, notification: InsertNotification): Promise<Notification> {
+    const { data, error } = await supabase
+      .from('notifications')
+      .insert({ ...notification, user_id: userId })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updateNotificationStatus(id: string, status: string): Promise<void> {
+    const { error } = await supabase
+      .from('notifications')
+      .update({ status })
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
+  // USER PREFERENCES
+  async getUserPreference(userId: string, key: string): Promise<UserPreference | null> {
+    const { data, error } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('preference_key', key)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
+  },
+
+  async setUserPreference(userId: string, key: string, value: any): Promise<UserPreference> {
+    const { data, error } = await supabase
+      .from('user_preferences')
+      .upsert({ 
+        user_id: userId, 
+        preference_key: key, 
+        preference_value: value,
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // API INTEGRATIONS
+  async getApiIntegrations(userId: string): Promise<ApiIntegration[]> {
+    const { data, error } = await supabase
+      .from('api_integrations')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  },
+
+  async createApiIntegration(userId: string, integration: InsertApiIntegration): Promise<ApiIntegration> {
+    const { data, error } = await supabase
+      .from('api_integrations')
+      .insert({ ...integration, user_id: userId })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // PAYMENT METHODS
+  async getPaymentMethods(userId: string): Promise<PaymentMethod[]> {
+    const { data, error } = await supabase
+      .from('payment_methods')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .order('is_default', { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  },
+
+  async createPaymentMethod(userId: string, method: InsertPaymentMethod): Promise<PaymentMethod> {
+    const { data, error } = await supabase
+      .from('payment_methods')
+      .insert({ ...method, user_id: userId })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
   }
 };
