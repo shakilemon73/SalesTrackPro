@@ -606,14 +606,85 @@ export const supabaseService = {
   },
 
   async createCollection(userId: string, collection: InsertCollection): Promise<Collection> {
-    const { data, error } = await supabase
-      .from('collections')
-      .insert({ ...collection, user_id: userId })
-      .select()
-      .single();
+    console.log('🔄 CREATING COLLECTION:', collection);
     
-    if (error) throw error;
-    return data;
+    // Start a transaction to update both collections and reduce due amounts
+    try {
+      // First, create the collection record
+      const { data: collectionData, error: collectionError } = await supabase
+        .from('collections')
+        .insert({ ...collection, user_id: userId })
+        .select()
+        .single();
+      
+      if (collectionError) throw collectionError;
+      
+      const collectionAmount = parseFloat(collection.amount.toString());
+      let remainingAmount = collectionAmount;
+      
+      // Get customer's outstanding sales (oldest first)
+      const { data: salesWithDue, error: salesError } = await supabase
+        .from('sales')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('customer_id', collection.customer_id)
+        .gt('due_amount', 0)
+        .order('created_at', { ascending: true });
+      
+      if (salesError) throw salesError;
+      
+      console.log('📋 SALES WITH DUE for customer:', salesWithDue);
+      
+      // Update sales due amounts (FIFO - oldest first)
+      for (const sale of salesWithDue || []) {
+        if (remainingAmount <= 0) break;
+        
+        const currentDue = parseFloat(sale.due_amount.toString());
+        const paymentForThisSale = Math.min(remainingAmount, currentDue);
+        const newDueAmount = currentDue - paymentForThisSale;
+        
+        // Update the sale's due amount
+        const { error: updateError } = await supabase
+          .from('sales')
+          .update({ due_amount: newDueAmount })
+          .eq('id', sale.id);
+        
+        if (updateError) throw updateError;
+        
+        remainingAmount -= paymentForThisSale;
+        console.log(`💰 Updated sale ${sale.id}: due reduced by ${paymentForThisSale}, new due: ${newDueAmount}`);
+      }
+      
+      // If there's still remaining amount, reduce customer's total_credit
+      if (remainingAmount > 0) {
+        const { data: customer, error: customerFetchError } = await supabase
+          .from('customers')
+          .select('total_credit')
+          .eq('id', collection.customer_id)
+          .single();
+        
+        if (customerFetchError) throw customerFetchError;
+        
+        const currentCredit = parseFloat(customer.total_credit.toString());
+        const newCredit = Math.max(0, currentCredit - remainingAmount);
+        
+        const { error: customerUpdateError } = await supabase
+          .from('customers')
+          .update({ total_credit: newCredit })
+          .eq('id', collection.customer_id);
+        
+        if (customerUpdateError) throw customerUpdateError;
+        
+        console.log(`👤 Updated customer credit: reduced by ${remainingAmount}, new credit: ${newCredit}`);
+      }
+      
+      console.log('✅ COLLECTION CREATED with due amount updates');
+      return collectionData;
+      
+    } catch (error) {
+      console.error('❌ Collection creation failed:', error);
+      throw error;
+    }
   },
 
   // Stats - ONLY REAL SUPABASE DATA
@@ -674,6 +745,17 @@ export const supabaseService = {
       if (creditError) throw creditError;
       
       console.log('🔥 CUSTOMERS WITH CREDIT:', customersWithCredit);
+      
+      // Get total collections made to verify our calculation
+      const { data: allCollections, error: collectionsError } = await supabase
+        .from('collections')
+        .select('amount')
+        .eq('user_id', userId);
+        
+      if (collectionsError) throw collectionsError;
+      
+      const totalCollected = allCollections?.reduce((sum, col) => sum + parseFloat(col.amount || '0'), 0) || 0;
+      console.log('💰 TOTAL COLLECTIONS MADE:', totalCollected);
 
       // Calculate totals
       const totalSales = todaySales?.reduce((sum, sale) => sum + parseFloat(sale.total_amount || '0'), 0) || 0;
