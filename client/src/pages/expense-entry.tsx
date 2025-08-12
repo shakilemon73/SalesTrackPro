@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useLocation } from "wouter";
 import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
-import { formatCurrency, toBengaliNumber, getBengaliDate, getBangladeshTime } from "@/lib/bengali-utils";
+import { formatCurrency, toBengaliNumber, getBengaliDate, getBangladeshTime, getBangladeshTimeISO } from "@/lib/bengali-utils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,7 +34,7 @@ export default function ExpenseEntry() {
       const expenses = await supabaseService.getExpenses(CURRENT_USER_ID);
       const today = new Date().toDateString();
       return expenses.filter(expense => 
-        new Date(expense.expense_date).toDateString() === today
+        new Date(expense.expense_date || expense.created_at || new Date()).toDateString() === today
       );
     },
   });
@@ -54,7 +54,7 @@ export default function ExpenseEntry() {
         category: data.category,
         amount: parseFloat(data.amount),
         description: data.description,
-        expense_date: getBangladeshTime(),
+        expense_date: getBangladeshTimeISO(),
       };
       return await supabaseService.createExpense(CURRENT_USER_ID, expenseData);
     },
@@ -336,7 +336,7 @@ export default function ExpenseEntry() {
                   <div className="text-right">
                     <p className="font-bold text-red-700 number-font">{formatCurrency(expense.amount)}</p>
                     <p className="text-xs text-gray-500">
-                      {new Date(expense.expense_date).toLocaleTimeString('bn-BD', { 
+                      {new Date(expense.expense_date || expense.created_at || new Date()).toLocaleTimeString('bn-BD', { 
                         hour: '2-digit', 
                         minute: '2-digit' 
                       })}

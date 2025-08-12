@@ -58,6 +58,7 @@ export default function SalesEntry() {
 
   const createSaleMutation = useMutation({
     mutationFn: async (formData: any) => {
+      const { getBangladeshTimeISO } = await import('@/lib/bengali-utils');
       const dbSaleData = {
         customer_id: formData.customer_id,
         customer_name: formData.customer_name,
@@ -65,9 +66,10 @@ export default function SalesEntry() {
         paid_amount: formData.paid_amount,
         due_amount: formData.due_amount,
         payment_method: formData.payment_method,
-        items: formData.items
+        items: formData.items,
+        sale_date: getBangladeshTimeISO() // Set sale_date to current Bangladesh time
       };
-      console.log('Transformed DB saleData:', dbSaleData);
+      console.log('Transformed DB saleData with Bangladesh time:', dbSaleData);
       return await supabaseService.createSale(CURRENT_USER_ID, dbSaleData);
     },
     onSuccess: () => {
@@ -211,7 +213,7 @@ export default function SalesEntry() {
                     <SelectItem key={customer.id} value={customer.name}>
                       <div className="flex items-center space-x-2">
                         <span className="bengali-font">{customer.name}</span>
-                        {customer.total_credit > 0 && (
+                        {parseFloat(customer.total_credit.toString()) > 0 && (
                           <span className="text-xs text-red-600 bengali-font">
                             (বাকি: {formatCurrency(customer.total_credit)})
                           </span>

@@ -49,12 +49,12 @@ export interface Sale {
 
 export interface Expense {
   id: string;
-  userId: string;
+  user_id: string;
   description: string;
   amount: string;
   category: string;
-  expenseDate?: Date;
-  createdAt?: Date;
+  expense_date?: Date;
+  created_at?: Date;
 }
 
 export interface Collection {

@@ -68,19 +68,21 @@ export default function Collection() {
       const collectionAmount = parseFloat(data.amount);
       
       // Create a sale record with negative amount to represent collection
+      const { getBangladeshTimeISO } = await import('@/lib/bengali-utils');
       const saleData = {
         customer_id: data.customer_id,
         customer_name: selectedCustomer?.name || "",
-        total_amount: -collectionAmount, // Negative amount for collection
-        paid_amount: collectionAmount,
-        due_amount: 0,
+        total_amount: (-collectionAmount).toString(), // Negative amount for collection (converted to string)
+        paid_amount: collectionAmount.toString(),
+        due_amount: "0",
         payment_method: `${data.payment_method} (সংগ্রহ)`,
         items: [{
           productName: `সংগ্রহ - ${selectedCustomer?.name || "গ্রাহক"}`,
           quantity: 1,
           unitPrice: collectionAmount.toString(),
           totalPrice: collectionAmount.toString()
-        }]
+        }],
+        sale_date: getBangladeshTimeISO() // Set proper Bangladesh timezone
       };
 
       return await supabaseService.createSale(CURRENT_USER_ID, saleData);
