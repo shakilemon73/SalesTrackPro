@@ -90,9 +90,19 @@ export const supabaseService = {
     return data;
   },
 
-  // Customers - ONLY REAL SUPABASE DATA
+  // Customers - REAL SUPABASE DATA WITH SMART CACHING
   async getCustomers(userId: string): Promise<Customer[]> {
     console.log('🔥 FETCHING CUSTOMERS for user:', userId);
+    
+    // Try cache first
+    const { cacheManager, createCacheKey } = await import('./cache-manager');
+    const cacheKey = createCacheKey('customers', userId);
+    const cached = cacheManager.get<Customer[]>(cacheKey);
+    
+    if (cached) {
+      console.log('📦 CACHE: Using cached customers data');
+      return cached;
+    }
     
     const { data, error } = await supabase
       .from('customers')
@@ -104,6 +114,9 @@ export const supabaseService = {
       console.error('❌ Error fetching customers:', error);
       throw error; // NEVER fall back to offline data
     }
+    
+    // Cache the results for 3 minutes
+    cacheManager.set(cacheKey, data || [], 3 * 60 * 1000);
     
     console.log('✅ Customers fetched from Supabase:', data?.length || 0, data);
     return data || [];

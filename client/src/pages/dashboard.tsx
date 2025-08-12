@@ -4,6 +4,7 @@ import TransactionItem from "@/components/ui/transaction-item";
 import { toBengaliNumber, formatCurrency, getBengaliDate, getBengaliTime } from "@/lib/bengali-utils";
 import { Link } from "wouter";
 import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { whatsappManager } from "@/lib/whatsapp-business";
 
 export default function Dashboard() {
 
@@ -59,6 +60,19 @@ export default function Dashboard() {
 
   console.log('🔥 DASHBOARD: Stats loaded:', stats);
   console.log('🔥 DASHBOARD: Recent sales loaded:', recentSales);
+
+  // Handle WhatsApp sharing
+  const handleShareReport = () => {
+    if (stats) {
+      whatsappManager.shareSalesReport({
+        todaySales: stats.todaySales,
+        totalSales: stats.totalSales,
+        profit: stats.profit,
+        pendingCollection: stats.pendingCollection,
+        salesCount: stats.salesCount
+      });
+    }
+  };
 
   return (
     <>
@@ -209,7 +223,7 @@ export default function Dashboard() {
             </div>
             দ্রুত কাজ
           </h2>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3 mb-3">
             <Link to="/sales/new">
               <button className="quick-action-btn bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
                 <i className="fas fa-plus-circle text-2xl"></i>
@@ -222,12 +236,21 @@ export default function Dashboard() {
                 <span className="text-sm font-semibold bengali-font">নতুন গ্রাহক</span>
               </button>
             </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
             <Link to="/expenses/new">
               <button className="quick-action-btn bg-gradient-to-br from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
                 <i className="fas fa-receipt text-2xl"></i>
                 <span className="text-sm font-semibold bengali-font">খরচ যোগ</span>
               </button>
             </Link>
+            <button 
+              onClick={handleShareReport}
+              className="quick-action-btn bg-gradient-to-br from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+            >
+              <i className="fab fa-whatsapp text-2xl"></i>
+              <span className="text-sm font-semibold bengali-font">রিপোর্ট শেয়ার</span>
+            </button>
           </div>
         </div>
 
