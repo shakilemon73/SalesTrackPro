@@ -42,9 +42,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setSession(session);
           setUser(session.user);
         } else {
-          // Check Bangladesh auth service for existing session
-          const { bangladeshAuthService } = await import('../lib/bangladesh-auth-service');
-          const bdUser = bangladeshAuthService.getCurrentUser();
+          // Check new Bangladesh auth service for existing session
+          const { bangladeshAuthServiceV2 } = await import('../lib/bangladesh-auth-service-v2');
+          const bdUser = bangladeshAuthServiceV2.getCurrentUser();
           
           if (bdUser) {
             setUser(bdUser as any);
@@ -76,9 +76,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signInWithOTP = async (phone: string) => {
     try {
-      // Use Bangladesh SMS service for real OTP
-      const { bangladeshAuthService } = await import('../lib/bangladesh-auth-service');
-      const result = await bangladeshAuthService.sendOTP(phone);
+      // Use new hybrid Bangladesh auth service
+      const { bangladeshAuthServiceV2 } = await import('../lib/bangladesh-auth-service-v2');
+      const result = await bangladeshAuthServiceV2.sendOTP(phone);
       
       if (result.success) {
         return { error: null };
@@ -93,25 +93,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const verifyOTP = async (phone: string, token: string) => {
     try {
-      // Use Bangladesh SMS service for OTP verification
-      const { bangladeshAuthService } = await import('../lib/bangladesh-auth-service');
-      const result = await bangladeshAuthService.verifyOTP(phone, token);
+      // Use new hybrid Bangladesh auth service
+      const { bangladeshAuthServiceV2 } = await import('../lib/bangladesh-auth-service-v2');
+      const result = await bangladeshAuthServiceV2.verifyOTP(phone, token);
       
       if (result.success && result.user) {
-        try {
-          // Create/update user profile and ensure Supabase profile exists
-          await bangladeshAuthService.ensureUserProfile();
-          
-          // Set the authenticated user
-          setUser(result.user as any);
-          setSession({ user: result.user } as any);
-          
-          console.log('✅ Authentication complete for new user:', result.user.phone);
-          return { error: null, user: result.user };
-        } catch (profileError: any) {
-          console.error('Profile creation failed:', profileError);
-          return { error: { message: 'Failed to create user profile. Please try again.' }, user: null };
-        }
+        // Set the authenticated user
+        setUser(result.user as any);
+        setSession({ user: result.user } as any);
+        
+        console.log('✅ Authentication complete:', result.user.phone, result.isNewUser ? '(new user)' : '(existing user)');
+        return { 
+          error: null, 
+          user: result.user,
+          isNewUser: result.isNewUser 
+        };
       } else {
         return { error: { message: result.error || 'Invalid OTP' }, user: null };
       }
@@ -158,8 +154,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signOut = async () => {
     try {
       // Sign out from Bangladesh auth service
-      const { bangladeshAuthService } = await import('../lib/bangladesh-auth-service');
-      await bangladeshAuthService.signOut();
+      const { bangladeshAuthServiceV2 } = await import('../lib/bangladesh-auth-service-v2');
+      await bangladeshAuthServiceV2.signOut();
       
       // Clear local state
       setUser(null);

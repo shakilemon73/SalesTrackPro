@@ -23,6 +23,8 @@ import AnalyticsMobileOptimized from "@/pages/analytics-mobile-optimized";
 import SmartInventoryMobileOptimized from "@/pages/smart-inventory-mobile-optimized";
 import LoyaltyMobileOptimized from "@/pages/loyalty-mobile-optimized";
 import SubscriptionSelectMobile from "@/pages/auth/SubscriptionSelectMobile";
+import PhoneAuthMobile from "@/pages/auth/PhoneAuthMobile";
+import RegistrationFormMobile from "@/pages/auth/RegistrationFormMobile";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 // Removed seed data import - using only live Supabase data

@@ -106,14 +106,21 @@ export default function PhoneAuthMobile({ onSuccess }: PhoneAuthMobileProps) {
     setLoading(true);
     setError('');
 
-    const { error, user } = await verifyOTP(phone, otp);
+    const result = await verifyOTP(phone, otp);
 
-    if (error) {
-      setError(getErrorMessage(error));
+    if (result.error) {
+      setError(getErrorMessage(result.error));
       setLoading(false);
-    } else if (user) {
-      // Success - AuthContext will handle the redirect
-      onSuccess?.();
+    } else if (result.user) {
+      // Check if this is a new user that needs registration
+      if ((result as any).isNewUser) {
+        console.log('🆕 New user detected, redirecting to registration');
+        setLocation('/auth/register');
+      } else {
+        console.log('👤 Existing user, redirecting to dashboard');
+        onSuccess?.();
+        setLocation('/');
+      }
     }
   };
 

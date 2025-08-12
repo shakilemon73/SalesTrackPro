@@ -1,6 +1,8 @@
 import React from 'react';
+import { Switch, Route } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import PhoneAuthMobile from '@/pages/auth/PhoneAuthMobile';
+import RegistrationFormMobile from '@/pages/auth/RegistrationFormMobile';
 import { Loader2 } from 'lucide-react';
 
 interface AuthGuardProps {
@@ -29,7 +31,16 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
   // Show auth screen if not authenticated
   if (!user) {
-    return <PhoneAuthMobile />;
+    return (
+      <Switch>
+        <Route path="/auth/register">
+          <RegistrationFormMobile />
+        </Route>
+        <Route path="*">
+          <PhoneAuthMobile />
+        </Route>
+      </Switch>
+    );
   }
 
   // Show app if authenticated

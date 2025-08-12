@@ -15,8 +15,9 @@ import {
   ArrowLeft, Settings, User, Bell, Shield, Database,
   Download, Upload, Moon, Sun, Smartphone, 
   HelpCircle, Info, ChevronRight, Store,
-  Clock, Activity, BarChart3
+  Clock, Activity, BarChart3, LogOut
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SettingsMobileOptimized() {
   const [notifications, setNotifications] = useState(true);
@@ -31,6 +32,7 @@ export default function SettingsMobileOptimized() {
   });
   
   const { toast } = useToast();
+  const { signOut } = useAuth();
 
   // Load saved settings
   useEffect(() => {
@@ -142,6 +144,22 @@ export default function SettingsMobileOptimized() {
       }
     };
     input.click();
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "সফলভাবে লগআউট",
+        description: "আপনি সফলভাবে লগআউট হয়েছেন"
+      });
+    } catch (error) {
+      toast({
+        title: "লগআউট ত্রুটি",
+        description: "লগআউট করতে সমস্যা হয়েছে",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -409,6 +427,18 @@ export default function SettingsMobileOptimized() {
                 <span className="bengali-font">সহায়তা কেন্দ্র</span>
               </div>
               <ChevronRight className="w-4 h-4 text-slate-400" />
+            </Button>
+
+            <Button 
+              variant="destructive" 
+              onClick={handleSignOut}
+              className="w-full justify-center text-sm h-10 mt-4"
+              data-testid="button-logout"
+            >
+              <div className="flex items-center space-x-2">
+                <LogOut className="w-4 h-4" />
+                <span className="bengali-font">লগআউট</span>
+              </div>
             </Button>
           </div>
         </Card>
