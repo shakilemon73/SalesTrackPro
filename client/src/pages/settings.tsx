@@ -178,7 +178,7 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className="p-4 pb-20 space-y-6">
+      <div className="p-4 mobile-safe-area space-y-6">
         {/* User Profile Card */}
         <Card className="enhanced-card bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
           <CardContent className="p-6">

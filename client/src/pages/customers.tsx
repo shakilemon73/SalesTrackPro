@@ -80,7 +80,7 @@ export default function CustomersPage() {
       </div>
 
       {/* Enhanced Customer List */}
-      <div className="p-4 pb-20">
+      <div className="p-4 mobile-safe-area">
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3, 4, 5].map(i => (

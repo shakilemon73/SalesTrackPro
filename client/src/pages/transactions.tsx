@@ -436,7 +436,7 @@ export default function Transactions() {
       </div>
 
       {/* Enhanced Transaction List */}
-      <div className="px-4 pb-20 space-y-3">
+      <div className="px-4 mobile-safe-area space-y-3">
         {filteredTransactions.length === 0 ? (
           <div className="empty-state">
             <div className="empty-state-icon">

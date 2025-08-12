@@ -187,7 +187,7 @@ export default function SalesEntry() {
         </div>
       </div>
 
-      <form id="sales-form" onSubmit={form.handleSubmit(onSubmit)} className="p-4 pb-20 space-y-6">
+      <form id="sales-form" onSubmit={form.handleSubmit(onSubmit)} className="p-4 mobile-safe-area space-y-6">
         {/* Customer Selection */}
         <Card className="enhanced-card">
           <CardHeader className="enhanced-card-header">

@@ -105,7 +105,7 @@ export default function CustomerAdd() {
         </div>
       </div>
 
-      <div className="p-4 pb-20">
+      <div className="p-4 mobile-safe-area">
         <form id="customer-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Customer Information */}
           <Card className="enhanced-card">

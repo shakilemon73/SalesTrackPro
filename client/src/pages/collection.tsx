@@ -167,7 +167,7 @@ export default function Collection() {
         </div>
       </div>
 
-      <div className="p-4 pb-20">
+      <div className="p-4 mobile-safe-area">
         <form id="collection-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Due Customers Summary */}
           {customersWithDue.length > 0 && (

@@ -183,7 +183,7 @@ export default function Reports() {
         </div>
       </div>
 
-      <div className="p-4 pb-20 space-y-6">
+      <div className="p-4 mobile-safe-area space-y-6">
         {/* Enhanced Revenue Summary */}
         <div className="stats-grid grid-cols-2 gap-4">
           <div className="stats-card bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
