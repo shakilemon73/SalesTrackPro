@@ -17,9 +17,9 @@ import ExpenseEntryMobileOptimized from "@/pages/expense-entry-mobile-optimized"
 import InventoryMobileOptimizedFixed from "@/pages/inventory-mobile-optimized-fixed";
 import BottomNavigationOptimized from "@/components/ui/bottom-navigation-optimized";
 import CommunicationPanel from "@/components/ui/communication-panel";
-import Analytics from "@/pages/analytics";
-import SmartInventory from "@/pages/smart-inventory";
-import Loyalty from "@/pages/loyalty";
+import AnalyticsMobileOptimized from "@/pages/analytics-mobile-optimized";
+import SmartInventoryMobileOptimized from "@/pages/smart-inventory-mobile-optimized";
+import LoyaltyMobileOptimized from "@/pages/loyalty-mobile-optimized";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 // Removed seed data import - using only live Supabase data
@@ -42,9 +42,9 @@ function Router() {
         <Route path="/inventory" component={InventoryMobileOptimizedFixed} />
         <Route path="/collection" component={CollectionMobileOptimized} />
         <Route path="/expenses/new" component={ExpenseEntryMobileOptimized} />
-        <Route path="/analytics" component={Analytics} />
-        <Route path="/smart-inventory" component={SmartInventory} />
-        <Route path="/loyalty" component={Loyalty} />
+        <Route path="/analytics" component={AnalyticsMobileOptimized} />
+        <Route path="/smart-inventory" component={SmartInventoryMobileOptimized} />
+        <Route path="/loyalty" component={LoyaltyMobileOptimized} />
         <Route component={NotFoundMobileOptimized} />
       </Switch>
       <BottomNavigationOptimized />
