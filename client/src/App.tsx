@@ -24,6 +24,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 // Removed seed data import - using only live Supabase data
 import { supabase } from "./lib/supabase";
+import { initializeAndroidOptimizations } from "./lib/android-optimizations";
 
 
 function Router() {
@@ -55,6 +56,9 @@ function Router() {
 function App() {
   useEffect(() => {
     console.log('App initialized with Supabase database connection');
+    
+    // Initialize Android APK optimizations
+    initializeAndroidOptimizations();
     
     // Check database connection
     const checkConnection = async () => {

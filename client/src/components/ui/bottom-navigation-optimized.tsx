@@ -1,6 +1,7 @@
 import { useLocation } from "wouter";
 import { Link } from "wouter";
 import { Home, ArrowLeftRight, Users, BarChart3, Settings, Package } from "lucide-react";
+import { androidHapticFeedback, androidClasses } from "@/lib/android-optimizations";
 
 const navItems = [
   { 
@@ -48,10 +49,14 @@ const navItems = [
 export default function BottomNavigationOptimized() {
   const [location] = useLocation();
 
+  const handleNavClick = () => {
+    androidHapticFeedback('light');
+  };
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50">
+    <div className={`${androidClasses.bottomNav} fixed bottom-0 left-0 right-0 z-50`}>
       {/* World-class mobile navigation with backdrop blur and glass morphism */}
-      <div className="bg-white/95 backdrop-blur-lg border-t border-gray-200/50 shadow-2xl">
+      <div className="bg-white/95 backdrop-blur-lg border-t border-gray-200/50 shadow-2xl android-nav-spacing">
         <div className="max-w-md mx-auto">
           <div className="grid grid-cols-5 gap-1 px-2 py-2">
             {navItems.map((item, index) => {
@@ -61,7 +66,9 @@ export default function BottomNavigationOptimized() {
               return (
                 <Link key={item.path} to={item.path}>
                   <button 
+                    onClick={handleNavClick}
                     className={`
+                      ${androidClasses.touchTarget}
                       relative flex flex-col items-center justify-center py-2 px-1 
                       rounded-2xl transition-all duration-300 ease-out
                       group hover:scale-105 active:scale-95
