@@ -1,12 +1,45 @@
 import { useQuery } from "@tanstack/react-query";
 import DashboardCard from "@/components/ui/dashboard-card";
 import TransactionItem from "@/components/ui/transaction-item";
+import CommunicationPanel from "@/components/ui/communication-panel";
 import { toBengaliNumber, formatCurrency, getBengaliDate, getBengaliTime } from "@/lib/bengali-utils";
 import { Link } from "wouter";
 import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
 import { whatsappManager } from "@/lib/whatsapp-business";
+import { smsManager } from "@/lib/sms-api";
+import { paymentManager } from "@/lib/payment-integration";
+import { smartInventory } from "@/lib/smart-inventory";
+import { analyticsEngine } from "@/lib/advanced-analytics";
+import { loyaltyProgram } from "@/lib/loyalty-program";
+import { offlineStorage } from "@/lib/offline-storage";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
+  const [showCommunicationPanel, setShowCommunicationPanel] = useState(false);
+  const [smartInsights, setSmartInsights] = useState<any>(null);
+  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
+  const [isOffline, setIsOffline] = useState(false);
+  const { toast } = useToast();
+
+  // Monitor network status
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    setIsOffline(!navigator.onLine);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   const { data: stats, isLoading: statsLoading, error: statsError } = useQuery({
     queryKey: ['dashboard', CURRENT_USER_ID],
@@ -45,6 +78,27 @@ export default function Dashboard() {
     queryFn: () => supabaseService.getLowStockProducts(CURRENT_USER_ID),
   });
 
+  // Load smart insights after stats are available
+  useEffect(() => {
+    if (stats) {
+      const loadInsights = async () => {
+        try {
+          const insights = await analyticsEngine.generateBusinessIntelligenceReport();
+          setSmartInsights(insights);
+        } catch (error) {
+          console.error('Failed to load insights:', error);
+        }
+      };
+      loadInsights();
+    }
+  }, [stats]);
+
+  // Load payment methods on mount
+  useEffect(() => {
+    const methods = paymentManager.getProviders();
+    setPaymentMethods(methods);
+  }, []);
+
   if (statsLoading) {
     console.log('🔥 DASHBOARD: Loading state - waiting for stats...');
     return (
@@ -74,18 +128,69 @@ export default function Dashboard() {
     }
   };
 
+  // Handle payment integration
+  const handleQuickPayment = (method: string) => {
+    const qrCode = paymentManager.generateUniversalQR({
+      amount: 100,
+      description: 'দোকান হিসাব দ্রুত পেমেন্ট',
+      orderId: `QP_${Date.now()}`
+    });
+    
+    toast({
+      title: "পেমেন্ট QR তৈরি হয়েছে",
+      description: `${method} দিয়ে পেমেন্ট নিতে প্রস্তুত`
+    });
+  };
+
+  // Handle SMS reminder
+  const handleSendReminders = async () => {
+    try {
+      // Get customers with due amounts
+      const customers = await supabaseService.getCustomers(CURRENT_USER_ID);
+      const sales = await supabaseService.getSales(CURRENT_USER_ID);
+      
+      const customersWithDue = customers.filter(customer => {
+        const customerSales = sales.filter(sale => sale.customer_id === customer.id);
+        const totalDue = customerSales.reduce((sum, sale) => sum + (sale.due_amount || 0), 0);
+        return totalDue > 0;
+      });
+
+      if (customersWithDue.length > 0) {
+        toast({
+          title: "রিমাইন্ডার প্রস্তুত",
+          description: `${toBengaliNumber(customersWithDue.length)}টি গ্রাহকের জন্য বার্তা প্রস্তুত`
+        });
+        setShowCommunicationPanel(true);
+      } else {
+        toast({
+          title: "কোন বাকি নেই",
+          description: "সব গ্রাহকের পেমেন্ট আপ টু ডেট"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "ত্রুটি",
+        description: "রিমাইন্ডার চেক করতে সমস্যা হয়েছে",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <>
-      {/* Premium Status Bar */}
+      {/* Premium Status Bar with Network Status */}
       <div className="status-bar">
         <div className="flex items-center space-x-2">
           <div className="flex space-x-1">
-            <div className="w-1 h-1 bg-white rounded-full opacity-100"></div>
-            <div className="w-1 h-1 bg-white rounded-full opacity-100"></div>
-            <div className="w-1 h-1 bg-white rounded-full opacity-100"></div>
-            <div className="w-1 h-1 bg-white rounded-full opacity-60"></div>
+            <div className={`w-1 h-1 rounded-full ${isOffline ? 'bg-red-400' : 'bg-white'} opacity-100`}></div>
+            <div className={`w-1 h-1 rounded-full ${isOffline ? 'bg-red-400' : 'bg-white'} opacity-100`}></div>
+            <div className={`w-1 h-1 rounded-full ${isOffline ? 'bg-red-400' : 'bg-white'} opacity-100`}></div>
+            <div className={`w-1 h-1 rounded-full ${isOffline ? 'bg-red-400/60' : 'bg-white/60'}`}></div>
           </div>
           <span className="text-xs font-semibold">দোকান হিসাব</span>
+          {isOffline && (
+            <Badge variant="destructive" className="text-xs px-2 py-1">অফলাইন</Badge>
+          )}
         </div>
         <div className="flex items-center space-x-3">
           <span className="text-xs font-bold number-font">
@@ -97,9 +202,9 @@ export default function Dashboard() {
           </span>
           <div className="flex items-center space-x-1">
             <div className="w-4 h-2 border border-white/80 rounded-sm relative overflow-hidden">
-              <div className="w-4/5 h-full bg-white rounded-sm"></div>
+              <div className={`w-4/5 h-full rounded-sm ${isOffline ? 'bg-red-400' : 'bg-white'}`}></div>
             </div>
-            <div className="w-0.5 h-1 bg-white rounded-full"></div>
+            <div className={`w-0.5 h-1 rounded-full ${isOffline ? 'bg-red-400' : 'bg-white'}`}></div>
           </div>
         </div>
       </div>
@@ -215,43 +320,125 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Quick Actions with Enhanced Design */}
+        {/* Enhanced Quick Actions with Smart Features */}
         <div className="dashboard-card">
           <h2 className="text-lg font-bold text-foreground mb-4 bengali-font flex items-center">
             <div className="w-6 h-6 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
               <i className="fas fa-bolt text-primary text-sm"></i>
             </div>
             দ্রুত কাজ
+            {smartInsights?.summary.atRiskCustomers > 0 && (
+              <Badge variant="destructive" className="ml-2 text-xs">
+                {toBengaliNumber(smartInsights.summary.atRiskCustomers)} ঝুঁকিপূর্ণ
+              </Badge>
+            )}
           </h2>
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            <Link to="/sales/new">
-              <button className="quick-action-btn bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
-                <i className="fas fa-plus-circle text-2xl"></i>
-                <span className="text-sm font-semibold bengali-font">নতুন বিক্রয়</span>
-              </button>
-            </Link>
-            <Link to="/customers/new">
-              <button className="quick-action-btn bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700">
-                <i className="fas fa-user-plus text-2xl"></i>
-                <span className="text-sm font-semibold bengali-font">নতুন গ্রাহক</span>
-              </button>
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Link to="/expenses/new">
-              <button className="quick-action-btn bg-gradient-to-br from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
-                <i className="fas fa-receipt text-2xl"></i>
-                <span className="text-sm font-semibold bengali-font">খরচ যোগ</span>
-              </button>
-            </Link>
-            <button 
-              onClick={handleShareReport}
-              className="quick-action-btn bg-gradient-to-br from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
-            >
-              <i className="fab fa-whatsapp text-2xl"></i>
-              <span className="text-sm font-semibold bengali-font">রিপোর্ট শেয়ার</span>
-            </button>
-          </div>
+          
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-4">
+              <TabsTrigger value="basic" className="bengali-font">মৌলিক</TabsTrigger>
+              <TabsTrigger value="payment" className="bengali-font">পেমেন্ট</TabsTrigger>
+              <TabsTrigger value="communication" className="bengali-font">যোগাযোগ</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="basic">
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <Link to="/sales/new">
+                  <button className="quick-action-btn bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
+                    <i className="fas fa-plus-circle text-2xl"></i>
+                    <span className="text-sm font-semibold bengali-font">নতুন বিক্রয়</span>
+                  </button>
+                </Link>
+                <Link to="/customers/new">
+                  <button className="quick-action-btn bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700">
+                    <i className="fas fa-user-plus text-2xl"></i>
+                    <span className="text-sm font-semibold bengali-font">নতুন গ্রাহক</span>
+                  </button>
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Link to="/expenses/new">
+                  <button className="quick-action-btn bg-gradient-to-br from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
+                    <i className="fas fa-receipt text-2xl"></i>
+                    <span className="text-sm font-semibold bengali-font">খরচ যোগ</span>
+                  </button>
+                </Link>
+                <button 
+                  onClick={handleShareReport}
+                  className="quick-action-btn bg-gradient-to-br from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+                >
+                  <i className="fab fa-whatsapp text-2xl"></i>
+                  <span className="text-sm font-semibold bengali-font">রিপোর্ট শেয়ার</span>
+                </button>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="payment">
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <button 
+                  onClick={() => handleQuickPayment('bKash')}
+                  className="quick-action-btn bg-gradient-to-br from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700"
+                >
+                  <i className="fas fa-mobile-alt text-2xl"></i>
+                  <span className="text-sm font-semibold bengali-font">বিকাশ QR</span>
+                </button>
+                <button 
+                  onClick={() => handleQuickPayment('Nagad')}
+                  className="quick-action-btn bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
+                >
+                  <i className="fas fa-qrcode text-2xl"></i>
+                  <span className="text-sm font-semibold bengali-font">নগদ QR</span>
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Link to="/collection">
+                  <button className="quick-action-btn bg-gradient-to-br from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700">
+                    <i className="fas fa-coins text-2xl"></i>
+                    <span className="text-sm font-semibold bengali-font">টাকা আদায়</span>
+                  </button>
+                </Link>
+                <Link to="/analytics">
+                  <button className="quick-action-btn bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700">
+                    <i className="fas fa-chart-line text-2xl"></i>
+                    <span className="text-sm font-semibold bengali-font">AI অ্যানালিটিক্স</span>
+                  </button>
+                </Link>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="communication">
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <button 
+                  onClick={handleSendReminders}
+                  className="quick-action-btn bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
+                >
+                  <i className="fas fa-bell text-2xl"></i>
+                  <span className="text-sm font-semibold bengali-font">বাকি রিমাইন্ডার</span>
+                </button>
+                <button 
+                  onClick={() => setShowCommunicationPanel(true)}
+                  className="quick-action-btn bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                >
+                  <i className="fas fa-comments text-2xl"></i>
+                  <span className="text-sm font-semibold bengali-font">যোগাযোগ কেন্দ্র</span>
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Link to="/loyalty">
+                  <button className="quick-action-btn bg-gradient-to-br from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700">
+                    <i className="fas fa-star text-2xl"></i>
+                    <span className="text-sm font-semibold bengali-font">লয়ালটি প্রোগ্রাম</span>
+                  </button>
+                </Link>
+                <Link to="/smart-inventory">
+                  <button className="quick-action-btn bg-gradient-to-br from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700">
+                    <i className="fas fa-brain text-2xl"></i>
+                    <span className="text-sm font-semibold bengali-font">স্মার্ট স্টক</span>
+                  </button>
+                </Link>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
 
         {/* Recent Activity with Enhanced Visual Design */}
@@ -379,7 +566,103 @@ export default function Dashboard() {
             </Link>
           </div>
         )}
+
+        {/* Smart Insights Panel */}
+        {smartInsights && (
+          <div className="dashboard-card border-l-4 border-purple-500 bg-gradient-to-r from-purple-50 to-indigo-50">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold flex items-center text-purple-700 bengali-font">
+                <div className="w-6 h-6 bg-purple-500/20 rounded-lg flex items-center justify-center mr-3">
+                  <i className="fas fa-brain text-purple-600 text-sm"></i>
+                </div>
+                AI বিজনেস ইনসাইট
+              </h2>
+              <Badge variant="outline" className="text-purple-600 border-purple-300">
+                স্মার্ট অ্যানালিটিক্স
+              </Badge>
+            </div>
+            
+            <div className="space-y-3">
+              {smartInsights.topInsights.slice(0, 3).map((insight: string, index: number) => (
+                <div key={index} className="flex items-start space-x-3 p-3 bg-white rounded-lg border border-purple-200">
+                  <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <i className="fas fa-lightbulb text-purple-600 text-xs"></i>
+                  </div>
+                  <span className="text-sm text-gray-700 bengali-font">{insight}</span>
+                </div>
+              ))}
+              
+              {smartInsights.recommendations.slice(0, 2).map((recommendation: string, index: number) => (
+                <div key={index} className="flex items-start space-x-3 p-3 bg-white rounded-lg border border-green-200">
+                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <i className="fas fa-arrow-up text-green-600 text-xs"></i>
+                  </div>
+                  <span className="text-sm text-gray-700 bengali-font">{recommendation}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-purple-200">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-lg font-bold text-purple-600 number-font">
+                    {toBengaliNumber(smartInsights.summary.highValueCustomers)}
+                  </p>
+                  <p className="text-xs text-purple-600 bengali-font">উচ্চ মূল্যের গ্রাহক</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-orange-600 number-font">
+                    {toBengaliNumber(smartInsights.summary.atRiskCustomers)}
+                  </p>
+                  <p className="text-xs text-orange-600 bengali-font">ঝুঁকিপূর্ণ গ্রাহক</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-green-600 number-font">
+                    {smartInsights.summary.profitOptimizationPotential > 0 ? 
+                      formatCurrency(smartInsights.summary.profitOptimizationPotential) : '০'}
+                  </p>
+                  <p className="text-xs text-green-600 bengali-font">অপটিমাইজেশন সম্ভাবনা</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Communication Panel Dialog */}
+      {showCommunicationPanel && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold bengali-font">যোগাযোগ কেন্দ্র</h2>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setShowCommunicationPanel(false)}
+                >
+                  <i className="fas fa-times"></i>
+                </Button>
+              </div>
+              
+              <CommunicationPanel 
+                salesData={stats ? {
+                  todaySales: stats.todaySales,
+                  totalSales: stats.totalSales,
+                  profit: stats.profit,
+                  pendingCollection: stats.pendingCollection,
+                  salesCount: stats.salesCount
+                } : undefined}
+                lowStockItems={lowStockProducts.map(product => ({
+                  name: product.name,
+                  currentStock: product.currentStock,
+                  minStock: product.min_stock_level
+                }))}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Enhanced Floating Action Button */}
       <Link to="/sales/new">

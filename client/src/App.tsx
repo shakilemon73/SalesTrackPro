@@ -16,6 +16,9 @@ import Inventory from "@/pages/inventory";
 import Collection from "@/pages/collection";
 import ExpenseEntry from "@/pages/expense-entry";
 import BottomNavigation from "@/components/ui/bottom-navigation";
+import Analytics from "@/pages/analytics";
+import SmartInventory from "@/pages/smart-inventory";
+import Loyalty from "@/pages/loyalty";
 import { useEffect } from "react";
 // Removed seed data import - using only live Supabase data
 import { supabase } from "./lib/supabase";
@@ -35,6 +38,9 @@ function Router() {
         <Route path="/inventory" component={Inventory} />
         <Route path="/collection" component={Collection} />
         <Route path="/expenses/new" component={ExpenseEntry} />
+        <Route path="/analytics" component={Analytics} />
+        <Route path="/smart-inventory" component={SmartInventory} />
+        <Route path="/loyalty" component={Loyalty} />
         <Route component={NotFound} />
       </Switch>
       <BottomNavigation />
