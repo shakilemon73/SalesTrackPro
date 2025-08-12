@@ -15,7 +15,7 @@ import CustomerDetailsMobileOptimized from "@/pages/customer-details-mobile-opti
 import CollectionMobileOptimized from "@/pages/collection-mobile-optimized";
 import ExpenseEntryMobileOptimized from "@/pages/expense-entry-mobile-optimized";
 import InventoryMobileOptimizedFixed from "@/pages/inventory-mobile-optimized-fixed";
-import BottomNavigation from "@/components/ui/bottom-navigation";
+import BottomNavigationOptimized from "@/components/ui/bottom-navigation-optimized";
 import CommunicationPanel from "@/components/ui/communication-panel";
 import Analytics from "@/pages/analytics";
 import SmartInventory from "@/pages/smart-inventory";
@@ -47,7 +47,7 @@ function Router() {
         <Route path="/loyalty" component={Loyalty} />
         <Route component={NotFound} />
       </Switch>
-      <BottomNavigation />
+      <BottomNavigationOptimized />
     </div>
   );
 }

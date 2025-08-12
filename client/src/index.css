@@ -606,7 +606,7 @@
     transform: translateX(4px);
   }
 
-  /* Modern Bottom Navigation */
+  /* World-Class Mobile Navigation - iOS/Material Design Inspired */
   .bottom-nav {
     @apply fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md px-4 py-2;
     background: rgba(255, 255, 255, 0.95);
@@ -638,6 +638,44 @@
     height: 3px;
     background: var(--primary);
     border-radius: 2px;
+  }
+
+  /* Safe area support for newer devices */
+  .h-safe-area-inset-bottom {
+    height: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Enhanced mobile touch targets */
+  .nav-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* World-class backdrop blur support */
+  .backdrop-blur-lg {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  /* Modern gradient shadows for elevated nav items */
+  .nav-shadow-blue {
+    box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.15);
+  }
+
+  .nav-shadow-indigo {
+    box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.15);
+  }
+
+  .nav-shadow-green {
+    box-shadow: 0 4px 14px 0 rgba(34, 197, 94, 0.15);
+  }
+
+  .nav-shadow-purple {
+    box-shadow: 0 4px 14px 0 rgba(147, 51, 234, 0.15);
+  }
+
+  .nav-shadow-orange {
+    box-shadow: 0 4px 14px 0 rgba(251, 146, 60, 0.15);
   }
 
   /* Floating Action Button */
