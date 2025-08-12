@@ -175,12 +175,20 @@
     padding-bottom: max(env(safe-area-inset-bottom), 16px);
   }
 
+  /* Better safe area handling for bottom navigation */
+  @supports (padding: max(0px)) {
+    .bottom-nav-safe {
+      padding-bottom: max(env(safe-area-inset-bottom), 16px);
+    }
+  }
+
   /* Keyboard handling for Android */
   body.keyboard-open {
     padding-bottom: 0;
   }
 
-  body.keyboard-open .android-nav-spacing {
+  body.keyboard-open .android-nav-spacing,
+  body.keyboard-open .bottom-nav-safe {
     padding-bottom: 0;
   }
 

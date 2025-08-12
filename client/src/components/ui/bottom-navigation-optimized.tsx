@@ -54,11 +54,12 @@ export default function BottomNavigationOptimized() {
   };
 
   return (
-    <div className={`${androidClasses.bottomNav} fixed bottom-0 left-0 right-0 z-50`}>
+    <div className="fixed bottom-0 left-0 right-0 z-50 android-nav-spacing">
       {/* World-class mobile navigation with backdrop blur and glass morphism */}
-      <div className="bg-white/95 backdrop-blur-lg border-t border-gray-200/50 shadow-2xl android-nav-spacing">
-        <div className="max-w-md mx-auto">
-          <div className="grid grid-cols-5 gap-1 px-2 py-2">
+      <div className="bg-white/95 backdrop-blur-lg border-t border-gray-200/50 shadow-2xl"
+           style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 16px)' }}>
+        <div className="w-full">
+          <div className="grid grid-cols-5 gap-1 px-4 py-3">
             {navItems.map((item, index) => {
               const isActive = location === item.path;
               const IconComponent = item.icon;
@@ -68,10 +69,10 @@ export default function BottomNavigationOptimized() {
                   <button 
                     onClick={handleNavClick}
                     className={`
-                      ${androidClasses.touchTarget}
                       relative flex flex-col items-center justify-center py-2 px-1 
                       rounded-2xl transition-all duration-300 ease-out
-                      group hover:scale-105 active:scale-95
+                      group hover:scale-105 active:scale-95 min-h-12 min-w-12
+                      touch-manipulation
                       ${isActive ? 'transform -translate-y-1' : 'hover:bg-gray-50/80'}
                     `}
                   >
@@ -139,8 +140,8 @@ export default function BottomNavigationOptimized() {
         </div>
 
         {/* Home indicator (iPhone-style) */}
-        <div className="flex justify-center pb-2">
-          <div className="w-32 h-1 bg-gray-300 rounded-full opacity-60" />
+        <div className="flex justify-center pb-1">
+          <div className="w-20 h-1 bg-gray-300 rounded-full opacity-40" />
         </div>
       </div>
 

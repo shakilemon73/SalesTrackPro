@@ -31,7 +31,7 @@ function Router() {
   const [showCommunicationPanel, setShowCommunicationPanel] = useState(false);
 
   return (
-    <div className="mobile-container">
+    <div className="min-h-screen bg-slate-50 overflow-x-hidden w-full">
       <Switch>
         <Route path="/" component={DashboardMobileOptimized} />
         <Route path="/transactions" component={TransactionsMobileOptimized} />
