@@ -12,6 +12,7 @@ import ReportsMobileOptimized from "@/pages/reports-mobile-optimized";
 import SettingsMobileOptimized from "@/pages/settings-mobile-optimized";
 import SalesEntryMobileOptimized from "@/pages/sales-entry-mobile-optimized";
 import SalesEntrySplitScreen from "@/pages/sales-entry-split-screen";
+import SalesEntryBottomSheet from "@/pages/sales-entry-bottom-sheet";
 import CustomerAddMobileOptimized from "@/pages/customer-add-mobile-optimized";
 import CustomerDetailsMobileOptimized from "@/pages/customer-details-mobile-optimized";
 import CollectionMobileOptimized from "@/pages/collection-mobile-optimized";
@@ -39,7 +40,7 @@ function Router() {
         <Route path="/customers" component={CustomersMobileOptimized} />
         <Route path="/reports" component={ReportsMobileOptimized} />
         <Route path="/settings" component={SettingsMobileOptimized} />
-        <Route path="/sales/new" component={SalesEntrySplitScreen} />
+        <Route path="/sales/new" component={SalesEntryBottomSheet} />
         <Route path="/customers/new" component={CustomerAddMobileOptimized} />
         <Route path="/customers/:id" component={CustomerDetailsMobileOptimized} />
         <Route path="/inventory" component={InventoryMobileOptimizedFixed} />
