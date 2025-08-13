@@ -386,7 +386,17 @@ export default function DashboardMobileOptimized() {
                 </div>
               )}
               
-
+              {/* View All Button for Transactions */}
+              <Link to="/transactions" className="block mt-3">
+                <Button 
+                  variant="ghost" 
+                  className="w-full text-xs py-2 bg-slate-100/50 hover:bg-slate-200/50 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 rounded-lg transition-all duration-200 group" 
+                  data-testid="button-view-all-transactions"
+                >
+                  <span className="bengali-font font-semibold">সব দেখুন</span>
+                  <ChevronRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
             </TabsContent>
             
             {/* Compact Scrollable Customers Tab */}
@@ -446,7 +456,17 @@ export default function DashboardMobileOptimized() {
                 </div>
               )}
               
-              {/* View All Selector is now handled globally above */}
+              {/* View All Button for Customers */}
+              <Link to="/customers" className="block mt-3">
+                <Button 
+                  variant="ghost" 
+                  className="w-full text-xs py-2 bg-slate-100/50 hover:bg-slate-200/50 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 rounded-lg transition-all duration-200 group" 
+                  data-testid="button-view-all-customers"
+                >
+                  <span className="bengali-font font-semibold">সব দেখুন</span>
+                  <ChevronRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
             </TabsContent>
           </Tabs>
         </Card>
