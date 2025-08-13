@@ -394,16 +394,25 @@ export const supabaseService = {
     try {
       const { data: currentUser } = await supabase.auth.getUser();
       if (currentUser.user && currentUser.user.id === userId) {
-        // Try to create or update user profile
+        // Get user metadata from auth
+        const userMetadata = currentUser.user.user_metadata || {};
+        const businessName = userMetadata.businessName || userMetadata.business_name || 'দোকান';
+        const ownerName = userMetadata.name || userMetadata.owner_name || 'Owner';
+        
+        // Try to create or update user profile with correct column names
         const { error: profileError } = await supabase
           .from('users')
           .upsert({
             id: userId,
-            email: currentUser.user.email || '',
-            business_name: 'দোকান',
             username: currentUser.user.email?.split('@')[0] || 'user',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            password: 'supabase_managed', // Password managed by Supabase Auth
+            shop_name: businessName,
+            owner_name: ownerName,
+            business_name: businessName,
+            email: currentUser.user.email || '',
+            phone_number: userMetadata.phone || '',
+            address: userMetadata.address || '',
+            created_at: new Date().toISOString()
           }, { 
             onConflict: 'id' 
           });
