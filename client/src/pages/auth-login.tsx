@@ -6,129 +6,98 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Phone, KeyRound, Store } from 'lucide-react';
-import { formatBengaliPhone } from '@/lib/bengali-utils';
+import { Mail, KeyRound, Store, User } from 'lucide-react';
 
 export default function AuthLogin() {
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [otp, setOtp] = useState('');
-  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const formatPhoneNumber = (phone: string) => {
-    // Remove any non-digit characters
-    const cleaned = phone.replace(/\D/g, '');
-    
-    // Ensure it starts with +880 for Bangladesh
-    if (cleaned.startsWith('880')) {
-      return `+${cleaned}`;
-    } else if (cleaned.startsWith('0') && cleaned.length === 11) {
-      return `+880${cleaned.substring(1)}`;
-    } else if (cleaned.length === 10) {
-      return `+880${cleaned}`;
-    }
-    
-    return phone;
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
-  const handleSendOtp = async () => {
-    if (!phoneNumber.trim()) {
+  const handleAuth = async () => {
+    if (!email.trim() || !password.trim()) {
       toast({
-        title: 'ফোন নম্বর প্রয়োজন',
-        description: 'দয়া করে আপনার ফোন নম্বর দিন',
+        title: 'সব তথ্য প্রয়োজন',
+        description: 'দয়া করে ইমেইল এবং পাসওয়ার্ড দিন',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      toast({
+        title: 'ভুল ইমেইল',
+        description: 'দয়া করে সঠিক ইমেইল ঠিকানা দিন',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      toast({
+        title: 'পাসওয়ার্ড ছোট',
+        description: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে',
         variant: 'destructive'
       });
       return;
     }
 
     setIsLoading(true);
-    const formattedPhone = formatPhoneNumber(phoneNumber);
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: formattedPhone,
-      });
+      let result;
+      if (isSignUp) {
+        result = await supabase.auth.signUp({
+          email: email.trim(),
+          password: password.trim(),
+        });
+      } else {
+        result = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password: password.trim(),
+        });
+      }
 
-      if (error) {
+      if (result.error) {
         toast({
-          title: 'OTP পাঠানো যায়নি',
-          description: error.message,
+          title: isSignUp ? 'অ্যাকাউন্ট তৈরি করা যায়নি' : 'লগইন করা যায়নি',
+          description: result.error.message,
           variant: 'destructive'
         });
       } else {
-        setIsOtpSent(true);
-        toast({
-          title: 'OTP পাঠানো হয়েছে',
-          description: `${formatBengaliPhone(formattedPhone)} নম্বরে OTP পাঠানো হয়েছে`,
-        });
-      }
-    } catch (error) {
-      console.error('OTP send error:', error);
-      toast({
-        title: 'সমস্যা হয়েছে',
-        description: 'দয়া করে আবার চেষ্টা করুন',
-        variant: 'destructive'
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        // Create user profile if it doesn't exist and it's a sign up
+        if (isSignUp && result.data.user) {
+          const { error: profileError } = await supabase
+            .from('users')
+            .upsert({
+              id: result.data.user.id,
+              email: email.trim(),
+              business_name: '',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }, { 
+              onConflict: 'id' 
+            });
 
-  const handleVerifyOtp = async () => {
-    if (!otp.trim()) {
-      toast({
-        title: 'OTP প্রয়োজন',
-        description: 'দয়া করে আপনার OTP কোড দিন',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    const formattedPhone = formatPhoneNumber(phoneNumber);
-
-    try {
-      const { data, error } = await supabase.auth.verifyOtp({
-        phone: formattedPhone,
-        token: otp,
-        type: 'sms'
-      });
-
-      if (error) {
-        toast({
-          title: 'OTP যাচাই করা যায়নি',
-          description: error.message,
-          variant: 'destructive'
-        });
-      } else if (data.user) {
-        // Create user profile if it doesn't exist
-        const { error: profileError } = await supabase
-          .from('users')
-          .upsert({
-            id: data.user.id,
-            phone_number: formattedPhone,
-            business_name: '',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }, { 
-            onConflict: 'id' 
-          });
-
-        if (profileError) {
-          console.warn('Profile creation warning:', profileError);
+          if (profileError) {
+            console.warn('Profile creation warning:', profileError);
+          }
         }
 
         toast({
-          title: 'সফলভাবে লগইন হয়েছে',
-          description: 'স্বাগতম!',
+          title: isSignUp ? 'অ্যাকাউন্ট তৈরি হয়েছে' : 'লগইন সফল',
+          description: isSignUp ? 'আপনার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে' : 'স্বাগতম!',
         });
-        
-        // Redirect will happen automatically due to auth state change
-        window.location.href = '/';
+        // Navigation will be handled by the auth guard
       }
     } catch (error) {
-      console.error('OTP verification error:', error);
+      console.error('Auth error:', error);
       toast({
         title: 'সমস্যা হয়েছে',
         description: 'দয়া করে আবার চেষ্টা করুন',
@@ -138,6 +107,8 @@ export default function AuthLogin() {
       setIsLoading(false);
     }
   };
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
@@ -153,87 +124,72 @@ export default function AuthLogin() {
         </CardHeader>
         
         <CardContent className="space-y-6">
-          {!isOtpSent ? (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="text-sm font-medium">
-                  ফোন নম্বর
-                </Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="01XXXXXXXXX বা +8801XXXXXXXXX"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  বাংলাদেশের যেকোনো মোবাইল অপারেটর (গ্রামীণফোন, বাংলালিংক, রবি, টেলিটক)
-                </p>
-              </div>
-              
-              <Button 
-                onClick={handleSendOtp} 
-                disabled={isLoading}
-                className="w-full bg-green-600 hover:bg-green-700"
-              >
-                {isLoading ? 'পাঠানো হচ্ছে...' : 'OTP পাঠান'}
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <p className="text-sm text-green-800">
-                  OTP পাঠানো হয়েছে
-                </p>
-                <p className="text-xs text-green-600 mt-1">
-                  {formatBengaliPhone(formatPhoneNumber(phoneNumber))}
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="otp" className="text-sm font-medium">
-                  OTP কোড
-                </Label>
-                <div className="relative">
-                  <KeyRound className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="otp"
-                    type="text"
-                    placeholder="6 অঙ্কের কোড"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    className="pl-10 text-center text-lg tracking-widest"
-                    maxLength={6}
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                <Button 
-                  onClick={handleVerifyOtp} 
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-medium">
+                ইমেইল
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="আপনার ইমেইল লিখুন"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10 bengali-font"
                   disabled={isLoading}
-                  className="w-full bg-green-600 hover:bg-green-700"
-                >
-                  {isLoading ? 'যাচাই করা হচ্ছে...' : 'লগইন করুন'}
-                </Button>
-                
-                <Button 
-                  onClick={() => {
-                    setIsOtpSent(false);
-                    setOtp('');
-                  }} 
-                  variant="outline"
-                  className="w-full"
-                >
-                  ফোন নম্বর পরিবর্তন করুন
-                </Button>
+                />
               </div>
             </div>
-          )}
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm font-medium">
+                পাসওয়ার্ড
+              </Label>
+              <div className="relative">
+                <KeyRound className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="আপনার পাসওয়ার্ড লিখুন"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 bengali-font"
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            <Button 
+              onClick={handleAuth}
+              className="w-full bg-green-600 hover:bg-green-700"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>{isSignUp ? 'অ্যাকাউন্ট তৈরি হচ্ছে...' : 'লগইন হচ্ছে...'}</span>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  {isSignUp ? <User className="w-4 h-4" /> : <Mail className="w-4 h-4" />}
+                  <span>{isSignUp ? 'অ্যাকাউন্ট তৈরি করুন' : 'লগইন করুন'}</span>
+                </div>
+              )}
+            </Button>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="text-sm text-green-600 hover:text-green-800 bengali-font"
+                disabled={isLoading}
+              >
+                {isSignUp ? 'আগে থেকেই অ্যাকাউন্ট আছে? লগইন করুন' : 'নতুন অ্যাকাউন্ট তৈরি করুন'}
+              </button>
+            </div>
+          </div>
           
           <div className="text-center text-xs text-muted-foreground">
             লগইন করার মাধ্যমে আপনি আমাদের{' '}
