@@ -20,6 +20,7 @@ import ExpenseEntryMobileOptimized from "@/pages/expense-entry-mobile-optimized"
 import InventoryMobileOptimizedFixed from "@/pages/inventory-mobile-optimized-fixed";
 import BottomNavigationOptimized from "@/components/ui/bottom-navigation-optimized";
 import CommunicationPanel from "@/components/ui/communication-panel";
+import FloatingActionMenu from "@/components/ui/floating-action-menu";
 
 
 import { useEffect, useState } from "react";
@@ -55,6 +56,7 @@ function Router() {
         <Route component={NotFoundMobileOptimized} />
       </Switch>
       {!hideBottomNav && <BottomNavigationOptimized />}
+      {!hideBottomNav && <FloatingActionMenu />}
     </div>
   );
 }

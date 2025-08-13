@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { Link } from "wouter";
-import { Home, ArrowLeftRight, Users, BarChart3, Settings, Package } from "lucide-react";
+import { Home, ArrowLeftRight, Users, BarChart3, Package } from "lucide-react";
 import { androidHapticFeedback, androidClasses } from "@/lib/android-optimizations";
 
 const navItems = [
@@ -8,25 +8,25 @@ const navItems = [
     path: "/", 
     icon: Home, 
     label: "হোম", 
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
-    activeColor: "bg-blue-600"
+    color: "text-emerald-600",
+    bgColor: "bg-emerald-50",
+    activeColor: "bg-emerald-600"
   },
   { 
     path: "/inventory", 
     icon: Package, 
     label: "স্টক", 
-    color: "text-indigo-600",
-    bgColor: "bg-indigo-50",
-    activeColor: "bg-indigo-600"
+    color: "text-blue-600",
+    bgColor: "bg-blue-50",
+    activeColor: "bg-blue-600"
   },
   { 
     path: "/transactions", 
     icon: ArrowLeftRight, 
     label: "লেনদেন", 
-    color: "text-green-600",
-    bgColor: "bg-green-50",
-    activeColor: "bg-green-600"
+    color: "text-indigo-600",
+    bgColor: "bg-indigo-50",
+    activeColor: "bg-indigo-600"
   },
   { 
     path: "/customers", 
@@ -58,7 +58,7 @@ export default function BottomNavigationOptimized() {
       {/* Professional Bottom Navigation with Material Design 3 */}
       <div className="bg-white/98 backdrop-blur-xl border-t border-slate-200/60 shadow-2xl">
         <div className="w-full">
-          <div className="grid grid-cols-5 gap-0 px-2 py-2">
+          <div className="grid grid-cols-5 gap-1 px-3 py-2">
             {navItems.map((item, index) => {
               const isActive = location === item.path;
               const IconComponent = item.icon;
@@ -69,30 +69,36 @@ export default function BottomNavigationOptimized() {
                     onClick={handleNavClick}
                     className={`
                       relative flex flex-col items-center justify-center w-full
-                      py-3 px-2 rounded-xl transition-all duration-200 ease-out
-                      touch-manipulation active:scale-95
+                      py-3 px-2 rounded-2xl transition-all duration-300 ease-out
+                      touch-manipulation active:scale-95 min-h-[60px]
                       ${isActive 
-                        ? 'bg-emerald-500 text-white shadow-lg' 
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                        ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg scale-105' 
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
                       }
                     `}
+                    style={{ minHeight: '60px', minWidth: '60px' }}
                   >
-                    {/* Clean Icon */}
+                    {/* Enhanced Icon with better spacing */}
                     <IconComponent 
-                      size={20} 
+                      size={22} 
                       className={`
-                        transition-colors duration-200 mb-1
-                        ${isActive ? 'text-white' : 'text-current'}
+                        transition-all duration-300 mb-1
+                        ${isActive ? 'text-white scale-110' : 'text-current'}
                       `} 
                     />
                     
-                    {/* Clean Label */}
+                    {/* Enhanced Label with better typography */}
                     <span className={`
-                      text-xs font-medium bengali-font transition-colors duration-200
+                      text-[10px] font-semibold bengali-font transition-all duration-300 leading-tight
                       ${isActive ? 'text-white' : 'text-current'}
                     `}>
                       {item.label}
                     </span>
+
+                    {/* Active indicator dot */}
+                    {isActive && (
+                      <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-white rounded-full opacity-80" />
+                    )}
                   </button>
                 </Link>
               );

@@ -18,6 +18,7 @@ import {
   PenTool, Receipt, DollarSign, ChevronDown
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import DashboardHeaderEnhanced from "@/components/ui/dashboard-header-enhanced";
 
 export default function DashboardMobileOptimized() {
   const [timeOfDay, setTimeOfDay] = useState('');
@@ -95,71 +96,13 @@ export default function DashboardMobileOptimized() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pb-16">
       
-      {/* Ultra-Compact Header for 916x412 */}
-      <div className="sticky top-0 z-50 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-slate-900 dark:to-slate-800 backdrop-blur-xl border-b border-emerald-100 dark:border-slate-700/50 shadow-sm">
-        <div className="px-3 py-2">
-          <div className="flex items-center justify-between">
-            {/* Compact Bengali Shop Identity */}
-            <div className="flex items-center space-x-2">
-              <div className="relative">
-                {/* Smaller Bengali Shop Symbol */}
-                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 via-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
-                  <div className="text-white text-sm font-bold bengali-font">দো</div>
-                </div>
-                {/* Smaller Active Status */}
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full border border-white shadow-sm animate-pulse"></div>
-              </div>
-              <div>
-                <h1 className="text-sm font-bold text-slate-800 dark:text-white bengali-font">
-                  {timeOfDay}!
-                </h1>
-                <div className="text-xs text-slate-600 dark:text-slate-400 bengali-font">
-                  📅 {getBengaliDate()}
-                </div>
-              </div>
-            </div>
-            
-            {/* Compact Actions */}
-            <div className="flex items-center space-x-1">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-8 w-8 p-0 rounded-lg hover:bg-white/80 dark:hover:bg-slate-800 transition-all duration-200" 
-                title="বিজ্ঞপ্তি"
-              >
-                <div className="relative">
-                  <Bell className="w-4 h-4" />
-                  {(stats?.pendingCollection && stats.pendingCollection > 0) && (
-                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border border-white animate-bounce"></div>
-                  )}
-                </div>
-              </Button>
-              
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-8 w-8 p-0 rounded-lg hover:bg-white/80 dark:hover:bg-slate-800 transition-all duration-200" 
-                onClick={() => refetchStats()}
-                data-testid="button-refresh-dashboard"
-                title="তাজা করুন"
-              >
-                <RefreshCw className="w-4 h-4" />
-              </Button>
-              
-              <Link to="/settings">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-8 w-8 p-0 rounded-lg hover:bg-white/80 dark:hover:bg-slate-800 transition-all duration-200" 
-                  title="সেটিংস"
-                >
-                  <Settings className="w-4 h-4" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Enhanced Header with Key Metrics */}
+      <DashboardHeaderEnhanced
+        timeOfDay={timeOfDay}
+        stats={stats}
+        isLoading={statsLoading}
+        onRefresh={() => refetchStats()}
+      />
 
       {/* Ultra-Compact Content for 916x412 Screen */}
       <div className="px-2 py-3 space-y-3">
