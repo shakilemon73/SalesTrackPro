@@ -298,7 +298,7 @@ export default function DashboardMobileOptimized() {
 
 
         {/* Ultra-Compact Business Intelligence for 916x412 */}
-        <Card className="border-0 shadow-md bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800 p-2">
+        <Card className="border-0 shadow-md bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800 p-2 min-h-[360px]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-2">
               <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
@@ -335,7 +335,7 @@ export default function DashboardMobileOptimized() {
             {/* Compact Scrollable Transactions Tab */}
             <TabsContent value="transactions" className="space-y-2 mt-3">
               {recentSales.length > 0 ? (
-                <div className="max-h-40 overflow-y-auto space-y-2 pr-1">
+                <div className="max-h-56 overflow-y-auto space-y-2 pr-1">
                   {recentSales.map((sale) => (
                     <div key={sale.id} className="bg-gradient-to-r from-white to-emerald-50/50 dark:from-slate-800 dark:to-emerald-900/10 rounded-lg p-2 border border-emerald-100/50 dark:border-emerald-800/30">
                       <div className="flex items-center justify-between">
@@ -393,7 +393,7 @@ export default function DashboardMobileOptimized() {
             {/* Compact Scrollable Customers Tab */}
             <TabsContent value="customers" className="space-y-2 mt-3">
               {customers.length > 0 ? (
-                <div className="max-h-40 overflow-y-auto space-y-2 pr-1">
+                <div className="max-h-56 overflow-y-auto space-y-2 pr-1">
                   {customers.slice(0, 10).map((customer) => (
                     <div key={customer.id} className="bg-gradient-to-r from-white to-blue-50/50 dark:from-slate-800 dark:to-blue-900/10 rounded-lg p-2 border border-blue-100/50 dark:border-blue-800/30">
                       <div className="flex items-center justify-between">
