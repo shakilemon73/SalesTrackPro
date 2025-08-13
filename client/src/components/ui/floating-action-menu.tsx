@@ -77,14 +77,14 @@ export default function FloatingActionMenu() {
 
       {/* FAB Menu */}
       <div className="fixed bottom-20 right-4 z-50">
-        {/* Action Items */}
+        {/* Action Items with Labels */}
         <AnimatePresence>
           {isOpen && (
             <div className="mb-4 space-y-3">
               {fabActions.map((action, index) => {
                 const IconComponent = action.icon;
                 return (
-                  <motion.button
+                  <motion.div
                     key={action.id}
                     initial={{ 
                       scale: 0, 
@@ -107,18 +107,33 @@ export default function FloatingActionMenu() {
                       stiffness: 500,
                       damping: 30
                     }}
-                    onClick={() => handleActionClick(action.path)}
-                    className={`
-                      flex items-center justify-center w-12 h-12 rounded-2xl shadow-lg
-                      ${action.bgColor} ${action.color}
-                      transform transition-transform duration-200
-                      hover:scale-110 active:scale-95
-                      border border-white/20
-                    `}
-                    whileTap={{ scale: 0.9 }}
+                    className="flex items-center justify-end space-x-3"
                   >
-                    <IconComponent size={20} />
-                  </motion.button>
+                    {/* Label */}
+                    <div className="
+                      bg-white/95 backdrop-blur-md px-3 py-2 rounded-xl shadow-lg
+                      border border-slate-200/80 min-w-fit
+                    ">
+                      <span className="text-xs font-semibold text-slate-800 bengali-font whitespace-nowrap">
+                        {action.label}
+                      </span>
+                    </div>
+                    
+                    {/* Button */}
+                    <motion.button
+                      onClick={() => handleActionClick(action.path)}
+                      className={`
+                        flex items-center justify-center w-12 h-12 rounded-2xl shadow-lg
+                        ${action.bgColor} ${action.color}
+                        transform transition-transform duration-200
+                        hover:scale-110 active:scale-95
+                        border border-white/20
+                      `}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <IconComponent size={20} />
+                    </motion.button>
+                  </motion.div>
                 );
               })}
             </div>
@@ -172,53 +187,7 @@ export default function FloatingActionMenu() {
           </AnimatePresence>
         </motion.button>
 
-        {/* Action Labels (when expanded) - Positioned correctly */}
-        <AnimatePresence>
-          {isOpen && (
-            <div className="absolute bottom-4 right-16 flex flex-col space-y-3">
-              {fabActions.map((action, index) => (
-                <motion.div
-                  key={`label-${action.id}`}
-                  initial={{ 
-                    opacity: 0,
-                    x: 10,
-                    scale: 0.8
-                  }}
-                  animate={{ 
-                    opacity: 1,
-                    x: 0,
-                    scale: 1
-                  }}
-                  exit={{ 
-                    opacity: 0,
-                    x: 10,
-                    scale: 0.8
-                  }}
-                  transition={{ 
-                    delay: index * 0.08 + 0.1,
-                    duration: 0.25,
-                    type: "spring",
-                    stiffness: 400,
-                    damping: 25
-                  }}
-                  className="flex items-center justify-end"
-                  style={{
-                    marginBottom: index === fabActions.length - 1 ? '0px' : '12px'
-                  }}
-                >
-                  <div className="
-                    bg-white/95 backdrop-blur-md px-3 py-2 rounded-xl shadow-lg
-                    border border-slate-200/80 min-w-fit
-                  ">
-                    <span className="text-xs font-semibold text-slate-800 bengali-font whitespace-nowrap">
-                      {action.label}
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </AnimatePresence>
+
       </div>
     </>
   );

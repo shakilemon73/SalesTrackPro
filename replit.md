@@ -6,6 +6,9 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 - **August 13, 2025**: Successfully migrated project from Replit Agent to standard Replit environment
+- **DOM Nesting Error Fixed**: Resolved invalid HTML structure in dashboard header by changing `<p>` tags to `<div>` tags
+- **Business Metrics Removed**: Removed business metrics bar from dashboard header as requested by user
+- **Floating Action Button Alignment Fixed**: Corrected text alignment issues for Bengali labels (বিক্রয়, গ্রাহক, খরচ) with their corresponding icons
 - **CSS ROOT PROBLEM FIXED**: Identified and permanently resolved persistent styling issues by eliminating CSS conflicts, duplications, and mismatched configurations
 - **Unified Design System**: Consolidated CSS variables, removed duplicate loading/animation definitions, and synchronized SHADCN/Tailwind configurations
 - **Mobile Optimization Complete**: Fully optimized dashboard "ব্যবসার খবর" section and all mobile layouts for 917x412 screen resolution
