@@ -298,6 +298,13 @@ export default function SalesEntryBottomSheet() {
       console.log("🔧 Auto-creating new customer:", data.customerName);
       
       try {
+        console.log("🔧 Attempting to create customer:", {
+          name: data.customerName.trim(),
+          phone_number: data.customerPhone || '',
+          address: data.customerAddress || '',
+          total_credit: 0
+        });
+        
         const newCustomer = await supabaseService.createCustomer(CURRENT_USER_ID, {
           name: data.customerName.trim(),
           phone_number: data.customerPhone || '',
@@ -305,8 +312,14 @@ export default function SalesEntryBottomSheet() {
           total_credit: 0
         });
         
-        // Update customer list and set as selected
+        console.log("✅ Customer created successfully:", newCustomer);
+        
+        // Clear cache and update customer list
+        const { clearCustomerCache } = await import('@/lib/cache-manager');
+        clearCustomerCache(CURRENT_USER_ID);
+        
         queryClient.invalidateQueries({ queryKey: ['customers'] });
+        queryClient.invalidateQueries({ queryKey: ['customers', CURRENT_USER_ID] });
         setSelectedCustomer(newCustomer);
         
         showToast(`✅ নতুন গ্রাহক ${data.customerName} স্বয়ংক্রিয়ভাবে যোগ করা হয়েছে`, 'success');
@@ -316,9 +329,10 @@ export default function SalesEntryBottomSheet() {
           createSaleMutation.mutate(data);
         }, 500);
         
-      } catch (error) {
+      } catch (error: any) {
         console.error("❌ Auto customer creation failed:", error);
-        showToast("❌ নতুন গ্রাহক তৈরিতে সমস্যা। ম্যানুয়ালি যোগ করুন।", 'error');
+        console.error("❌ Error message:", error?.message || 'Unknown error');
+        showToast(`❌ গ্রাহক তৈরিতে সমস্যা: ${error?.message || 'অজানা ত্রুটি'}`, 'error');
         return;
       }
     } else {

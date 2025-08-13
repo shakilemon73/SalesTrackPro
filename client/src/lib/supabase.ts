@@ -384,11 +384,13 @@ export const supabaseService = {
     
     const dbCustomer = {
       name: customer.name,
-      phone_number: customer.phone_number || null,
-      address: customer.address || null,
+      phone_number: customer.phone_number || '',
+      address: customer.address || '',
       user_id: userId,
-      total_credit: customer.total_credit || '0.00'
+      total_credit: customer.total_credit || 0
     };
+    
+    console.log('🔧 Database customer object:', dbCustomer);
     
     const { data, error } = await supabase
       .from('customers')
@@ -398,10 +400,11 @@ export const supabaseService = {
     
     if (error) {
       console.error('❌ Error creating customer:', error);
-      throw error;
+      console.error('❌ Error details:', JSON.stringify(error, null, 2));
+      throw new Error(`Customer creation failed: ${error.message}`);
     }
     
-    console.log('✅ Customer created:', data);
+    console.log('✅ Customer created successfully:', data);
     return data;
   },
 

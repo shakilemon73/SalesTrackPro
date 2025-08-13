@@ -135,3 +135,10 @@ export async function cachedQuery<T>(
   
   return data;
 }
+
+// Specific cache functions for the app
+export function clearCustomerCache(userId: string): void {
+  const customerCacheKey = createCacheKey('customers', userId);
+  cacheManager.clear(customerCacheKey);
+  console.log(`📦 CACHE: Cleared customer cache for user ${userId}`);
+}
