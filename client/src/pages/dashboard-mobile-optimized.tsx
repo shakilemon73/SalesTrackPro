@@ -311,15 +311,17 @@ export default function DashboardMobileOptimized() {
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">ব্যবসার খবর</h3>
               </div>
             </div>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="h-6 px-2 text-xs bengali-font font-medium text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all duration-200 rounded-md"
-              data-testid="button-live-status"
-            >
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse mr-1"></div>
-              লাইভ
-            </Button>
+            <Link to={activeTab === 'transactions' ? '/transactions' : '/customers'}>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="h-6 px-2 text-xs bengali-font font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 rounded-md group"
+                data-testid="button-view-all-dynamic"
+              >
+                <span>সব দেখুন</span>
+                <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
           </div>
           
           <Tabs defaultValue="transactions" onValueChange={setActiveTab} className="space-y-3">
@@ -386,17 +388,7 @@ export default function DashboardMobileOptimized() {
                 </div>
               )}
               
-              {/* View All Button for Transactions */}
-              <Link to="/transactions" className="block mt-3">
-                <Button 
-                  variant="ghost" 
-                  className="w-full text-xs py-2 bg-slate-100/50 hover:bg-slate-200/50 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 rounded-lg transition-all duration-200 group" 
-                  data-testid="button-view-all-transactions"
-                >
-                  <span className="bengali-font font-semibold">সব দেখুন</span>
-                  <ChevronRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+
             </TabsContent>
             
             {/* Compact Scrollable Customers Tab */}
@@ -456,17 +448,7 @@ export default function DashboardMobileOptimized() {
                 </div>
               )}
               
-              {/* View All Button for Customers */}
-              <Link to="/customers" className="block mt-3">
-                <Button 
-                  variant="ghost" 
-                  className="w-full text-xs py-2 bg-slate-100/50 hover:bg-slate-200/50 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 rounded-lg transition-all duration-200 group" 
-                  data-testid="button-view-all-customers"
-                >
-                  <span className="bengali-font font-semibold">সব দেখুন</span>
-                  <ChevronRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+
             </TabsContent>
           </Tabs>
         </Card>
