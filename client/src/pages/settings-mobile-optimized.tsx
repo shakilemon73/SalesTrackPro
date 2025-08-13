@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { supabaseService, DEMO_USER_ID } from "@/lib/supabase";
+import { useAuth } from "@/hooks/use-auth";
 import { 
   ArrowLeft, Settings, User, Bell, Shield, Database,
   Download, Upload, Moon, Sun, Smartphone, 
@@ -32,6 +33,8 @@ export default function SettingsMobileOptimized() {
   });
   
   const { toast } = useToast();
+  const { user, signOut } = useAuth();
+  const currentUserId = user?.id || DEMO_USER_ID;
 
   // Load saved settings
   useEffect(() => {
@@ -51,19 +54,35 @@ export default function SettingsMobileOptimized() {
 
   // Get actual data for statistics
   const { data: customers = [] } = useQuery({
-    queryKey: ['customers', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
+    queryKey: ['customers', currentUserId],
+    queryFn: () => supabaseService.getCustomers(currentUserId),
   });
 
   const { data: sales = [] } = useQuery({
-    queryKey: ['sales', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getSales(CURRENT_USER_ID),
+    queryKey: ['sales', currentUserId],
+    queryFn: () => supabaseService.getSales(currentUserId),
   });
 
   const { data: stats } = useQuery({
-    queryKey: ['dashboard', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getStats(CURRENT_USER_ID),
+    queryKey: ['dashboard', currentUserId],
+    queryFn: () => supabaseService.getStats(currentUserId),
   });
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "লগআউট সফল",
+        description: "আপনি সফলভাবে লগআউট হয়েছেন",
+      });
+    } catch (error) {
+      toast({
+        title: "সমস্যা হয়েছে",
+        description: "লগআউট করতে সমস্যা হয়েছে",
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleSettingsSave = () => {
     const settings = { notifications, autoBackup, darkMode };
@@ -424,7 +443,7 @@ export default function SettingsMobileOptimized() {
 
             <Button 
               variant="destructive" 
-              onClick={handleAppRefresh}
+              onClick={handleLogout}
               className="w-full justify-center text-sm h-10 mt-4"
               data-testid="button-logout"
             >

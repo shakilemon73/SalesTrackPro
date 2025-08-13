@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { toBengaliNumber, formatCurrency, getBengaliDate } from "@/lib/bengali-utils";
 import { Link } from "wouter";
-import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { supabaseService } from "@/lib/supabase";
+import { useAuth } from "@/hooks/use-auth";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,6 +27,7 @@ export default function DashboardMobileOptimized() {
   const [activeTab, setActiveTab] = useState('transactions');
   const [selectedView, setSelectedView] = useState('sales');
   const { toast } = useToast();
+  const { userId } = useAuth();
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -35,8 +37,8 @@ export default function DashboardMobileOptimized() {
   }, []);
 
   const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useQuery({
-    queryKey: ['dashboard', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getStats(CURRENT_USER_ID),
+    queryKey: ['dashboard', userId],
+    queryFn: () => supabaseService.getStats(userId),
     staleTime: 0,
     gcTime: 0,
     retry: 3,
@@ -44,20 +46,20 @@ export default function DashboardMobileOptimized() {
   });
 
   const { data: recentSales = [] } = useQuery({
-    queryKey: ['sales', CURRENT_USER_ID, 'recent'],
-    queryFn: () => supabaseService.getSales(CURRENT_USER_ID, 2),
+    queryKey: ['sales', userId, 'recent'],
+    queryFn: () => supabaseService.getSales(userId, 2),
     staleTime: 0,
     gcTime: 0,
   });
 
   const { data: lowStockProducts = [] } = useQuery({
-    queryKey: ['products', CURRENT_USER_ID, 'low-stock'],
-    queryFn: () => supabaseService.getLowStockProducts(CURRENT_USER_ID),
+    queryKey: ['products', userId, 'low-stock'],
+    queryFn: () => supabaseService.getLowStockProducts(userId),
   });
 
   const { data: customers = [] } = useQuery({
-    queryKey: ['customers', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
+    queryKey: ['customers', userId],
+    queryFn: () => supabaseService.getCustomers(userId),
     staleTime: 0,
     gcTime: 0,
   });

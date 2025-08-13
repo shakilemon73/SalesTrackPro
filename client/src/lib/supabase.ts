@@ -303,13 +303,21 @@ console.log('🔥 SUPABASE CLIENT: Created, testing connection...');
   }
 })();
 
-// Current user ID - now dynamically fetched from auth
-export const getCurrentUserId = () => {
-  return supabase.auth.getUser().then(({ data: { user } }) => user?.id || null);
+// Current user ID - dynamically fetched from auth
+export const getCurrentUserId = async (): Promise<string | null> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  return user?.id || null;
 };
 
-// Legacy constant for backward compatibility (will be removed)
-export const CURRENT_USER_ID = '11111111-1111-1111-1111-111111111111';
+// Get current user ID synchronously (for components that need immediate access)
+export const getCurrentUserIdSync = (): string | null => {
+  // This will only work if session is already loaded
+  const session = supabase.auth.getSession();
+  return session ? (session as any).data?.session?.user?.id || null : null;
+};
+
+// Legacy demo user ID (only used for fallback when no auth)
+export const DEMO_USER_ID = '11111111-1111-1111-1111-111111111111';
 
 // Database service functions - NO OFFLINE FALLBACKS, ONLY REAL DATA
 export const supabaseService = {

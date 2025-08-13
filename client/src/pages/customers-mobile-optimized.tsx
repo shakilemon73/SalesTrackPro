@@ -6,7 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { supabaseService } from "@/lib/supabase";
+import { useAuth } from "@/hooks/use-auth";
 import { 
   ArrowLeft, Search, UserPlus, Phone, MapPin,
   Users, TrendingUp, AlertCircle, Eye,
@@ -15,18 +16,19 @@ import {
 
 export default function CustomersMobileOptimized() {
   const [searchTerm, setSearchTerm] = useState("");
+  const { userId } = useAuth();
 
   const { data: customers = [], isLoading } = useQuery({
-    queryKey: ['customers', CURRENT_USER_ID],
+    queryKey: ['customers', userId],
     queryFn: async () => {
-      const data = await supabaseService.getCustomers(CURRENT_USER_ID);
+      const data = await supabaseService.getCustomers(userId);
       return data || [];
     }
   });
 
   const { data: sales = [] } = useQuery({
-    queryKey: ['sales', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getSales(CURRENT_USER_ID),
+    queryKey: ['sales', userId],
+    queryFn: () => supabaseService.getSales(userId),
   });
 
   const filteredCustomers = customers.filter(customer =>
@@ -37,8 +39,8 @@ export default function CustomersMobileOptimized() {
   // Calculate customer stats
   const getCustomerStats = (customerId: string) => {
     const customerSales = sales.filter(sale => sale.customer_id === customerId);
-    const totalPurchases = customerSales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || '0'), 0);
-    const totalDue = customerSales.reduce((sum, sale) => sum + parseFloat(sale.due_amount || '0'), 0);
+    const totalPurchases = customerSales.reduce((sum, sale) => sum + parseFloat(String(sale.total_amount || '0')), 0);
+    const totalDue = customerSales.reduce((sum, sale) => sum + parseFloat(String(sale.due_amount || '0')), 0);
     return { totalPurchases, totalDue, salesCount: customerSales.length };
   };
 

@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import AuthGuard from "@/components/auth/auth-guard";
 
 import NotFoundMobileOptimized from "@/pages/not-found-mobile-optimized";
 import DashboardMobileOptimized from "@/pages/dashboard-mobile-optimized";
@@ -68,37 +69,28 @@ function App() {
     // Initialize Android APK optimizations
     initializeAndroidOptimizations();
     
-    // Check database connection
-    const checkConnection = async () => {
+    // Test database connection (will only work after authentication)
+    const testConnection = async () => {
       try {
-        const { data, error } = await supabase
-          .from('customers')
-          .select('*')
-          .eq('user_id', '11111111-1111-1111-1111-111111111111');
-          
-        if (error) {
-          console.error('Database connection error:', error);
-        } else {
-          console.log('Database connected successfully. Total customers:', data?.length || 0);
-          if (data && data.length > 0) {
-            console.log('Sample customer:', data[0].name);
-          }
-          
-
+        const { count, error } = await supabase.from('customers').select('count', { count: 'exact', head: true });
+        if (!error) {
+          console.log('✅ Database connection verified');
         }
       } catch (error) {
-        console.error('Database check failed:', error);
+        console.log('🔄 Database connection will be available after authentication');
       }
     };
     
-    checkConnection();
+    testConnection();
   }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Router />
+        <AuthGuard>
+          <Router />
+        </AuthGuard>
       </TooltipProvider>
     </QueryClientProvider>
   );
