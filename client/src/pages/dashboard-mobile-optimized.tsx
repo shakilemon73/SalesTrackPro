@@ -92,57 +92,45 @@ export default function DashboardMobileOptimized() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pb-20">
       
-      {/* Compact Header - Reduced Height */}
-      <div className="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50">
-        <div className="px-4 py-3">
+      {/* Minimalist Header - Don Norman's Discoverability & Steve Krug's Clarity */}
+      <div className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-b border-slate-200/30 dark:border-slate-700/30">
+        <div className="px-4 py-4">
           <div className="flex items-center justify-between">
+            {/* Left: Clean Identity - Dieter Rams Minimalism */}
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <Avatar className="h-8 w-8 ring-2 ring-emerald-500/20">
-                  <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-xs font-bold">
+                <Avatar className="h-10 w-10 ring-2 ring-emerald-500/10 shadow-sm">
+                  <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white text-sm font-semibold">
                     দহ
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border border-white"></div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white shadow-sm"></div>
               </div>
               <div>
-                <h1 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">
-                  {timeOfDay}!
+                <h1 className="text-base font-bold text-slate-900 dark:text-white bengali-font leading-tight">
+                  {timeOfDay}
                 </h1>
-                <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center space-x-1">
-                  <Clock className="w-3 h-3" />
-                  <span>{getBengaliDate()}</span>
-                  <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+                <div className="text-xs text-slate-600 dark:text-slate-400 flex items-center space-x-1 mt-0.5">
+                  <span className="bengali-font">{getBengaliDate()}</span>
                 </div>
               </div>
             </div>
             
-            <div className="flex items-center space-x-1">
+            {/* Right: Essential Actions Only - Alan Cooper's Goal-Oriented Design */}
+            <div className="flex items-center space-x-2">
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="h-8 w-8 p-0" 
+                className="h-10 w-10 p-0 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" 
                 onClick={() => refetchStats()}
                 data-testid="button-refresh-dashboard"
+                title="রিফ্রেশ করুন"
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="w-5 h-5" />
               </Button>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 relative">
-                <Bell className="w-4 h-4" />
-                {lowStockProducts.length > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs bg-red-500 text-white">
-                    {lowStockProducts.length}
-                  </Badge>
-                )}
-              </Button>
-              <Link to="/reports">
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <BarChart3 className="w-4 h-4" />
-                </Button>
-              </Link>
               <Link to="/settings">
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <Settings className="w-4 h-4" />
+                <Button variant="ghost" size="sm" className="h-10 w-10 p-0 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="সেটিংস">
+                  <Settings className="w-5 h-5" />
                 </Button>
               </Link>
             </div>
@@ -150,211 +138,247 @@ export default function DashboardMobileOptimized() {
         </div>
       </div>
 
-      {/* Content Container - Optimized Spacing */}
-      <div className="px-4 py-4 space-y-4">
+      {/* Content Container - Julie Zhuo's Systems Thinking & 8px Grid */}
+      <div className="px-4 py-6 space-y-6">
         
-        {/* Compact KPI Grid - Only 2 Cards */}
-        <div className="grid grid-cols-2 gap-3">
-          <Card className="border-0 shadow-md bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-4 relative overflow-hidden">
-            <div className="space-y-1">
+        {/* Essential Metrics - Susan Weinschenk's Information Chunking & Aarron Walter's Emotional Design */}
+        <div className="grid grid-cols-2 gap-4">
+          {/* Today's Sales - Primary Action (Green = Success/Trust) */}
+          <Card className="border-0 shadow-sm bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 p-5 relative overflow-hidden hover:shadow-md transition-all duration-300">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-xs text-emerald-100 bengali-font">আজকের বিক্রয়</p>
-                <TrendingUp className="w-4 h-4 text-emerald-200" />
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shadow-sm">
+                    <TrendingUp className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-sm text-emerald-700 dark:text-emerald-300 bengali-font font-medium">আজকের বিক্রয়</p>
+                </div>
               </div>
-              <p className="text-xl font-bold number-font">
-                {formatCurrency(stats?.todaySales || 0)}
-              </p>
-              <div className="flex items-center space-x-1">
-                <ArrowUpRight className="w-3 h-3 text-emerald-200" />
-                <span className="text-emerald-200 text-xs">
-                  +{toBengaliNumber(salesGrowth)}%
-                </span>
+              <div>
+                <p className="text-2xl font-bold text-emerald-800 dark:text-emerald-200 number-font leading-tight">
+                  {formatCurrency(stats?.todaySales || 0)}
+                </p>
+                <div className="flex items-center space-x-1 mt-1">
+                  <ArrowUpRight className="w-3 h-3 text-emerald-600" />
+                  <span className="text-emerald-600 text-xs bengali-font">
+                    +{toBengaliNumber(salesGrowth)}% বৃদ্ধি
+                  </span>
+                </div>
               </div>
             </div>
-            <div className="absolute top-2 right-2 w-2 h-2 bg-yellow-400 rounded-full"></div>
+            {/* Subtle visual indicator */}
+            <div className="absolute -top-2 -right-2 w-16 h-16 bg-emerald-200/30 rounded-full blur-xl"></div>
           </Card>
 
-          <Card className="border-0 shadow-md bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-4">
-            <div className="space-y-1">
+          {/* Pending Collection - Secondary but Important (Blue = Trust/Reliability) */}
+          <Card className="border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-5 relative overflow-hidden hover:shadow-md transition-all duration-300">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-xs text-blue-100 bengali-font">বাকি আদায়</p>
-                <Wallet className="w-4 h-4 text-blue-200" />
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center shadow-sm">
+                    <Wallet className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-sm text-blue-700 dark:text-blue-300 bengali-font font-medium">বাকি আদায়</p>
+                </div>
               </div>
-              <p className="text-xl font-bold number-font">
-                {formatCurrency(stats?.pendingCollection || 0)}
-              </p>
-              <p className="text-blue-200 text-xs">
-                {toBengaliNumber(stats?.totalCustomers || 0)} গ্রাহক
-              </p>
+              <div>
+                <p className="text-2xl font-bold text-blue-800 dark:text-blue-200 number-font leading-tight">
+                  {formatCurrency(stats?.pendingCollection || 0)}
+                </p>
+                <p className="text-blue-600 text-xs bengali-font mt-1">
+                  {toBengaliNumber(stats?.totalCustomers || 0)} জন গ্রাহক
+                </p>
+              </div>
             </div>
+            {/* Subtle visual indicator */}
+            <div className="absolute -top-2 -right-2 w-16 h-16 bg-blue-200/30 rounded-full blur-xl"></div>
           </Card>
         </div>
 
-        {/* Quick Actions - 4x4 Grid Layout */}
-        <Card className="border-0 shadow-md p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">ব্যবহার করুন</h3>
-            <Activity className="w-4 h-4 text-emerald-600" />
+        {/* Action Grid - Luke Wroblewski's Mobile-First & 44px Touch Targets */}
+        <Card className="border-0 shadow-sm bg-white dark:bg-slate-900 p-4">
+          <div className="flex items-center space-x-2 mb-4">
+            <div className="w-6 h-6 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center">
+              <Activity className="w-4 h-4 text-emerald-600" />
+            </div>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white bengali-font">ব্যবহার করুন</h3>
           </div>
           
-          {/* First Row - 4 buttons */}
+          {/* First Row - Primary Actions */}
           <div className="grid grid-cols-4 gap-3 mb-3">
-            <Link to="/sales/new" data-testid="link-sales-new">
-              <Button size="sm" className="w-full h-16 bg-emerald-500 hover:bg-emerald-600 text-white flex flex-col space-y-1 p-2">
-                <ShoppingCart className="w-5 h-5" />
-                <span className="text-xs bengali-font">বিক্রয় করুন</span>
+            <Link to="/sales/new" data-testid="link-sales-new" className="block">
+              <Button className="w-full h-20 bg-emerald-500 hover:bg-emerald-600 text-white flex flex-col space-y-1.5 p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
+                <ShoppingCart className="w-6 h-6" />
+                <span className="text-xs bengali-font font-medium leading-tight text-center">বিক্রয় করুন</span>
               </Button>
             </Link>
             
-            <Link to="/customers/new" data-testid="link-customer-new">
-              <Button size="sm" variant="outline" className="w-full h-16 flex flex-col space-y-1 p-2 border-blue-200 hover:bg-blue-50">
-                <Users className="w-5 h-5 text-blue-600" />
-                <span className="text-xs bengali-font">নতুন গ্রাহক</span>
+            <Link to="/customers/new" data-testid="link-customer-new" className="block">
+              <Button variant="outline" className="w-full h-20 flex flex-col space-y-1.5 p-3 border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200">
+                <Users className="w-6 h-6 text-blue-600" />
+                <span className="text-xs bengali-font font-medium leading-tight text-center text-blue-700 dark:text-blue-400">নতুন গ্রাহক</span>
               </Button>
             </Link>
             
-            <Link to="/collection" data-testid="link-collection">
-              <Button size="sm" variant="outline" className="w-full h-16 flex flex-col space-y-1 p-2 border-purple-200 hover:bg-purple-50">
-                <Wallet className="w-5 h-5 text-purple-600" />
-                <span className="text-xs bengali-font">আদায় করুন</span>
+            <Link to="/collection" data-testid="link-collection" className="block">
+              <Button variant="outline" className="w-full h-20 flex flex-col space-y-1.5 p-3 border-purple-200 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all duration-200">
+                <Wallet className="w-6 h-6 text-purple-600" />
+                <span className="text-xs bengali-font font-medium leading-tight text-center text-purple-700 dark:text-purple-400">আদায় করুন</span>
               </Button>
             </Link>
             
-            <Link to="/inventory" data-testid="link-inventory">
-              <Button size="sm" variant="outline" className="w-full h-16 flex flex-col space-y-1 p-2 border-orange-200 hover:bg-orange-50">
-                <Package className="w-5 h-5 text-orange-600" />
-                <span className="text-xs bengali-font">স্টক দেখুন</span>
+            <Link to="/inventory" data-testid="link-inventory" className="block">
+              <Button variant="outline" className="w-full h-20 flex flex-col space-y-1.5 p-3 border-orange-200 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-xl transition-all duration-200">
+                <Package className="w-6 h-6 text-orange-600" />
+                <span className="text-xs bengali-font font-medium leading-tight text-center text-orange-700 dark:text-orange-400">স্টক দেখুন</span>
               </Button>
             </Link>
           </div>
           
-          {/* Second Row - 4 buttons */}
+          {/* Second Row - Secondary Actions */}
           <div className="grid grid-cols-4 gap-3">
-            <Link to="/expenses/new" data-testid="link-expense-new">
-              <Button size="sm" variant="outline" className="w-full h-16 flex flex-col space-y-1 p-2 border-red-200 hover:bg-red-50">
-                <TrendingDown className="w-5 h-5 text-red-600" />
-                <span className="text-xs bengali-font">খরচ লিখুন</span>
+            <Link to="/expenses/new" data-testid="link-expense-new" className="block">
+              <Button variant="outline" className="w-full h-20 flex flex-col space-y-1.5 p-3 border-red-200 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all duration-200">
+                <TrendingDown className="w-6 h-6 text-red-600" />
+                <span className="text-xs bengali-font font-medium leading-tight text-center text-red-700 dark:text-red-400">খরচ লিখুন</span>
               </Button>
             </Link>
             
-            <Link to="/transactions" data-testid="link-transactions">
-              <Button size="sm" variant="outline" className="w-full h-16 flex flex-col space-y-1 p-2 border-indigo-200 hover:bg-indigo-50">
-                <Receipt className="w-5 h-5 text-indigo-600" />
-                <span className="text-xs bengali-font">দেনা পাওনা</span>
+            <Link to="/transactions" data-testid="link-transactions" className="block">
+              <Button variant="outline" className="w-full h-20 flex flex-col space-y-1.5 p-3 border-indigo-200 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-xl transition-all duration-200">
+                <Receipt className="w-6 h-6 text-indigo-600" />
+                <span className="text-xs bengali-font font-medium leading-tight text-center text-indigo-700 dark:text-indigo-400">দেনা পাওনা</span>
               </Button>
             </Link>
             
-            <Button size="sm" variant="outline" className="w-full h-16 flex flex-col space-y-1 p-2 border-gray-200 hover:bg-gray-50" data-testid="button-draft">
-              <FileText className="w-5 h-5 text-gray-600" />
-              <span className="text-xs bengali-font">খসড়া করুন</span>
+            <Button variant="outline" className="w-full h-20 flex flex-col space-y-1.5 p-3 border-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all duration-200" data-testid="button-draft">
+              <FileText className="w-6 h-6 text-slate-600" />
+              <span className="text-xs bengali-font font-medium leading-tight text-center text-slate-700 dark:text-slate-400">খসড়া করুন</span>
             </Button>
             
             <Button 
-              size="sm" 
               variant="outline" 
-              className="w-full h-16 flex flex-col space-y-1 p-2 border-green-200 hover:bg-green-50"
+              className="w-full h-20 flex flex-col space-y-1.5 p-3 border-green-200 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-xl transition-all duration-200"
               onClick={() => toast({ title: "WhatsApp রিপোর্ট", description: "রিপোর্ট পাঠানো হচ্ছে..." })}
               data-testid="button-send-message"
             >
-              <MessageCircle className="w-5 h-5 text-green-600" />
-              <span className="text-xs bengali-font">মেসেজ পাঠান</span>
+              <MessageCircle className="w-6 h-6 text-green-600" />
+              <span className="text-xs bengali-font font-medium leading-tight text-center text-green-700 dark:text-green-400">মেসেজ পাঠান</span>
             </Button>
           </div>
         </Card>
 
 
 
-        {/* Recent Activity - Always Expanded with Tabs */}
-        <Card className="border-0 shadow-md p-4">
-          <div className="flex items-center space-x-2 mb-4">
-            <Activity className="w-4 h-4 text-slate-600" />
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">
+        {/* Activity Overview - Steve Krug's Scannability & Susan Weinschenk's Information Chunking */}
+        <Card className="border-0 shadow-sm bg-white dark:bg-slate-900 p-4">
+          <div className="flex items-center space-x-2 mb-5">
+            <div className="w-6 h-6 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center">
+              <Activity className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+            </div>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white bengali-font">
               সাম্প্রতিক কার্যকলাপ
             </h3>
           </div>
           
           <Tabs defaultValue="transactions" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-3">
-              <TabsTrigger value="transactions" className="text-xs bengali-font" data-testid="tab-transactions">
+            <TabsList className="grid w-full grid-cols-2 mb-4 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+              <TabsTrigger 
+                value="transactions" 
+                className="text-sm bengali-font font-medium py-2.5 rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+                data-testid="tab-transactions"
+              >
                 সাম্প্রতিক লেনদেন
               </TabsTrigger>
-              <TabsTrigger value="customers" className="text-xs bengali-font" data-testid="tab-customers">
+              <TabsTrigger 
+                value="customers" 
+                className="text-sm bengali-font font-medium py-2.5 rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+                data-testid="tab-customers"
+              >
                 গ্রাহক তালিকা
               </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="transactions" className="space-y-2">
+            <TabsContent value="transactions" className="space-y-3">
               {recentSales.length > 0 ? (
                 recentSales.map((sale) => (
-                  <div key={sale.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div key={sale.id} className="flex items-center justify-between p-4 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                        <ArrowUpRight className="w-5 h-5 text-green-600" />
+                      <div className="w-12 h-12 bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900/30 dark:to-emerald-800/30 rounded-xl flex items-center justify-center">
+                        <ArrowUpRight className="w-5 h-5 text-emerald-600" />
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-900 dark:text-white bengali-font">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white bengali-font truncate">
                           {sale.customer_name}
                         </p>
-                        <p className="text-xs text-slate-500">{sale.payment_method}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 bengali-font mt-0.5">
+                          {sale.payment_method}
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold text-green-600 number-font">
+                      <p className="text-base font-bold text-emerald-600 dark:text-emerald-400 number-font">
                         +{formatCurrency(Number(sale.total_amount))}
                       </p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-slate-400 mt-0.5">
                         {new Date(sale.created_at).toLocaleDateString('bn-BD')}
                       </p>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-6">
-                  <Clock className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-sm text-slate-500 bengali-font">আজকে কোনো বিক্রয় নেই</p>
+                <div className="text-center py-8 bg-slate-50/30 dark:bg-slate-800/30 rounded-xl">
+                  <Clock className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+                  <p className="text-sm text-slate-500 bengali-font font-medium">আজকে কোনো বিক্রয় নেই</p>
+                  <p className="text-xs text-slate-400 bengali-font mt-1">নতুন বিক্রয় যোগ করুন</p>
                 </div>
               )}
-              <Link to="/transactions">
-                <Button variant="ghost" size="sm" className="w-full text-xs mt-3" data-testid="button-view-all-transactions">
-                  সব লেনদেন দেখুন
+              <Link to="/transactions" className="block">
+                <Button variant="ghost" className="w-full text-sm py-3 mt-4 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-testid="button-view-all-transactions">
+                  <span className="bengali-font">সব লেনদেন দেখুন</span>
+                  <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </TabsContent>
             
-            <TabsContent value="customers" className="space-y-2">
+            <TabsContent value="customers" className="space-y-3">
               {customers.length > 0 ? (
                 customers.slice(0, 5).map((customer) => (
-                  <div key={customer.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div key={customer.id} className="flex items-center justify-between p-4 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl flex items-center justify-center">
                         <Users className="w-5 h-5 text-blue-600" />
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-900 dark:text-white bengali-font">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white bengali-font truncate">
                           {customer.name}
                         </p>
-                        <p className="text-xs text-slate-500">{customer.phone_number}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 number-font mt-0.5">
+                          {customer.phone_number}
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className={`text-sm font-bold number-font ${customer.total_credit > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                        {customer.total_credit > 0 ? `+${formatCurrency(customer.total_credit)}` : '০'}
+                      <p className={`text-base font-bold number-font ${customer.total_credit > 0 ? 'text-red-500' : 'text-emerald-600'}`}>
+                        {customer.total_credit > 0 ? `+${formatCurrency(customer.total_credit)}` : '০ টাকা'}
                       </p>
-                      <p className="text-xs text-slate-400 bengali-font">
-                        {customer.total_credit > 0 ? 'ক্রেডিট' : 'পেইড'}
+                      <p className={`text-xs font-medium mt-0.5 bengali-font ${customer.total_credit > 0 ? 'text-red-400' : 'text-emerald-500'}`}>
+                        {customer.total_credit > 0 ? 'বাকি আছে' : 'পরিশোধিত'}
                       </p>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-6">
-                  <Users className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-sm text-slate-500 bengali-font">কোনো গ্রাহক নেই</p>
+                <div className="text-center py-8 bg-slate-50/30 dark:bg-slate-800/30 rounded-xl">
+                  <Users className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+                  <p className="text-sm text-slate-500 bengali-font font-medium">কোনো গ্রাহক নেই</p>
+                  <p className="text-xs text-slate-400 bengali-font mt-1">নতুন গ্রাহক যোগ করুন</p>
                 </div>
               )}
-              <Link to="/customers">
-                <Button variant="ghost" size="sm" className="w-full text-xs mt-3" data-testid="button-view-all-customers">
-                  সব গ্রাহক দেখুন
+              <Link to="/customers" className="block">
+                <Button variant="ghost" className="w-full text-sm py-3 mt-4 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-testid="button-view-all-customers">
+                  <span className="bengali-font">সব গ্রাহক দেখুন</span>
+                  <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </TabsContent>
