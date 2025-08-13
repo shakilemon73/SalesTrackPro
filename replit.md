@@ -9,6 +9,8 @@ Preferred communication style: Simple, everyday language.
 - **Migration Completed**: Fixed all authentication issues, RLS policy violations resolved, TypeScript errors addressed
 - **Authentication Fixed**: Removed DEMO_USER_ID fallback, added proper null checks for userId across all components
 - **Database Integration Verified**: Supabase connection working properly with real user authentication
+- **RLS Policy Issue Fixed**: Added user profile creation during customer creation to resolve RLS policy violations
+- **Auto Customer Creation Fixed**: Enhanced customer creation with proper user profile verification
 - **Authentication System Updated**: Changed from Bangladesh phone OTP to email-based user registration and login system
 - **Real User Authentication**: Implemented proper Supabase authentication with email/password, including automatic user profile creation
 - **User Isolation Complete**: All CURRENT_USER_ID references replaced with dynamic useAuth hook across all components

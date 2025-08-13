@@ -390,6 +390,34 @@ export const supabaseService = {
   async createCustomer(userId: string, customer: InsertCustomer): Promise<Customer> {
     console.log('🔥 Creating customer:', customer);
     
+    // First ensure the user profile exists
+    try {
+      const { data: currentUser } = await supabase.auth.getUser();
+      if (currentUser.user && currentUser.user.id === userId) {
+        // Try to create or update user profile
+        const { error: profileError } = await supabase
+          .from('users')
+          .upsert({
+            id: userId,
+            email: currentUser.user.email || '',
+            business_name: 'দোকান',
+            username: currentUser.user.email?.split('@')[0] || 'user',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, { 
+            onConflict: 'id' 
+          });
+        
+        if (profileError) {
+          console.warn('⚠️ Profile upsert warning:', profileError);
+        } else {
+          console.log('✅ User profile ensured for:', userId);
+        }
+      }
+    } catch (profileErr) {
+      console.warn('⚠️ Profile check warning:', profileErr);
+    }
+    
     const dbCustomer = {
       name: customer.name,
       phone_number: customer.phone_number || '',
