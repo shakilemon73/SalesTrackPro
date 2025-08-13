@@ -300,139 +300,197 @@ export default function DashboardMobileOptimized() {
 
 
 
-        {/* Ultra-Compact Business Intelligence for 916x412 */}
-        <Card className="border-0 shadow-md bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800 p-2 min-h-[480px]">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-2">
-              <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
-                <div className="text-white text-sm">📈</div>
+        {/* World-Class Business Intelligence Dashboard */}
+        <Card className="border-0 shadow-lg bg-white dark:bg-slate-900 rounded-2xl overflow-hidden">
+          {/* Modern Header with Better Hierarchy */}
+          <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-850 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 00-2-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white bengali-font">ব্যবসার খবর</h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 bengali-font">সাম্প্রতিক কার্যকলাপ</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">ব্যবসার খবর</h3>
-              </div>
+              <Link to={activeTab === 'transactions' ? '/transactions' : '/customers'}>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="h-8 px-3 text-xs bengali-font font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all duration-200 rounded-lg group border border-indigo-200 dark:border-indigo-800"
+                  data-testid="button-view-all-dynamic"
+                >
+                  <span>সব দেখুন</span>
+                  <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                </Button>
+              </Link>
             </div>
-            <Link to={activeTab === 'transactions' ? '/transactions' : '/customers'}>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="h-6 px-2 text-xs bengali-font font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 rounded-md group"
-                data-testid="button-view-all-dynamic"
-              >
-                <span>সব দেখুন</span>
-                <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
           </div>
-          
-          <Tabs defaultValue="transactions" onValueChange={setActiveTab} className="space-y-3">
-            <TabsList className="grid grid-cols-2 w-full bg-slate-100/50 dark:bg-slate-800/50 rounded-lg p-1 backdrop-blur-sm">
-              <TabsTrigger 
-                value="transactions" 
-                className="text-xs bengali-font font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all duration-200 py-2"
-                data-testid="tab-transactions"
-              >
-                🛒 বিক্রয়
-              </TabsTrigger>
-              <TabsTrigger 
-                value="customers" 
-                className="text-xs bengali-font font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all duration-200 py-2"
-                data-testid="tab-customers"
-              >
-                👥 গ্রাহক
-              </TabsTrigger>
-            </TabsList>
+
+          {/* Enhanced Tab System */}
+          <div className="p-4">
+            <Tabs defaultValue="transactions" onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid grid-cols-2 w-full bg-slate-100 dark:bg-slate-800 rounded-xl p-1 h-12">
+                <TabsTrigger 
+                  value="transactions" 
+                  className="text-sm bengali-font font-semibold data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:shadow-md rounded-lg transition-all duration-300 py-2.5 relative group"
+                  data-testid="tab-transactions"
+                >
+                  <div className="flex items-center space-x-2">
+                    <div className="w-5 h-5 bg-gradient-to-br from-emerald-400 to-green-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                      </svg>
+                    </div>
+                    <span>বিক্রয়</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="customers" 
+                  className="text-sm bengali-font font-semibold data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:shadow-md rounded-lg transition-all duration-300 py-2.5 relative group"
+                  data-testid="tab-customers"
+                >
+                  <div className="flex items-center space-x-2">
+                    <div className="w-5 h-5 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                      </svg>
+                    </div>
+                    <span>গ্রাহক</span>
+                  </div>
+                </TabsTrigger>
+              </TabsList>
             
-            {/* Optimized Dense List - Transactions Tab */}
-            <TabsContent value="transactions" className="mt-2">
-              {recentSales.length > 0 ? (
-                <div className="max-h-80 overflow-y-auto">
-                  <div className="space-y-1">
+              {/* Premium Sales List */}
+              <TabsContent value="transactions" className="mt-4">
+                {recentSales.length > 0 ? (
+                  <div className="space-y-2 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
                     {recentSales.map((sale, index) => (
-                      <div key={sale.id} className="flex items-center justify-between py-2 px-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-700 last:border-b-0">
-                        <div className="flex items-center space-x-3 flex-1 min-w-0">
-                          <div className="w-2 h-2 bg-emerald-500 rounded-full flex-shrink-0"></div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-slate-900 dark:text-white bengali-font truncate">
-                              {sale.customer_name}
-                            </p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 bengali-font">
-                              {sale.payment_method}
-                            </p>
+                      <div key={sale.id} className="group relative bg-gradient-to-r from-emerald-50/50 to-green-50/30 dark:from-emerald-900/20 dark:to-green-900/10 rounded-xl p-3 hover:shadow-md hover:scale-[1.02] transition-all duration-300 border border-emerald-100/50 dark:border-emerald-800/30">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3 flex-1 min-w-0">
+                            <div className="relative">
+                              <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-green-500 rounded-xl flex items-center justify-center shadow-sm">
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                </svg>
+                              </div>
+                              {sale.due_amount > 0 && (
+                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full border-2 border-white"></div>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-bold text-slate-900 dark:text-white bengali-font truncate">
+                                {sale.customer_name}
+                              </p>
+                              <div className="flex items-center space-x-2 mt-0.5">
+                                <span className="text-xs text-emerald-600 dark:text-emerald-400 bengali-font font-medium px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
+                                  {sale.payment_method}
+                                </span>
+                                <span className="text-xs text-slate-500 dark:text-slate-400 bengali-font">
+                                  {new Date(sale.sale_date).toLocaleDateString('bn-BD')}
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        <div className="text-right flex-shrink-0 ml-2">
-                          <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 number-font">
-                            ৳{formatCurrency(Number(sale.total_amount))}
-                          </p>
-                          {sale.due_amount > 0 && (
-                            <p className="text-xs text-orange-500 dark:text-orange-400 bengali-font">
-                              বাকি: ৳{formatCurrency(sale.due_amount)}
+                          <div className="text-right flex-shrink-0 ml-3">
+                            <p className="text-lg font-black text-emerald-600 dark:text-emerald-400 number-font">
+                              ৳{formatCurrency(Number(sale.total_amount))}
                             </p>
-                          )}
+                            {sale.due_amount > 0 && (
+                              <p className="text-xs text-orange-600 dark:text-orange-400 bengali-font font-semibold bg-orange-100 dark:bg-orange-900/30 px-2 py-0.5 rounded-full mt-1">
+                                বাকি: ৳{formatCurrency(sale.due_amount)}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
-              ) : (
-                <div className="text-center py-8 text-slate-400 dark:text-slate-500">
-                  <div className="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <span className="text-sm">💰</span>
+                ) : (
+                  <div className="text-center py-12 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700">
+                    <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                      </svg>
+                    </div>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font mb-1">আজ কোনো বিক্রয় হয়নি</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 bengali-font">প্রথম বিক্রয় যোগ করুন এবং আপনার ব্যবসা শুরু করুন</p>
                   </div>
-                  <p className="text-xs bengali-font">আজ কোনো বিক্রয় হয়নি</p>
-                </div>
-              )}
-            </TabsContent>
+                )}
+              </TabsContent>
             
-            {/* Optimized Dense List - Customers Tab */}
-            <TabsContent value="customers" className="mt-2">
-              {customers.length > 0 ? (
-                <div className="max-h-80 overflow-y-auto">
-                  <div className="space-y-1">
+              {/* Premium Customers List */}
+              <TabsContent value="customers" className="mt-4">
+                {customers.length > 0 ? (
+                  <div className="space-y-2 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
                     {customers.slice(0, 10).map((customer, index) => (
-                      <div key={customer.id} className="flex items-center justify-between py-2 px-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-700 last:border-b-0">
-                        <div className="flex items-center space-x-3 flex-1 min-w-0">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-slate-900 dark:text-white bengali-font truncate">
-                              {customer.name}
-                            </p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 bengali-font truncate">
-                              {customer.phone_number}
-                            </p>
+                      <div key={customer.id} className="group relative bg-gradient-to-r from-blue-50/50 to-indigo-50/30 dark:from-blue-900/20 dark:to-indigo-900/10 rounded-xl p-3 hover:shadow-md hover:scale-[1.02] transition-all duration-300 border border-blue-100/50 dark:border-blue-800/30">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3 flex-1 min-w-0">
+                            <div className="relative">
+                              <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center shadow-sm">
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                              </div>
+                              {customer.total_credit > 0 && (
+                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></div>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-bold text-slate-900 dark:text-white bengali-font truncate">
+                                {customer.name}
+                              </p>
+                              <div className="flex items-center space-x-2 mt-0.5">
+                                <span className="text-xs text-blue-600 dark:text-blue-400 bengali-font font-medium px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                                  {customer.phone_number}
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        <div className="text-right flex-shrink-0 ml-2">
-                          {customer.total_credit > 0 ? (
-                            <div>
-                              <p className="text-sm font-bold text-red-500 dark:text-red-400 number-font">
-                                ৳{formatCurrency(customer.total_credit)}
-                              </p>
-                              <p className="text-xs text-red-400 bengali-font">বাকি</p>
-                            </div>
-                          ) : (
-                            <div>
-                              <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 number-font">
-                                ৳০
-                              </p>
-                              <p className="text-xs text-emerald-500 bengali-font">পূর্ণ</p>
-                            </div>
-                          )}
+                          <div className="text-right flex-shrink-0 ml-3">
+                            {customer.total_credit > 0 ? (
+                              <div>
+                                <p className="text-lg font-black text-red-500 dark:text-red-400 number-font">
+                                  ৳{formatCurrency(customer.total_credit)}
+                                </p>
+                                <p className="text-xs text-red-600 dark:text-red-400 bengali-font font-semibold bg-red-100 dark:bg-red-900/30 px-2 py-0.5 rounded-full mt-1">
+                                  বাকি আছে
+                                </p>
+                              </div>
+                            ) : (
+                              <div>
+                                <p className="text-lg font-black text-emerald-600 dark:text-emerald-400 number-font">
+                                  ৳০
+                                </p>
+                                <p className="text-xs text-emerald-600 dark:text-emerald-400 bengali-font font-semibold bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full mt-1">
+                                  সম্পূর্ণ
+                                </p>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
-              ) : (
-                <div className="text-center py-8 text-slate-400 dark:text-slate-500">
-                  <div className="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <span className="text-sm">👥</span>
+                ) : (
+                  <div className="text-center py-12 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font mb-1">কোনো গ্রাহক নেই</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 bengali-font">প্রথম গ্রাহক যোগ করুন এবং সম্পর্ক গড়ে তুলুন</p>
                   </div>
-                  <p className="text-xs bengali-font">কোনো গ্রাহক নেই</p>
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
         </Card>
       </div>
       
