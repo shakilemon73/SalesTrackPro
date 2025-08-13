@@ -43,6 +43,9 @@ export default function CustomerAddMobileOptimized() {
 
   const createCustomerMutation = useMutation({
     mutationFn: async (customerData: any) => {
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
       return await supabaseService.createCustomer(userId, customerData);
     },
     onSuccess: () => {

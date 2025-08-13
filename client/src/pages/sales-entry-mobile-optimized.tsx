@@ -57,16 +57,21 @@ export default function SalesEntryMobileOptimized() {
 
   const { data: customers = [] } = useQuery({
     queryKey: ['customers', userId],
-    queryFn: () => supabaseService.getCustomers(userId),
+    queryFn: () => userId ? supabaseService.getCustomers(userId) : Promise.resolve([]),
+    enabled: !!userId,
   });
 
   const { data: products = [] } = useQuery({
     queryKey: ['products', userId],
-    queryFn: () => supabaseService.getProducts(userId),
+    queryFn: () => userId ? supabaseService.getProducts(userId) : Promise.resolve([]),
+    enabled: !!userId,
   });
 
   const createSaleMutation = useMutation({
     mutationFn: async (formData: any) => {
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
       const { getBangladeshTimeISO } = await import('@/lib/bengali-utils');
       const dbSaleData = {
         customer_id: formData.customer_id,
@@ -417,7 +422,7 @@ export default function SalesEntryMobileOptimized() {
                   {/* Payment Method */}
                   <div className="space-y-2">
                     <Label className="text-xs bengali-font">পেমেন্ট পদ্ধতি</Label>
-                    <Select value={form.watch("paymentMethod")} onValueChange={(value) => form.setValue("paymentMethod", value as "নগদ" | "বাকি" | "মিশ্র")}>
+                    <Select value={form.watch("paymentMethod")} onValueChange={(value: "নগদ" | "বাকি" | "মিশ্র") => form.setValue("paymentMethod", value)}>
                       <SelectTrigger className="h-10 text-sm">
                         <SelectValue />
                       </SelectTrigger>

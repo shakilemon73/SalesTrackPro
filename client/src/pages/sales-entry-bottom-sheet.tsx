@@ -207,17 +207,22 @@ export default function SalesEntryBottomSheet() {
 
   const { data: customers = [] } = useQuery({
     queryKey: ['customers', userId],
-    queryFn: () => supabaseService.getCustomers(userId),
+    queryFn: () => userId ? supabaseService.getCustomers(userId) : Promise.resolve([]),
+    enabled: !!userId,
   });
 
   const { data: todayStats } = useQuery({
     queryKey: ['dashboard', userId],
-    queryFn: () => supabaseService.getStats(userId),
+    queryFn: () => userId ? supabaseService.getStats(userId) : Promise.resolve(null),
+    enabled: !!userId,
   });
 
   // Create new customer mutation
   const createCustomerMutation = useMutation({
     mutationFn: async (customerData: any) => {
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
       return await supabaseService.createCustomer(userId, {
         name: customerData.customerName,
         phone_number: customerData.customerPhone,
@@ -267,6 +272,9 @@ export default function SalesEntryBottomSheet() {
         }],
         sale_date: getBangladeshTimeISO()
       };
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
       return await supabaseService.createSale(userId, dbSaleData);
     },
     onSuccess: (data, variables) => {
@@ -307,6 +315,9 @@ export default function SalesEntryBottomSheet() {
           total_credit: 0
         });
         
+        if (!userId) {
+          throw new Error('User not authenticated');
+        }
         const newCustomer = await supabaseService.createCustomer(userId, {
           name: data.customerName.trim(),
           phone_number: data.customerPhone || '',
@@ -318,7 +329,9 @@ export default function SalesEntryBottomSheet() {
         
         // Clear cache and update customer list
         const { clearCustomerCache } = await import('@/lib/cache-manager');
-        clearCustomerCache(userId);
+        if (userId) {
+          clearCustomerCache(userId);
+        }
         
         queryClient.invalidateQueries({ queryKey: ['customers'] });
         queryClient.invalidateQueries({ queryKey: ['customers', userId] });

@@ -36,7 +36,7 @@ export function useAuth() {
     isLoading,
     signOut,
     isAuthenticated: !!user,
-    // Helper to get current user ID with fallback for development
-    userId: user?.id || DEMO_USER_ID
+    // Only return userId if user is properly authenticated - no fallback
+    userId: user?.id || null
   };
 }
