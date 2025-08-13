@@ -16,14 +16,14 @@ import {
   Calculator, Package, Zap, Phone, Plus, ChevronUp,
   ChevronDown, Clock, MapPin, Hash, Wallet, TrendingUp,
   Receipt, Shield, Sparkles, X, MessageCircle, CheckCircle2,
-  Star, Home
+  Star, Home, UserPlus
 } from "lucide-react";
 
 // Enhanced schema with all fields
 const quickSaleSchema = z.object({
   customerName: z.string().min(1, "গ্রাহকের নাম আবশ্যক"),
   amount: z.string().min(1, "টাকার পরিমাণ আবশ্যক"),
-  paymentMethod: z.enum(["নগদ", "বাকি", "মিশ্র"]),
+  paymentMethod: z.enum(["নগদ", "বাকি", "মিশ্র"] as const),
   paidAmount: z.string().optional(),
   productDescription: z.string().optional(),
   customerPhone: z.string().optional(),
@@ -285,9 +285,46 @@ export default function SalesEntryBottomSheet() {
     },
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     showToast("📝 বিক্রয় তথ্য সেভ করা হচ্ছে...", 'info');
-    createSaleMutation.mutate(data);
+    
+    // Check if customer exists in the database
+    const customerExists = customers.find(customer => 
+      customer.name.toLowerCase() === data.customerName.toLowerCase()
+    );
+    
+    // If customer doesn't exist and customer name is provided, auto-create the customer
+    if (!customerExists && data.customerName && data.customerName.trim()) {
+      console.log("🔧 Auto-creating new customer:", data.customerName);
+      
+      try {
+        const newCustomer = await supabaseService.createCustomer(CURRENT_USER_ID, {
+          name: data.customerName.trim(),
+          phone_number: data.customerPhone || '',
+          address: data.customerAddress || '',
+          total_credit: 0
+        });
+        
+        // Update customer list and set as selected
+        queryClient.invalidateQueries({ queryKey: ['customers'] });
+        setSelectedCustomer(newCustomer);
+        
+        showToast(`✅ নতুন গ্রাহক ${data.customerName} স্বয়ংক্রিয়ভাবে যোগ করা হয়েছে`, 'success');
+        
+        // Small delay to ensure customer is created before creating sale
+        setTimeout(() => {
+          createSaleMutation.mutate(data);
+        }, 500);
+        
+      } catch (error) {
+        console.error("❌ Auto customer creation failed:", error);
+        showToast("❌ নতুন গ্রাহক তৈরিতে সমস্যা। ম্যানুয়ালি যোগ করুন।", 'error');
+        return;
+      }
+    } else {
+      // Customer exists or no customer name provided, proceed with sale
+      createSaleMutation.mutate(data);
+    }
   };
 
   // Auto-complete customer names
@@ -365,13 +402,19 @@ export default function SalesEntryBottomSheet() {
                 </div>
                 
                 {!selectedCustomer && watchedCustomerName && filteredCustomers.length === 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setShowNewCustomerForm(!showNewCustomerForm)}
-                    className="text-xs bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded-lg transition-colors bengali-font font-medium"
-                  >
-                    + নতুন গ্রাহক
-                  </button>
+                  <div className="flex items-center space-x-2">
+                    <div className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-lg bengali-font font-medium flex items-center space-x-1">
+                      <UserPlus className="w-3 h-3" />
+                      <span>স্বয়ংক্রিয় যোগ</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowNewCustomerForm(!showNewCustomerForm)}
+                      className="text-xs bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded-lg transition-colors bengali-font font-medium"
+                    >
+                      + ম্যানুয়াল যোগ
+                    </button>
+                  </div>
                 )}
               </div>
               
