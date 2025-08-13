@@ -49,7 +49,7 @@ export default function CustomerEditMobileOptimized({ customerId }: CustomerEdit
 
   const { data: customer, isLoading: customerLoading, error: customerError } = useQuery({
     queryKey: ['customer', customerId, userId],
-    queryFn: () => userId ? supabaseService.getCustomer(customerId, userId) : Promise.resolve(null),
+    queryFn: () => userId ? supabaseService.getCustomer(userId, customerId) : Promise.resolve(null),
     enabled: !!userId && !!customerId,
   });
 

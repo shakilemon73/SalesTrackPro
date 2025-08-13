@@ -13,6 +13,7 @@ Preferred communication style: Simple, everyday language.
 - **Skeleton Screens Implemented**: Added beautiful skeleton loading screens for better UX across customer pages and dashboard
 - **Customer Edit/Delete System**: Implemented complete customer edit and delete functionality with proper routing, forms, and confirmation dialogs
 - **Route Order Fixed**: Resolved 404 error for customer edit page by reordering routes (specific routes must come before general routes in Wouter)
+- **Parameter Order Fixed**: Corrected customer edit page API calls to use proper userId/customerId parameter order
 - **TypeScript Errors Resolved**: Fixed all parseFloat type issues and null reference errors across customer components
 - **Authentication Flow Improved**: Added proper loading states to prevent premature query execution before user authentication
 - **Migration Completed**: Fixed all authentication issues, RLS policy violations resolved, TypeScript errors addressed
