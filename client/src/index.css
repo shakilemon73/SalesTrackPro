@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 :root {
-  /* Modern Color Palette - Trust & Prosperity Psychology */
+  /* CONSISTENT COLOR SYSTEM - Business Trust & Growth */
   --background: hsl(210 25% 97%);
   --foreground: hsl(210 20% 15%);
   --card: hsl(0 0% 100%);
@@ -13,58 +13,57 @@
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(210 20% 15%);
   
-  /* Professional Business Green - Trust & Growth */
+  /* UNIFIED PRIMARY COLORS - Professional Business Green */
   --primary: hsl(151 83% 23%);
   --primary-foreground: hsl(0 0% 100%);
   --primary-soft: hsl(151 40% 95%);
   --primary-hover: hsl(151 83% 18%);
   
-  /* Premium Blue - Reliability & Trust */
+  /* SECONDARY COLORS - Reliability Blue */
   --secondary: hsl(219 78% 20%);
   --secondary-foreground: hsl(0 0% 100%);
   --secondary-soft: hsl(219 40% 96%);
   
-  /* Warm Success Green */
+  /* STATUS COLORS */
   --success: hsl(142 76% 24%);
   --success-soft: hsl(142 30% 95%);
   --success-foreground: hsl(0 0% 100%);
-  
-  /* Professional Warning */
   --warning: hsl(38 92% 45%);
   --warning-soft: hsl(38 40% 95%);
   --warning-foreground: hsl(0 0% 100%);
-  
-  /* Gentle Error Red */
+  --destructive: hsl(0 72% 51%);
+  --destructive-soft: hsl(0 30% 96%);
+  --destructive-foreground: hsl(0 0% 100%);
   --error: hsl(0 72% 51%);
   --error-soft: hsl(0 30% 96%);
   --error-foreground: hsl(0 0% 100%);
   
-  /* Neutral Grays */
+  /* SURFACE COLORS */
   --muted: hsl(210 20% 96%);
   --muted-foreground: hsl(210 15% 45%);
   --accent: hsl(210 40% 98%);
   --accent-foreground: hsl(210 20% 15%);
-  
-  /* Surface Colors */
   --surface: hsl(0 0% 100%);
   --surface-elevated: hsl(210 25% 99%);
   --background-app: hsl(210 25% 97%);
   
-  /* Borders & Inputs */
+  /* BORDERS & INPUTS */
   --border: hsl(210 20% 90%);
   --border-soft: hsl(210 15% 94%);
   --input: hsl(210 25% 98%);
   --ring: hsl(151 83% 23%);
   
-  /* Typography */
+  /* TYPOGRAPHY */
   --font-sans: 'Noto Sans Bengali', 'Inter', sans-serif;
   --font-display: 'Inter', sans-serif;
   --font-mono: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
   
-  /* Design System */
+  /* DESIGN TOKENS */
   --radius: 12px;
   --radius-sm: 8px;
   --radius-lg: 16px;
+  
+  /* ELEVATION SHADOWS */
   --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -381,26 +380,18 @@
     left: 100%;
   }
 
-  /* Advanced Animations & Transitions */
-  .fade-in {
-    animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .slide-up {
-    animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .scale-in {
-    animation: scaleIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+  /* UNIFIED ANIMATION SYSTEM - NO DUPLICATES */
+  .fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+  .slide-up { animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+  .scale-in { animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(16px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
@@ -409,21 +400,24 @@
     to { opacity: 1; transform: scale(1); }
   }
 
-  /* Premium Loading States */
+  /* UNIFIED LOADING STATES - NO DUPLICATES */
   .loading-spinner {
-    @apply w-8 h-8 border-4 rounded-full border-gray-200;
-    border-top-color: var(--primary);
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid var(--primary);
+    border-top-color: transparent;
+    border-radius: 50%;
     animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
   }
 
   .skeleton {
     background: linear-gradient(90deg, var(--muted) 25%, var(--accent) 50%, var(--muted) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 
   @keyframes shimmer {
@@ -686,20 +680,6 @@
     left: 100%;
   }
 
-  /* Transaction Items */
-  .transaction-item {
-    @apply flex items-center justify-between p-4 rounded-xl relative;
-    background: var(--surface);
-    border: 1px solid var(--border-soft);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .transaction-item:hover {
-    background: var(--accent);
-    border-color: var(--border);
-    transform: translateX(4px);
-  }
-
   /* OLD Navigation Styles - DISABLED for new BottomNavigationOptimized */
   .bottom-nav {
     display: none !important;
@@ -899,57 +879,7 @@
     background: var(--muted-foreground);
   }
 
-  /* Loading States */
-  .loading-spinner {
-    @apply w-5 h-5 rounded-full border-2;
-    border-color: var(--primary);
-    border-top-color: transparent;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
-  /* Animations */
-  .fade-in {
-    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .slide-up {
-    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .scale-in {
-    animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes slideUp {
-    from { 
-      transform: translateY(24px); 
-      opacity: 0; 
-    }
-    to { 
-      transform: translateY(0); 
-      opacity: 1; 
-    }
-  }
-
-  @keyframes scaleIn {
-    from { 
-      transform: scale(0.9); 
-      opacity: 0; 
-    }
-    to { 
-      transform: scale(1); 
-      opacity: 1; 
-    }
-  }
+  /* REMOVED DUPLICATE LOADING AND ANIMATION SECTIONS */
 
   /* Responsive Design */
   @media (max-width: 480px) {

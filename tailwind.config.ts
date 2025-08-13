@@ -72,10 +72,25 @@ export default {
           border: "var(--sidebar-border)",
           ring: "var(--sidebar-ring)",
         },
-        success: "var(--success)",
-        warning: "var(--warning)",
-        error: "var(--error)",
-        surface: "var(--surface)",
+        success: {
+          DEFAULT: "var(--success)",
+          soft: "var(--success-soft)",
+          foreground: "var(--success-foreground)",
+        },
+        warning: {
+          DEFAULT: "var(--warning)",
+          soft: "var(--warning-soft)",
+          foreground: "var(--warning-foreground)",
+        },
+        error: {
+          DEFAULT: "var(--error)",
+          soft: "var(--error-soft)",
+          foreground: "var(--error-foreground)",
+        },
+        surface: {
+          DEFAULT: "var(--surface)",
+          elevated: "var(--surface-elevated)",
+        },
       },
       fontFamily: {
         sans: ["var(--font-sans)"],
