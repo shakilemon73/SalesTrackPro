@@ -381,34 +381,39 @@ export default function DashboardMobileOptimized() {
                 </div>
               )}
               
-              {/* New View All Selector with Live Indicator */}
+              {/* Business News Header with Live Indicator and View All Selector */}
               <div className="mt-2 space-y-2">
-                <div className="flex items-center justify-between bg-gradient-to-r from-slate-100/70 to-slate-200/70 dark:from-slate-800/70 dark:to-slate-700/70 rounded-lg p-2 border border-slate-200/50 dark:border-slate-600/50">
-                  <div className="flex items-center space-x-2">
-                    <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <span className="text-xs text-slate-600 dark:text-slate-400 bengali-font font-medium">লাইভ</span>
-                    </div>
-                    <Select value={selectedView} onValueChange={setSelectedView}>
-                      <SelectTrigger className="w-auto h-7 text-xs border-0 bg-transparent focus:ring-0 shadow-none p-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sales" className="text-xs bengali-font">
-                          <div className="flex items-center space-x-2">
-                            <span>🛒</span>
-                            <span>বিক্রয়</span>
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="customers" className="text-xs bengali-font">
-                          <div className="flex items-center space-x-2">
-                            <span>👥</span>
-                            <span>গ্রাহক</span>
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                {/* Header Section */}
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 bengali-font">ব্যবসার খবর</h3>
+                  <div className="flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-slate-600 dark:text-slate-400 bengali-font font-medium">লাইভ</span>
                   </div>
+                </div>
+                
+                {/* Selector and View All Section */}
+                <div className="flex items-center justify-between bg-gradient-to-r from-slate-100/70 to-slate-200/70 dark:from-slate-800/70 dark:to-slate-700/70 rounded-lg p-2 border border-slate-200/50 dark:border-slate-600/50">
+                  <Select value={selectedView} onValueChange={setSelectedView}>
+                    <SelectTrigger className="w-auto h-7 text-xs border-0 bg-transparent focus:ring-0 shadow-none p-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sales" className="text-xs bengali-font">
+                        <div className="flex items-center space-x-2">
+                          <span>🛒</span>
+                          <span>বিক্রয়</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="customers" className="text-xs bengali-font">
+                        <div className="flex items-center space-x-2">
+                          <span>👥</span>
+                          <span>গ্রাহক</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
                   <Link to={selectedView === 'sales' ? '/transactions' : '/customers'} className="block">
                     <Button 
                       variant="ghost" 
