@@ -38,30 +38,34 @@ export default function DashboardMobileOptimized() {
 
   const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useQuery({
     queryKey: ['dashboard', userId],
-    queryFn: () => supabaseService.getStats(userId),
+    queryFn: () => userId ? supabaseService.getStats(userId) : Promise.resolve(null),
     staleTime: 0,
     gcTime: 0,
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    enabled: !!userId,
   });
 
   const { data: recentSales = [] } = useQuery({
     queryKey: ['sales', userId, 'recent'],
-    queryFn: () => supabaseService.getSales(userId, 2),
+    queryFn: () => userId ? supabaseService.getSales(userId, 2) : Promise.resolve([]),
     staleTime: 0,
     gcTime: 0,
+    enabled: !!userId,
   });
 
   const { data: lowStockProducts = [] } = useQuery({
     queryKey: ['products', userId, 'low-stock'],
-    queryFn: () => supabaseService.getLowStockProducts(userId),
+    queryFn: () => userId ? supabaseService.getLowStockProducts(userId) : Promise.resolve([]),
+    enabled: !!userId,
   });
 
   const { data: customers = [] } = useQuery({
     queryKey: ['customers', userId],
-    queryFn: () => supabaseService.getCustomers(userId),
+    queryFn: () => userId ? supabaseService.getCustomers(userId) : Promise.resolve([]),
     staleTime: 0,
     gcTime: 0,
+    enabled: !!userId,
   });
 
 

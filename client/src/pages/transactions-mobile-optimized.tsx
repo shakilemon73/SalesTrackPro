@@ -27,22 +27,26 @@ export default function TransactionsMobileOptimized() {
 
   const { data: sales = [], isLoading: salesLoading } = useQuery({
     queryKey: ['sales', userId],
-    queryFn: () => supabaseService.getSales(userId),
+    queryFn: () => userId ? supabaseService.getSales(userId) : Promise.resolve([]),
+    enabled: !!userId,
   });
 
   const { data: expenses = [], isLoading: expensesLoading } = useQuery({
     queryKey: ['expenses', userId],
-    queryFn: () => supabaseService.getExpenses(userId),
+    queryFn: () => userId ? supabaseService.getExpenses(userId) : Promise.resolve([]),
+    enabled: !!userId,
   });
 
   const { data: collections = [], isLoading: collectionsLoading } = useQuery({
     queryKey: ['collections', userId],
-    queryFn: () => supabaseService.getCollections(userId),
+    queryFn: () => userId ? supabaseService.getCollections(userId) : Promise.resolve([]),
+    enabled: !!userId,
   });
 
   const { data: customers = [] } = useQuery({
     queryKey: ['customers', userId],
-    queryFn: () => supabaseService.getCustomers(userId),
+    queryFn: () => userId ? supabaseService.getCustomers(userId) : Promise.resolve([]),
+    enabled: !!userId,
   });
 
   const isLoading = salesLoading || expensesLoading || collectionsLoading;

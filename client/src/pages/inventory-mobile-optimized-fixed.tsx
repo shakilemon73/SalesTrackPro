@@ -53,11 +53,15 @@ export default function InventoryMobileOptimizedFixed() {
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products', userId],
-    queryFn: () => supabaseService.getProducts(userId),
+    queryFn: () => userId ? supabaseService.getProducts(userId) : Promise.resolve([]),
+    enabled: !!userId,
   });
 
   const createProductMutation = useMutation({
     mutationFn: async (productData: any) => {
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
       return await supabaseService.createProduct(userId, productData);
     },
     onSuccess: () => {

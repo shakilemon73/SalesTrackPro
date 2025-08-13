@@ -21,14 +21,17 @@ export default function CustomersMobileOptimized() {
   const { data: customers = [], isLoading } = useQuery({
     queryKey: ['customers', userId],
     queryFn: async () => {
+      if (!userId) return [];
       const data = await supabaseService.getCustomers(userId);
       return data || [];
-    }
+    },
+    enabled: !!userId,
   });
 
   const { data: sales = [] } = useQuery({
     queryKey: ['sales', userId],
-    queryFn: () => supabaseService.getSales(userId),
+    queryFn: () => userId ? supabaseService.getSales(userId) : Promise.resolve([]),
+    enabled: !!userId,
   });
 
   const filteredCustomers = customers.filter(customer =>

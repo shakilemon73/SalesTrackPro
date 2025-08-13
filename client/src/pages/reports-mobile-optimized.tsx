@@ -22,22 +22,26 @@ export default function ReportsMobileOptimized() {
 
   const { data: stats } = useQuery({
     queryKey: ['dashboard', userId],
-    queryFn: () => supabaseService.getStats(userId),
+    queryFn: () => userId ? supabaseService.getStats(userId) : Promise.resolve(null),
+    enabled: !!userId,
   });
 
   const { data: sales = [] } = useQuery({
     queryKey: ['sales', userId],
-    queryFn: () => supabaseService.getSales(userId),
+    queryFn: () => userId ? supabaseService.getSales(userId) : Promise.resolve([]),
+    enabled: !!userId,
   });
 
   const { data: expenses = [] } = useQuery({
     queryKey: ['expenses', userId],
-    queryFn: () => supabaseService.getExpenses(userId),
+    queryFn: () => userId ? supabaseService.getExpenses(userId) : Promise.resolve([]),
+    enabled: !!userId,
   });
 
   const { data: customers = [] } = useQuery({
     queryKey: ['customers', userId],
-    queryFn: () => supabaseService.getCustomers(userId),
+    queryFn: () => userId ? supabaseService.getCustomers(userId) : Promise.resolve([]),
+    enabled: !!userId,
   });
 
   // Calculate period-based data
