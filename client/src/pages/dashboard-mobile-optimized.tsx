@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   TrendingUp, TrendingDown, Users, ShoppingCart, 
   Wallet, AlertCircle, Plus, Bell, Eye,
   ArrowUpRight, Package, MessageCircle,
   BarChart3, Settings, Clock, Target,
-  ChevronRight, Activity, RefreshCw
+  ChevronRight, Activity, RefreshCw, FileText,
+  PenTool, Receipt, DollarSign
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -47,6 +49,13 @@ export default function DashboardMobileOptimized() {
   const { data: lowStockProducts = [] } = useQuery({
     queryKey: ['products', CURRENT_USER_ID, 'low-stock'],
     queryFn: () => supabaseService.getLowStockProducts(CURRENT_USER_ID),
+  });
+
+  const { data: customers = [] } = useQuery({
+    queryKey: ['customers', CURRENT_USER_ID],
+    queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
+    staleTime: 0,
+    gcTime: 0,
   });
 
 
@@ -144,7 +153,7 @@ export default function DashboardMobileOptimized() {
       {/* Content Container - Optimized Spacing */}
       <div className="px-4 py-4 space-y-4">
         
-        {/* Compact KPI Grid - 2x2 Layout */}
+        {/* Compact KPI Grid - Only 2 Cards */}
         <div className="grid grid-cols-2 gap-3">
           <Card className="border-0 shadow-md bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-4 relative overflow-hidden">
             <div className="space-y-1">
@@ -179,236 +188,178 @@ export default function DashboardMobileOptimized() {
               </p>
             </div>
           </Card>
-
-          <Card className="border-0 shadow-md bg-gradient-to-br from-purple-500 to-violet-600 text-white p-4">
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-purple-100 bengali-font">মোট লাভ</p>
-                <Target className="w-4 h-4 text-purple-200" />
-              </div>
-              <p className="text-xl font-bold number-font">
-                {formatCurrency(stats?.profit || 0)}
-              </p>
-              <p className="text-purple-200 text-xs">
-                {toBengaliNumber(profitMargin.toFixed(1))}% মার্জিন
-              </p>
-            </div>
-          </Card>
-
-          <Card className="border-0 shadow-md bg-gradient-to-br from-orange-500 to-red-500 text-white p-4">
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-orange-100 bengali-font">গ্রাহক</p>
-                <Users className="w-4 h-4 text-orange-200" />
-              </div>
-              <p className="text-xl font-bold number-font">
-                {toBengaliNumber(stats?.totalCustomers || 0)}
-              </p>
-              <p className="text-orange-200 text-xs">সক্রিয় সদস্য</p>
-            </div>
-          </Card>
         </div>
 
-        {/* Quick Actions - Horizontal Scrollable */}
-        <Card className="border-0 shadow-md p-3">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">দ্রুত কাজ</h3>
-            <Plus className="w-4 h-4 text-emerald-600" />
+        {/* Quick Actions - 4x4 Grid Layout */}
+        <Card className="border-0 shadow-md p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">ব্যবহার করুন</h3>
+            <Activity className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="flex space-x-3 overflow-x-auto pb-1">
-            <Link to="/sales/new">
-              <Button size="sm" className="flex-shrink-0 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 h-12 flex flex-col space-y-1">
-                <ShoppingCart className="w-4 h-4" />
-                <span className="text-xs bengali-font">বিক্রয়</span>
+          
+          {/* First Row - 4 buttons */}
+          <div className="grid grid-cols-4 gap-3 mb-3">
+            <Link to="/sales/new" data-testid="link-sales-new">
+              <Button size="sm" className="w-full h-16 bg-emerald-500 hover:bg-emerald-600 text-white flex flex-col space-y-1 p-2">
+                <ShoppingCart className="w-5 h-5" />
+                <span className="text-xs bengali-font">বিক্রয় করুন</span>
               </Button>
             </Link>
             
-            <Link to="/customers/new">
-              <Button size="sm" variant="outline" className="flex-shrink-0 h-12 flex flex-col space-y-1 px-4">
-                <Users className="w-4 h-4 text-blue-600" />
-                <span className="text-xs bengali-font">গ্রাহক</span>
+            <Link to="/customers/new" data-testid="link-customer-new">
+              <Button size="sm" variant="outline" className="w-full h-16 flex flex-col space-y-1 p-2 border-blue-200 hover:bg-blue-50">
+                <Users className="w-5 h-5 text-blue-600" />
+                <span className="text-xs bengali-font">নতুন গ্রাহক</span>
               </Button>
             </Link>
             
-            <Link to="/collection">
-              <Button size="sm" variant="outline" className="flex-shrink-0 h-12 flex flex-col space-y-1 px-4">
-                <Wallet className="w-4 h-4 text-purple-600" />
-                <span className="text-xs bengali-font">আদায়</span>
+            <Link to="/collection" data-testid="link-collection">
+              <Button size="sm" variant="outline" className="w-full h-16 flex flex-col space-y-1 p-2 border-purple-200 hover:bg-purple-50">
+                <Wallet className="w-5 h-5 text-purple-600" />
+                <span className="text-xs bengali-font">আদায় করুন</span>
               </Button>
             </Link>
             
-            <Link to="/inventory">
-              <Button size="sm" variant="outline" className="flex-shrink-0 h-12 flex flex-col space-y-1 px-4">
-                <Package className="w-4 h-4 text-orange-600" />
-                <span className="text-xs bengali-font">স্টক</span>
+            <Link to="/inventory" data-testid="link-inventory">
+              <Button size="sm" variant="outline" className="w-full h-16 flex flex-col space-y-1 p-2 border-orange-200 hover:bg-orange-50">
+                <Package className="w-5 h-5 text-orange-600" />
+                <span className="text-xs bengali-font">স্টক দেখুন</span>
+              </Button>
+            </Link>
+          </div>
+          
+          {/* Second Row - 4 buttons */}
+          <div className="grid grid-cols-4 gap-3">
+            <Link to="/expenses/new" data-testid="link-expense-new">
+              <Button size="sm" variant="outline" className="w-full h-16 flex flex-col space-y-1 p-2 border-red-200 hover:bg-red-50">
+                <TrendingDown className="w-5 h-5 text-red-600" />
+                <span className="text-xs bengali-font">খরচ লিখুন</span>
               </Button>
             </Link>
             
-            <Link to="/expenses/new">
-              <Button size="sm" variant="outline" className="flex-shrink-0 h-12 flex flex-col space-y-1 px-4">
-                <TrendingDown className="w-4 h-4 text-red-600" />
-                <span className="text-xs bengali-font">খরচ</span>
+            <Link to="/transactions" data-testid="link-transactions">
+              <Button size="sm" variant="outline" className="w-full h-16 flex flex-col space-y-1 p-2 border-indigo-200 hover:bg-indigo-50">
+                <Receipt className="w-5 h-5 text-indigo-600" />
+                <span className="text-xs bengali-font">দেনা পাওনা</span>
               </Button>
             </Link>
+            
+            <Button size="sm" variant="outline" className="w-full h-16 flex flex-col space-y-1 p-2 border-gray-200 hover:bg-gray-50" data-testid="button-draft">
+              <FileText className="w-5 h-5 text-gray-600" />
+              <span className="text-xs bengali-font">খসড়া করুন</span>
+            </Button>
+            
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="w-full h-16 flex flex-col space-y-1 p-2 border-green-200 hover:bg-green-50"
+              onClick={() => toast({ title: "WhatsApp রিপোর্ট", description: "রিপোর্ট পাঠানো হচ্ছে..." })}
+              data-testid="button-send-message"
+            >
+              <MessageCircle className="w-5 h-5 text-green-600" />
+              <span className="text-xs bengali-font">মেসেজ পাঠান</span>
+            </Button>
           </div>
         </Card>
 
 
 
-        {/* Expandable Sections */}
-        <div className="space-y-3">
+        {/* Recent Activity - Always Expanded with Tabs */}
+        <Card className="border-0 shadow-md p-4">
+          <div className="flex items-center space-x-2 mb-4">
+            <Activity className="w-4 h-4 text-slate-600" />
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">
+              সাম্প্রতিক কার্যকলাপ
+            </h3>
+          </div>
           
-          {/* Recent Activity - Collapsible */}
-          <Card className="border-0 shadow-md">
-            <div 
-              className="p-4 cursor-pointer"
-              onClick={() => setExpandedCard(expandedCard === 'activity' ? null : 'activity')}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Activity className="w-4 h-4 text-slate-600" />
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">
-                    সাম্প্রতিক কার্যকলাপ
-                  </h3>
-                </div>
-                <ChevronRight className={`w-4 h-4 transition-transform ${expandedCard === 'activity' ? 'rotate-90' : ''}`} />
-              </div>
-            </div>
+          <Tabs defaultValue="transactions" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-3">
+              <TabsTrigger value="transactions" className="text-xs bengali-font" data-testid="tab-transactions">
+                সাম্প্রতিক লেনদেন
+              </TabsTrigger>
+              <TabsTrigger value="customers" className="text-xs bengali-font" data-testid="tab-customers">
+                গ্রাহক তালিকা
+              </TabsTrigger>
+            </TabsList>
             
-            {expandedCard === 'activity' && (
-              <div className="px-4 pb-4 space-y-2">
-                {recentSales.length > 0 ? (
-                  recentSales.map((sale) => (
-                    <div key={sale.id} className="flex items-center justify-between p-2 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                          <ArrowUpRight className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-medium text-slate-900 dark:text-white bengali-font">
-                            {sale.customer_name}
-                          </p>
-                          <p className="text-xs text-slate-500">{sale.payment_method}</p>
-                        </div>
+            <TabsContent value="transactions" className="space-y-2">
+              {recentSales.length > 0 ? (
+                recentSales.map((sale) => (
+                  <div key={sale.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <ArrowUpRight className="w-5 h-5 text-green-600" />
                       </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-900 dark:text-white bengali-font">
+                          {sale.customer_name}
+                        </p>
+                        <p className="text-xs text-slate-500">{sale.payment_method}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
                       <p className="text-sm font-bold text-green-600 number-font">
                         +{formatCurrency(Number(sale.total_amount))}
                       </p>
+                      <p className="text-xs text-slate-400">
+                        {new Date(sale.created_at).toLocaleDateString('bn-BD')}
+                      </p>
                     </div>
-                  ))
-                ) : (
-                  <p className="text-xs text-slate-500 text-center py-2 bengali-font">
-                    আজকে কোনো বিক্রয় নেই
-                  </p>
-                )}
-                <Link to="/transactions">
-                  <Button variant="ghost" size="sm" className="w-full text-xs">
-                    সব লেনদেন দেখুন
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </Card>
-
-          {/* Alerts - Collapsible */}
-          <Card className="border-0 shadow-md">
-            <div 
-              className="p-4 cursor-pointer"
-              onClick={() => setExpandedCard(expandedCard === 'alerts' ? null : 'alerts')}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <AlertCircle className="w-4 h-4 text-orange-600" />
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">
-                    গুরুত্বপূর্ণ সতর্কতা
-                  </h3>
-                  {(lowStockProducts.length > 0 || (stats?.pendingCollection && stats.pendingCollection > 0)) && (
-                    <Badge className="h-4 text-xs bg-red-500 text-white">
-                      {lowStockProducts.length + (stats?.pendingCollection && Number(stats.pendingCollection) > 0 ? 1 : 0)}
-                    </Badge>
-                  )}
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-6">
+                  <Clock className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                  <p className="text-sm text-slate-500 bengali-font">আজকে কোনো বিক্রয় নেই</p>
                 </div>
-                <ChevronRight className={`w-4 h-4 transition-transform ${expandedCard === 'alerts' ? 'rotate-90' : ''}`} />
-              </div>
-            </div>
+              )}
+              <Link to="/transactions">
+                <Button variant="ghost" size="sm" className="w-full text-xs mt-3" data-testid="button-view-all-transactions">
+                  সব লেনদেন দেখুন
+                </Button>
+              </Link>
+            </TabsContent>
             
-            {expandedCard === 'alerts' && (
-              <div className="px-4 pb-4 space-y-2">
-                {lowStockProducts.length > 0 && (
-                  <div className="p-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <Package className="w-4 h-4 text-orange-600" />
-                      <p className="text-xs font-medium text-orange-800 dark:text-orange-200 bengali-font">
-                        স্টক কম ({toBengaliNumber(lowStockProducts.length)}টি পণ্য)
+            <TabsContent value="customers" className="space-y-2">
+              {customers.length > 0 ? (
+                customers.slice(0, 5).map((customer) => (
+                  <div key={customer.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <Users className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-900 dark:text-white bengali-font">
+                          {customer.name}
+                        </p>
+                        <p className="text-xs text-slate-500">{customer.phone_number}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className={`text-sm font-bold number-font ${customer.total_credit > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                        {customer.total_credit > 0 ? `+${formatCurrency(customer.total_credit)}` : '০'}
+                      </p>
+                      <p className="text-xs text-slate-400 bengali-font">
+                        {customer.total_credit > 0 ? 'ক্রেডিট' : 'পেইড'}
                       </p>
                     </div>
-                    <p className="text-xs text-orange-600 dark:text-orange-300">
-                      {lowStockProducts.slice(0, 2).map(p => p.name).join(', ')}
-                      {lowStockProducts.length > 2 && ` এবং আরো ${lowStockProducts.length - 2}টি`}
-                    </p>
                   </div>
-                )}
-                
-                {stats?.pendingCollection && Number(stats.pendingCollection) > 0 && (
-                  <div className="p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <Wallet className="w-4 h-4 text-blue-600" />
-                      <p className="text-xs font-medium text-blue-800 dark:text-blue-200 bengali-font">
-                        বাকি আদায় করুন
-                      </p>
-                    </div>
-                    <p className="text-xs text-blue-600 dark:text-blue-300">
-                      {formatCurrency(stats.pendingCollection)} আদায় বাকি
-                    </p>
-                  </div>
-                )}
-                
-                {lowStockProducts.length === 0 && (!stats?.pendingCollection || Number(stats.pendingCollection) === 0) && (
-                  <div className="p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-center">
-                    <div className="flex items-center justify-center space-x-1 mb-1">
-                      <Activity className="w-4 h-4 text-green-600" />
-                      <p className="text-xs font-medium text-green-800 dark:text-green-200 bengali-font">
-                        সব ঠিক আছে!
-                      </p>
-                    </div>
-                    <p className="text-xs text-green-600 dark:text-green-300">
-                      আপনার ব্যবসা ভালো চলছে
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-          </Card>
-
-          {/* Quick Communication */}
-          <Card className="border-0 shadow-md p-4">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font mb-3 flex items-center space-x-2">
-              <MessageCircle className="w-4 h-4 text-green-600" />
-              <span>দ্রুত যোগাযোগ</span>
-            </h3>
-            <div className="grid grid-cols-2 gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="h-10 flex items-center space-x-2 text-xs"
-                onClick={() => toast({ title: "WhatsApp রিপোর্ট", description: "দৈনিক রিপোর্ট পাঠানো হচ্ছে" })}
-              >
-                <MessageCircle className="w-3 h-3 text-green-600" />
-                <span className="bengali-font">WhatsApp</span>
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="h-10 flex items-center space-x-2 text-xs"
-                onClick={() => toast({ title: "SMS রিমাইন্ডার", description: "বার্তা পাঠানো হবে" })}
-              >
-                <Bell className="w-3 h-3 text-blue-600" />
-                <span className="bengali-font">SMS</span>
-              </Button>
-            </div>
-          </Card>
-        </div>
+                ))
+              ) : (
+                <div className="text-center py-6">
+                  <Users className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                  <p className="text-sm text-slate-500 bengali-font">কোনো গ্রাহক নেই</p>
+                </div>
+              )}
+              <Link to="/customers">
+                <Button variant="ghost" size="sm" className="w-full text-xs mt-3" data-testid="button-view-all-customers">
+                  সব গ্রাহক দেখুন
+                </Button>
+              </Link>
+            </TabsContent>
+          </Tabs>
+        </Card>
       </div>
       
       {/* Professional bottom spacing for navigation */}
