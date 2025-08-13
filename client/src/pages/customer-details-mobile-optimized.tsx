@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabaseService } from "@/lib/supabase";
 import { useAuth } from "@/hooks/use-auth";
+import { CustomerDetailsSkeleton } from "@/components/loading-skeletons";
 import { 
   ArrowLeft, User, Phone, MapPin, Calendar, 
   ShoppingCart, Wallet, TrendingUp, Clock,
@@ -39,23 +40,9 @@ export default function CustomerDetailsMobileOptimized({ params }: CustomerDetai
     enabled: !!userId,
   });
 
-  // Show loading state while authentication is being checked
+  // Show skeleton loading state while authentication is being checked or data is loading
   if (authLoading || (!!userId && customerLoading)) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white border-0 shadow-lg">
-          <CardContent className="p-6 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
-            <h1 className="text-xl font-bold text-gray-900 mb-2 bengali-font">
-              গ্রাহকের তথ্য লোড হচ্ছে...
-            </h1>
-            <p className="text-gray-600 bengali-font">
-              অনুগ্রহ করে একটু অপেক্ষা করুন
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <CustomerDetailsSkeleton />;
   }
 
   // Error or Customer not found state

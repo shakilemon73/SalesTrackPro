@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DashboardSkeleton } from "@/components/loading-skeletons";
 import { 
   TrendingUp, TrendingDown, Users, ShoppingCart, 
   Wallet, AlertCircle, Plus, Bell, Eye,
@@ -27,7 +28,7 @@ export default function DashboardMobileOptimized() {
   const [activeTab, setActiveTab] = useState('transactions');
   const [selectedView, setSelectedView] = useState('sales');
   const { toast } = useToast();
-  const { userId } = useAuth();
+  const { userId, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -69,6 +70,11 @@ export default function DashboardMobileOptimized() {
   });
 
 
+
+  // Show skeleton while auth or stats are loading
+  if (authLoading || (!!userId && statsLoading)) {
+    return <DashboardSkeleton />;
+  }
 
   if (statsError) {
     return (

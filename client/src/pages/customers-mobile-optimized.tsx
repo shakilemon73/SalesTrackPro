@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabaseService } from "@/lib/supabase";
 import { useAuth } from "@/hooks/use-auth";
+import { CustomerListSkeleton } from "@/components/loading-skeletons";
 import { 
   ArrowLeft, Search, UserPlus, Phone, MapPin,
   Users, TrendingUp, AlertCircle, Eye,
@@ -34,20 +35,9 @@ export default function CustomersMobileOptimized() {
     enabled: !!userId,
   });
 
-  // Show loading state while auth is loading
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white border-0 shadow-lg">
-          <CardContent className="p-6 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
-            <h1 className="text-xl font-bold text-gray-900 mb-2 bengali-font">
-              লোড হচ্ছে...
-            </h1>
-          </CardContent>
-        </Card>
-      </div>
-    );
+  // Show skeleton loading state while auth is loading or data is loading
+  if (authLoading || (!!userId && isLoading)) {
+    return <CustomerListSkeleton />;
   }
 
   const filteredCustomers = customers.filter(customer =>
