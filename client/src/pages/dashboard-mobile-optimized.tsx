@@ -299,7 +299,7 @@ export default function DashboardMobileOptimized() {
 
 
         {/* Ultra-Compact Business Intelligence for 916x412 */}
-        <Card className="border-0 shadow-md bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800 p-2 min-h-[360px]">
+        <Card className="border-0 shadow-md bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800 p-2 min-h-[480px]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-2">
               <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
@@ -310,32 +310,8 @@ export default function DashboardMobileOptimized() {
               </div>
             </div>
             <div className="flex items-center space-x-1">
-              {/* Context-aware button based on active tab */}
-              {activeTab === 'transactions' ? (
-                <Link to="/transactions" className="block">
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="text-xs py-1 px-2 bg-emerald-100/50 hover:bg-emerald-200/50 dark:bg-emerald-800/50 dark:hover:bg-emerald-700/50 rounded-lg transition-all duration-200 group border border-emerald-200/50 dark:border-emerald-700/50" 
-                    data-testid="button-view-all-context"
-                  >
-                    <span className="bengali-font font-semibold text-emerald-700 dark:text-emerald-300">সব লেনদেন</span>
-                    <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-0.5 transition-transform text-emerald-600 dark:text-emerald-400" />
-                  </Button>
-                </Link>
-              ) : (
-                <Link to="/customers" className="block">
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="text-xs py-1 px-2 bg-blue-100/50 hover:bg-blue-200/50 dark:bg-blue-800/50 dark:hover:bg-blue-700/50 rounded-lg transition-all duration-200 group border border-blue-200/50 dark:border-blue-700/50" 
-                    data-testid="button-view-all-context"
-                  >
-                    <span className="bengali-font font-semibold text-blue-700 dark:text-blue-300">সব গ্রাহক</span>
-                    <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-0.5 transition-transform text-blue-600 dark:text-blue-400" />
-                  </Button>
-                </Link>
-              )}
+              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-xs text-green-600 dark:text-green-400 bengali-font font-medium">লাইভ</span>
             </div>
           </div>
           
