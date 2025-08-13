@@ -315,20 +315,34 @@ export default function DashboardMobileOptimized() {
           </div>
           
           <Tabs defaultValue="transactions" className="space-y-3">
-            <TabsList className="grid grid-cols-2 w-full bg-slate-100/50 dark:bg-slate-800/50 rounded-lg p-1 backdrop-blur-sm">
+            <TabsList className="grid grid-cols-4 w-full bg-slate-100/50 dark:bg-slate-800/50 rounded-lg p-1 backdrop-blur-sm text-xs">
               <TabsTrigger 
                 value="transactions" 
-                className="text-xs bengali-font font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all duration-200 py-2"
+                className="text-xs bengali-font font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all duration-200 py-2 px-1"
                 data-testid="tab-transactions"
               >
                 🛒 বিক্রয়
               </TabsTrigger>
               <TabsTrigger 
                 value="customers" 
-                className="text-xs bengali-font font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all duration-200 py-2"
+                className="text-xs bengali-font font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all duration-200 py-2 px-1"
                 data-testid="tab-customers"
               >
                 👥 গ্রাহক
+              </TabsTrigger>
+              <TabsTrigger 
+                value="news" 
+                className="text-xs bengali-font font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all duration-200 py-2 px-1"
+                data-testid="tab-news"
+              >
+                📰 খবর
+              </TabsTrigger>
+              <TabsTrigger 
+                value="analytics" 
+                className="text-xs bengali-font font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all duration-200 py-2 px-1"
+                data-testid="tab-analytics"
+              >
+                📊 তথ্য
               </TabsTrigger>
             </TabsList>
             
@@ -454,6 +468,119 @@ export default function DashboardMobileOptimized() {
                   data-testid="button-view-all-customers"
                 >
                   <span className="bengali-font font-semibold">সব গ্রাহক দেখুন</span>
+                  <ChevronRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </TabsContent>
+
+            {/* Business News Tab */}
+            <TabsContent value="news" className="space-y-2 mt-3">
+              <div className="max-h-40 overflow-y-auto space-y-2 pr-1">
+                {/* 10 Business News Items */}
+                {[
+                  { id: 1, title: "বাংলাদেশী ব্যবসায়ীদের জন্য নতুন সুবিধা", time: "২ ঘণ্টা আগে", category: "ব্যবসা" },
+                  { id: 2, title: "মোবাইল ব্যাংকিং এর নতুন আপডেট", time: "৪ ঘণ্টা আগে", category: "প্রযুক্তি" },
+                  { id: 3, title: "ছোট ব্যবসার জন্য ঋণের সুবিধা", time: "৬ ঘণ্টা আগে", category: "অর্থনীতি" },
+                  { id: 4, title: "নতুন করের নিয়মাবলী প্রকাশ", time: "৮ ঘণ্টা আগে", category: "সরকারি" },
+                  { id: 5, title: "ডিজিটাল পেমেন্টে নতুন সুবিধা", time: "১০ ঘণ্টা আগে", category: "প্রযুক্তি" },
+                  { id: 6, title: "রমজানে ব্যবসার প্রস্তুতি", time: "১২ ঘণ্টা আগে", category: "ব্যবসা" },
+                  { id: 7, title: "স্থানীয় বাজারে নতুন সুযোগ", time: "১৪ ঘণ্টা আগে", category: "বাজার" },
+                  { id: 8, title: "গ্রাহক সেবার উন্নতি", time: "১৬ ঘণ্টা আগে", category: "সেবা" },
+                  { id: 9, title: "অনলাইন বিক্রয়ের টিপস", time: "১৮ ঘণ্টা আগে", category: "ডিজিটাল" },
+                  { id: 10, title: "ব্যবসায়িক পরিকল্পনার গুরুত্ব", time: "২০ ঘণ্টা আগে", category: "পরিকল্পনা" }
+                ].map((news) => (
+                  <div key={news.id} className="bg-gradient-to-r from-white to-orange-50/50 dark:from-slate-800 dark:to-orange-900/10 rounded-lg p-2 border border-orange-100/50 dark:border-orange-800/30">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white bengali-font leading-tight">
+                          {news.title}
+                        </p>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <span className="text-xs text-orange-600 dark:text-orange-400 bengali-font font-medium bg-orange-100/50 dark:bg-orange-900/20 px-2 py-0.5 rounded">
+                            {news.category}
+                          </span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400 bengali-font">
+                            {news.time}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="w-6 h-6 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center shadow-sm ml-2">
+                        <div className="text-white text-xs">📰</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <Button 
+                variant="ghost" 
+                className="w-full text-xs py-2 mt-2 bg-slate-100/50 hover:bg-slate-200/50 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 rounded-lg transition-all duration-200 group" 
+                data-testid="button-view-all-news"
+              >
+                <span className="bengali-font font-semibold">আরও খবর দেখুন</span>
+                <ChevronRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </TabsContent>
+
+            {/* Analytics Tab */}
+            <TabsContent value="analytics" className="space-y-2 mt-3">
+              <div className="max-h-40 overflow-y-auto space-y-2 pr-1">
+                {/* 10 Analytics Items */}
+                {[
+                  { id: 1, title: "আজকের বিক্রয় লক্ষ্য অর্জন", value: "৮৫%", status: "ভালো", color: "green" },
+                  { id: 2, title: "সেরা বিক্রিত পণ্য", value: "সাধারণ পণ্য", status: "জনপ্রিয়", color: "blue" },
+                  { id: 3, title: "নতুন গ্রাহক যোগ", value: "৩ জন", status: "বৃদ্ধি", color: "emerald" },
+                  { id: 4, title: "বাকি পরিশোধের হার", value: "৬০%", status: "গড়", color: "yellow" },
+                  { id: 5, title: "মাসিক লাভের প্রবণতা", value: "+১২%", status: "উন্নতি", color: "green" },
+                  { id: 6, title: "স্টক শেষ হওয়ার সতর্কতা", value: "২ পণ্য", status: "সতর্কতা", color: "red" },
+                  { id: 7, title: "গড় বিক্রয় মূল্য", value: "৳২৫০", status: "স্থিতিশীল", color: "blue" },
+                  { id: 8, title: "গ্রাহক সন্তুষ্টি", value: "৯২%", status: "চমৎকার", color: "green" },
+                  { id: 9, title: "দৈনিক খরচ নিয়ন্ত্রণ", value: "৯৫%", status: "ভালো", color: "emerald" },
+                  { id: 10, title: "বিক্রয় পূর্বাভাস", value: "+২৫%", status: "ইতিবাচক", color: "blue" }
+                ].map((analytics) => {
+                  const colorMap = {
+                    green: { bg: "from-emerald-400 to-green-500", text: "emerald-600 dark:text-emerald-400", card: "to-emerald-50/50 border-emerald-100/50 dark:to-emerald-900/10 dark:border-emerald-800/30" },
+                    blue: { bg: "from-blue-400 to-indigo-500", text: "blue-600 dark:text-blue-400", card: "to-blue-50/50 border-blue-100/50 dark:to-blue-900/10 dark:border-blue-800/30" },
+                    yellow: { bg: "from-yellow-400 to-orange-500", text: "yellow-600 dark:text-yellow-400", card: "to-yellow-50/50 border-yellow-100/50 dark:to-yellow-900/10 dark:border-yellow-800/30" },
+                    red: { bg: "from-red-400 to-pink-500", text: "red-600 dark:text-red-400", card: "to-red-50/50 border-red-100/50 dark:to-red-900/10 dark:border-red-800/30" },
+                    emerald: { bg: "from-emerald-400 to-teal-500", text: "emerald-600 dark:text-emerald-400", card: "to-emerald-50/50 border-emerald-100/50 dark:to-emerald-900/10 dark:border-emerald-800/30" }
+                  };
+                  const colors = colorMap[analytics.color as keyof typeof colorMap];
+                  
+                  return (
+                    <div key={analytics.id} className={`bg-gradient-to-r from-white ${colors.card} rounded-lg p-2 border`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-8 h-8 bg-gradient-to-br ${colors.bg} rounded-lg flex items-center justify-center shadow-sm`}>
+                            <div className="text-white text-sm">📊</div>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-slate-900 dark:text-white bengali-font leading-tight">
+                              {analytics.title}
+                            </p>
+                            <span className={`text-xs bengali-font font-medium ${colors.text} bg-opacity-20 px-1 py-0.5 rounded`}>
+                              {analytics.status}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className={`text-sm font-black ${colors.text} number-font`}>
+                            {analytics.value}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              <Link to="/reports" className="block">
+                <Button 
+                  variant="ghost" 
+                  className="w-full text-xs py-2 mt-2 bg-slate-100/50 hover:bg-slate-200/50 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 rounded-lg transition-all duration-200 group" 
+                  data-testid="button-view-all-analytics"
+                >
+                  <span className="bengali-font font-semibold">বিস্তারিত রিপোর্ট দেখুন</span>
                   <ChevronRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
