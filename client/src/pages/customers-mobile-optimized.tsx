@@ -16,7 +16,7 @@ import {
 
 export default function CustomersMobileOptimized() {
   const [searchTerm, setSearchTerm] = useState("");
-  const { userId } = useAuth();
+  const { userId, isLoading: authLoading } = useAuth();
 
   const { data: customers = [], isLoading } = useQuery({
     queryKey: ['customers', userId],
@@ -33,6 +33,22 @@ export default function CustomersMobileOptimized() {
     queryFn: () => userId ? supabaseService.getSales(userId) : Promise.resolve([]),
     enabled: !!userId,
   });
+
+  // Show loading state while auth is loading
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white border-0 shadow-lg">
+          <CardContent className="p-6 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
+            <h1 className="text-xl font-bold text-gray-900 mb-2 bengali-font">
+              লোড হচ্ছে...
+            </h1>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const filteredCustomers = customers.filter(customer =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

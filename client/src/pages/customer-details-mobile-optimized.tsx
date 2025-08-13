@@ -19,27 +19,47 @@ interface CustomerDetailsProps {
 
 export default function CustomerDetailsMobileOptimized({ params }: CustomerDetailsProps) {
   const customerId = params.id;
-  const { userId } = useAuth();
+  const { userId, isLoading: authLoading } = useAuth();
 
   const { data: customer, isLoading: customerLoading, error: customerError } = useQuery({
     queryKey: ['customer', customerId],
-    queryFn: () => supabaseService.getCustomer(userId, customerId),
+    queryFn: () => supabaseService.getCustomer(userId!, customerId),
+    enabled: !!userId && !!customerId,
   });
 
   const { data: sales = [] } = useQuery({
     queryKey: ['sales', userId],
-    queryFn: () => supabaseService.getSales(userId),
+    queryFn: () => supabaseService.getSales(userId!),
+    enabled: !!userId,
   });
 
   const { data: collections = [] } = useQuery({
     queryKey: ['collections', userId],
-    queryFn: () => supabaseService.getCollections(userId),
+    queryFn: () => supabaseService.getCollections(userId!),
+    enabled: !!userId,
   });
 
-
+  // Show loading state while authentication is being checked
+  if (authLoading || (!!userId && customerLoading)) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white border-0 shadow-lg">
+          <CardContent className="p-6 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
+            <h1 className="text-xl font-bold text-gray-900 mb-2 bengali-font">
+              গ্রাহকের তথ্য লোড হচ্ছে...
+            </h1>
+            <p className="text-gray-600 bengali-font">
+              অনুগ্রহ করে একটু অপেক্ষা করুন
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // Error or Customer not found state
-  if (customerError || !customer) {
+  if (customerError || (!customerLoading && !customer && !!userId)) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-white border-0 shadow-lg">
@@ -71,16 +91,21 @@ export default function CustomerDetailsMobileOptimized({ params }: CustomerDetai
     );
   }
 
+  // If customer is still loading or not available, don't try to calculate stats
+  if (!customer) {
+    return null;
+  }
+
   // Calculate customer stats
   const customerSales = sales.filter(sale => sale.customer_id === customerId);
   const customerCollections = collections.filter(collection => collection.customer_id === customerId);
 
   const stats = {
-    totalPurchases: customerSales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || '0'), 0),
-    totalDue: customerSales.reduce((sum, sale) => sum + parseFloat(sale.due_amount || '0'), 0),
-    totalCollected: customerCollections.reduce((sum, collection) => sum + parseFloat(collection.amount || '0'), 0),
+    totalPurchases: customerSales.reduce((sum, sale) => sum + parseFloat(String(sale.total_amount || 0)), 0),
+    totalDue: customerSales.reduce((sum, sale) => sum + parseFloat(String(sale.due_amount || 0)), 0),
+    totalCollected: customerCollections.reduce((sum, collection) => sum + parseFloat(String(collection.amount || 0)), 0),
     orderCount: customerSales.length,
-    avgOrderValue: customerSales.length > 0 ? customerSales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || '0'), 0) / customerSales.length : 0,
+    avgOrderValue: customerSales.length > 0 ? customerSales.reduce((sum, sale) => sum + parseFloat(String(sale.total_amount || 0)), 0) / customerSales.length : 0,
     lastPurchase: customerSales.length > 0 ? new Date(customerSales.sort((a, b) => new Date(b.sale_date).getTime() - new Date(a.sale_date).getTime())[0].sale_date) : null
   };
 
@@ -287,7 +312,7 @@ export default function CustomerDetailsMobileOptimized({ params }: CustomerDetai
                       </div>
                       <div>
                         <p className="text-sm font-medium text-slate-900 dark:text-white number-font">
-                          {formatCurrency(parseFloat(sale.total_amount || '0'))}
+                          {formatCurrency(parseFloat(String(sale.total_amount || 0)))}
                         </p>
                         <p className="text-xs text-slate-500">
                           {new Date(sale.sale_date).toLocaleDateString('bn-BD')}
@@ -295,9 +320,9 @@ export default function CustomerDetailsMobileOptimized({ params }: CustomerDetai
                       </div>
                     </div>
                     <div className="text-right">
-                      {parseFloat(sale.due_amount || '0') > 0 && (
+                      {parseFloat(String(sale.due_amount || 0)) > 0 && (
                         <Badge variant="outline" className="text-xs h-4 px-1 text-red-600 border-red-200">
-                          বাকি: {formatCurrency(parseFloat(sale.due_amount || '0'))}
+                          বাকি: {formatCurrency(parseFloat(String(sale.due_amount || 0)))}
                         </Badge>
                       )}
                       <p className="text-xs text-slate-500 mt-1">
