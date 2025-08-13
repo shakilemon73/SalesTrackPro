@@ -262,23 +262,23 @@ export default function DashboardMobileOptimized() {
           {/* Secondary Actions Row */}
           <div className="grid grid-cols-4 gap-1.5">
             <Link to="/expenses/new" data-testid="link-expense-new" className="block group">
-              <div className="w-full h-14 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 group-active:scale-95">
-                <div className="text-white text-sm mb-0.5">📝</div>
-                <span className="text-xs text-white bengali-font font-bold text-center leading-tight">খরচ</span>
+              <div className="w-full h-14 bg-gradient-to-br from-red-500/10 to-pink-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-red-500/20 transition-all duration-200 group-active:scale-95">
+                <div className="text-red-600 text-sm mb-0.5">📝</div>
+                <span className="text-xs text-red-700 bengali-font font-bold text-center leading-tight">খরচ</span>
               </div>
             </Link>
             
             <Link to="/transactions" data-testid="link-transactions" className="block group">
-              <div className="w-full h-14 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 group-active:scale-95">
-                <div className="text-white text-sm mb-0.5">📊</div>
-                <span className="text-xs text-white bengali-font font-bold text-center leading-tight">হিসাব</span>
+              <div className="w-full h-14 bg-gradient-to-br from-teal-500/10 to-cyan-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-teal-500/20 transition-all duration-200 group-active:scale-95">
+                <div className="text-teal-600 text-sm mb-0.5">📊</div>
+                <span className="text-xs text-teal-700 bengali-font font-bold text-center leading-tight">হিসাব</span>
               </div>
             </Link>
             
             <button className="group" data-testid="button-calculator">
-              <div className="w-full h-14 bg-gradient-to-br from-slate-500 to-gray-600 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 group-active:scale-95">
-                <div className="text-white text-sm mb-0.5">🧮</div>
-                <span className="text-xs text-white bengali-font font-bold text-center leading-tight">ক্যালক</span>
+              <div className="w-full h-14 bg-gradient-to-br from-slate-500/10 to-gray-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-slate-500/20 transition-all duration-200 group-active:scale-95">
+                <div className="text-slate-600 text-sm mb-0.5">🧮</div>
+                <span className="text-xs text-slate-700 bengali-font font-bold text-center leading-tight">ক্যালক</span>
               </div>
             </button>
             
@@ -287,9 +287,9 @@ export default function DashboardMobileOptimized() {
               onClick={() => toast({ title: "WhatsApp রিপোর্ট", description: "রিপোর্ট পাঠানো হচ্ছে..." })}
               data-testid="button-whatsapp"
             >
-              <div className="w-full h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 group-active:scale-95">
-                <div className="text-white text-sm mb-0.5">📱</div>
-                <span className="text-xs text-white bengali-font font-bold text-center leading-tight">মেসেজ</span>
+              <div className="w-full h-14 bg-gradient-to-br from-green-500/10 to-emerald-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-green-500/20 transition-all duration-200 group-active:scale-95">
+                <div className="text-green-600 text-sm mb-0.5">📱</div>
+                <span className="text-xs text-green-700 bengali-font font-bold text-center leading-tight">মেসেজ</span>
               </div>
             </button>
           </div>
