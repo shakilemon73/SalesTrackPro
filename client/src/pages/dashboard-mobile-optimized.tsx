@@ -311,10 +311,15 @@ export default function DashboardMobileOptimized() {
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">ব্যবসার খবর</h3>
               </div>
             </div>
-            <div className="flex items-center space-x-1">
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-xs text-green-600 dark:text-green-400 bengali-font font-medium">লাইভ</span>
-            </div>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="h-6 px-2 text-xs bengali-font font-medium text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all duration-200 rounded-md"
+              data-testid="button-live-status"
+            >
+              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse mr-1"></div>
+              লাইভ
+            </Button>
           </div>
           
           <Tabs defaultValue="transactions" onValueChange={setActiveTab} className="space-y-3">
