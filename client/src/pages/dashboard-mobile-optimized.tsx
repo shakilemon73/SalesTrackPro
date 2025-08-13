@@ -8,13 +8,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   TrendingUp, TrendingDown, Users, ShoppingCart, 
   Wallet, AlertCircle, Plus, Bell, Eye,
   ArrowUpRight, Package, MessageCircle,
   BarChart3, Settings, Clock, Target,
   ChevronRight, Activity, RefreshCw, FileText,
-  PenTool, Receipt, DollarSign
+  PenTool, Receipt, DollarSign, ChevronDown
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -22,6 +23,7 @@ export default function DashboardMobileOptimized() {
   const [timeOfDay, setTimeOfDay] = useState('');
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('transactions');
+  const [selectedView, setSelectedView] = useState('sales');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -379,16 +381,47 @@ export default function DashboardMobileOptimized() {
                 </div>
               )}
               
-              <Link to="/transactions" className="block">
-                <Button 
-                  variant="ghost" 
-                  className="w-full text-xs py-2 mt-2 bg-slate-100/50 hover:bg-slate-200/50 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 rounded-lg transition-all duration-200 group" 
-                  data-testid="button-view-all-transactions"
-                >
-                  <span className="bengali-font font-semibold">সব লেনদেন দেখুন</span>
-                  <ChevronRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+              {/* New View All Selector with Live Indicator */}
+              <div className="mt-2 space-y-2">
+                <div className="flex items-center justify-between bg-gradient-to-r from-slate-100/70 to-slate-200/70 dark:from-slate-800/70 dark:to-slate-700/70 rounded-lg p-2 border border-slate-200/50 dark:border-slate-600/50">
+                  <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-xs text-slate-600 dark:text-slate-400 bengali-font font-medium">লাইভ</span>
+                    </div>
+                    <Select value={selectedView} onValueChange={setSelectedView}>
+                      <SelectTrigger className="w-auto h-7 text-xs border-0 bg-transparent focus:ring-0 shadow-none p-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sales" className="text-xs bengali-font">
+                          <div className="flex items-center space-x-2">
+                            <span>🛒</span>
+                            <span>বিক্রয়</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="customers" className="text-xs bengali-font">
+                          <div className="flex items-center space-x-2">
+                            <span>👥</span>
+                            <span>গ্রাহক</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Link to={selectedView === 'sales' ? '/transactions' : '/customers'} className="block">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="text-xs py-1 px-2 bg-slate-200/50 hover:bg-slate-300/50 dark:bg-slate-700/50 dark:hover:bg-slate-600/50 rounded transition-all duration-200 group" 
+                      data-testid="button-view-all-selected"
+                    >
+                      <span className="bengali-font font-semibold">সব দেখুন</span>
+                      <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
             </TabsContent>
             
             {/* Compact Scrollable Customers Tab */}
@@ -448,16 +481,7 @@ export default function DashboardMobileOptimized() {
                 </div>
               )}
               
-              <Link to="/customers" className="block">
-                <Button 
-                  variant="ghost" 
-                  className="w-full text-xs py-2 mt-2 bg-slate-100/50 hover:bg-slate-200/50 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 rounded-lg transition-all duration-200 group" 
-                  data-testid="button-view-all-customers"
-                >
-                  <span className="bengali-font font-semibold">সব গ্রাহক দেখুন</span>
-                  <ChevronRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+              {/* View All Selector is now handled globally above */}
             </TabsContent>
           </Tabs>
         </Card>
