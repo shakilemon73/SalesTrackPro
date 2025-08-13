@@ -17,6 +17,7 @@ import SalesEntryBottomSheet from "@/pages/sales-entry-bottom-sheet";
 import CustomerAddMobileOptimized from "@/pages/customer-add-mobile-optimized";
 import CustomerDetailsMobileOptimized from "@/pages/customer-details-mobile-optimized";
 import CustomerEditMobileOptimized from "@/pages/customer-edit-mobile-optimized";
+import TransactionDetailsMobileOptimized from "@/pages/transaction-details-mobile-optimized";
 import CollectionMobileOptimized from "@/pages/collection-mobile-optimized";
 import ExpenseEntryMobileOptimized from "@/pages/expense-entry-mobile-optimized";
 import InventoryMobileOptimizedFixed from "@/pages/inventory-mobile-optimized-fixed";
@@ -51,6 +52,9 @@ function Router() {
         <Route path="/customers/new" component={CustomerAddMobileOptimized} />
         <Route path="/customers/:id/edit">
           {(params) => <CustomerEditMobileOptimized customerId={params.id} />}
+        </Route>
+        <Route path="/transactions/:type/:id">
+          {(params) => <TransactionDetailsMobileOptimized type={params.type} id={params.id} />}
         </Route>
         <Route path="/customers/:id" component={CustomerDetailsMobileOptimized} />
         <Route path="/inventory" component={InventoryMobileOptimizedFixed} />

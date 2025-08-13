@@ -241,38 +241,40 @@ export default function TransactionsMobileOptimized() {
         <div className="space-y-2">
           {filteredTransactions.length > 0 ? (
             filteredTransactions.slice(0, 50).map((transaction, index) => (
-              <Card key={`${transaction.type}-${transaction.id || index}`} className="border-0 shadow-sm p-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center">
-                      {getTransactionIcon(transaction.type)}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-slate-900 dark:text-white bengali-font truncate">
-                        {transaction.description}
-                      </p>
-                      <div className="flex items-center space-x-2 text-xs text-slate-500">
-                        <span>{transaction.method}</span>
-                        <span>•</span>
-                        <span>{new Date(transaction.date).toLocaleDateString('bn-BD')}</span>
+              <Link key={`${transaction.type}-${transaction.id || index}`} to={`/transactions/${transaction.type}/${transaction.id}`}>
+                <Card className="border-0 shadow-sm p-3 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center">
+                        {getTransactionIcon(transaction.type)}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white bengali-font truncate">
+                          {transaction.description}
+                        </p>
+                        <div className="flex items-center space-x-2 text-xs text-slate-500">
+                          <span>{transaction.method}</span>
+                          <span>•</span>
+                          <span>{new Date(transaction.date).toLocaleDateString('bn-BD')}</span>
+                        </div>
                       </div>
                     </div>
+                    <div className="text-right">
+                      <p className={`text-sm font-bold number-font ${getTransactionColor(transaction.type)}`}>
+                        {transaction.type === 'expense' ? '-' : '+'}
+                        {formatCurrency(transaction.amount)}
+                      </p>
+                      <Badge 
+                        variant="outline" 
+                        className="text-xs h-4 px-1"
+                      >
+                        {transaction.type === 'sale' ? 'বিক্রয়' : 
+                         transaction.type === 'expense' ? 'খরচ' : 'আদায়'}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className={`text-sm font-bold number-font ${getTransactionColor(transaction.type)}`}>
-                      {transaction.type === 'expense' ? '-' : '+'}
-                      {formatCurrency(transaction.amount)}
-                    </p>
-                    <Badge 
-                      variant="outline" 
-                      className="text-xs h-4 px-1"
-                    >
-                      {transaction.type === 'sale' ? 'বিক্রয়' : 
-                       transaction.type === 'expense' ? 'খরচ' : 'আদায়'}
-                    </Badge>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </Link>
             ))
           ) : (
             <Card className="border-0 shadow-sm p-6 text-center">

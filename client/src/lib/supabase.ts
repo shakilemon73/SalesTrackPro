@@ -599,6 +599,27 @@ export const supabaseService = {
     return data;
   },
 
+  async updateSale(saleId: string, updates: Partial<Sale>): Promise<Sale> {
+    const { data, error } = await supabase
+      .from('sales')
+      .update(updates)
+      .eq('id', saleId)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteSale(saleId: string): Promise<void> {
+    const { error } = await supabase
+      .from('sales')
+      .delete()
+      .eq('id', saleId);
+    
+    if (error) throw error;
+  },
+
   // Expenses - ONLY REAL SUPABASE DATA
   async getExpenses(userId: string, limit?: number): Promise<Expense[]> {
     console.log('🔥 FETCHING EXPENSES for user:', userId, 'limit:', limit);
@@ -633,6 +654,27 @@ export const supabaseService = {
     
     if (error) throw error;
     return data;
+  },
+
+  async updateExpense(expenseId: string, updates: Partial<Expense>): Promise<Expense> {
+    const { data, error } = await supabase
+      .from('expenses')
+      .update(updates)
+      .eq('id', expenseId)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteExpense(expenseId: string): Promise<void> {
+    const { error } = await supabase
+      .from('expenses')
+      .delete()
+      .eq('id', expenseId);
+    
+    if (error) throw error;
   },
 
   // Collections - ONLY REAL SUPABASE DATA
