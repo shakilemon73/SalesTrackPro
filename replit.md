@@ -6,9 +6,12 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 - **August 13, 2025**: Successfully migrated project from Replit Agent to standard Replit environment
-- **Sales Entry Optimization**: Removed bottom navigation from sales entry page and optimized layout for 917x412 screen size
-- **Mobile UI Enhancements**: Reduced form padding, compacted input heights, and improved spacing for mobile devices
+- **Mobile Optimization Complete**: Fully optimized sales entry page for 917x412 screen resolution
+- **Automatic Customer Creation**: Fixed and implemented automatic customer creation when entering new customer names
+- **Sales Entry Optimization**: Removed bottom navigation from sales entry page and optimized all form elements
+- **Mobile UI Enhancements**: Reduced form padding from p-4 to p-3/p-2, compacted input heights from h-11 to h-9/h-10, optimized spacing
 - **Navigation Improvements**: Bottom navigation now hidden on entry pages (/sales/new, /customers/new, /expenses/new) for better UX
+- **Visual Feedback**: Added "স্বয়ংক্রিয় যোগ" (Auto Add) indicator when new customers will be auto-created
 
 # System Architecture
 
