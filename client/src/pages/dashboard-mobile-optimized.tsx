@@ -342,113 +342,95 @@ export default function DashboardMobileOptimized() {
               </TabsTrigger>
             </TabsList>
             
-            {/* Compact Scrollable Transactions Tab */}
-            <TabsContent value="transactions" className="space-y-2 mt-3">
+            {/* Optimized Dense List - Transactions Tab */}
+            <TabsContent value="transactions" className="mt-2">
               {recentSales.length > 0 ? (
-                <div className="max-h-56 overflow-y-auto space-y-2 pr-1">
-                  {recentSales.map((sale) => (
-                    <div key={sale.id} className="bg-gradient-to-r from-white to-emerald-50/50 dark:from-slate-800 dark:to-emerald-900/10 rounded-lg p-2 border border-emerald-100/50 dark:border-emerald-800/30">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-green-500 rounded-lg flex items-center justify-center shadow-sm">
-                            <div className="text-white text-sm">💵</div>
-                          </div>
-                          <div>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white bengali-font">
+                <div className="max-h-80 overflow-y-auto">
+                  <div className="space-y-1">
+                    {recentSales.map((sale, index) => (
+                      <div key={sale.id} className="flex items-center justify-between py-2 px-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-700 last:border-b-0">
+                        <div className="flex items-center space-x-3 flex-1 min-w-0">
+                          <div className="w-2 h-2 bg-emerald-500 rounded-full flex-shrink-0"></div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-slate-900 dark:text-white bengali-font truncate">
                               {sale.customer_name}
                             </p>
-                            <div className="flex items-center space-x-2">
-                              <span className="text-xs text-emerald-600 dark:text-emerald-400 bengali-font font-medium">
-                                💳 {sale.payment_method}
-                              </span>
-                            </div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 bengali-font">
+                              {sale.payment_method}
+                            </p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm font-black text-emerald-600 dark:text-emerald-400 number-font">
-                            +৳{formatCurrency(Number(sale.total_amount))}
+                        <div className="text-right flex-shrink-0 ml-2">
+                          <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 number-font">
+                            ৳{formatCurrency(Number(sale.total_amount))}
                           </p>
                           {sale.due_amount > 0 && (
-                            <p className="text-xs text-orange-600 dark:text-orange-400 bengali-font font-medium">
+                            <p className="text-xs text-orange-500 dark:text-orange-400 bengali-font">
                               বাকি: ৳{formatCurrency(sale.due_amount)}
                             </p>
                           )}
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               ) : (
-                <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-lg border border-dashed border-slate-300 dark:border-slate-600">
-                  <div className="w-12 h-12 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 rounded-xl flex items-center justify-center mx-auto mb-2 shadow-inner">
-                    <div className="text-lg">💰</div>
+                <div className="text-center py-8 text-slate-400 dark:text-slate-500">
+                  <div className="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <span className="text-sm">💰</span>
                   </div>
-                  <p className="text-slate-600 dark:text-slate-400 bengali-font text-sm font-semibold">আজ কোনো বিক্রয় হয়নি</p>
-                  <p className="text-slate-500 dark:text-slate-500 bengali-font text-xs mt-1">প্রথম বিক্রয় শুরু করুন</p>
+                  <p className="text-xs bengali-font">আজ কোনো বিক্রয় হয়নি</p>
                 </div>
               )}
-              
-
             </TabsContent>
             
-            {/* Compact Scrollable Customers Tab */}
-            <TabsContent value="customers" className="space-y-2 mt-3">
+            {/* Optimized Dense List - Customers Tab */}
+            <TabsContent value="customers" className="mt-2">
               {customers.length > 0 ? (
-                <div className="max-h-56 overflow-y-auto space-y-2 pr-1">
-                  {customers.slice(0, 10).map((customer) => (
-                    <div key={customer.id} className="bg-gradient-to-r from-white to-blue-50/50 dark:from-slate-800 dark:to-blue-900/10 rounded-lg p-2 border border-blue-100/50 dark:border-blue-800/30">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center shadow-sm">
-                            <div className="text-white text-sm">👤</div>
-                          </div>
-                          <div>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white bengali-font">
+                <div className="max-h-80 overflow-y-auto">
+                  <div className="space-y-1">
+                    {customers.slice(0, 10).map((customer, index) => (
+                      <div key={customer.id} className="flex items-center justify-between py-2 px-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-700 last:border-b-0">
+                        <div className="flex items-center space-x-3 flex-1 min-w-0">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-slate-900 dark:text-white bengali-font truncate">
                               {customer.name}
                             </p>
-                            <div className="flex items-center space-x-1">
-                              <span className="text-xs text-blue-600 dark:text-blue-400 bengali-font font-medium">
-                                📞 {customer.phone_number}
-                              </span>
-                            </div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 bengali-font truncate">
+                              {customer.phone_number}
+                            </p>
                           </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right flex-shrink-0 ml-2">
                           {customer.total_credit > 0 ? (
                             <div>
-                              <p className="text-sm font-black text-red-500 dark:text-red-400 number-font">
-                                +৳{formatCurrency(customer.total_credit)}
+                              <p className="text-sm font-bold text-red-500 dark:text-red-400 number-font">
+                                ৳{formatCurrency(customer.total_credit)}
                               </p>
-                              <p className="text-xs text-red-400 dark:text-red-500 bengali-font font-medium">
-                                🔔 বাকি
-                              </p>
+                              <p className="text-xs text-red-400 bengali-font">বাকি</p>
                             </div>
                           ) : (
                             <div>
-                              <p className="text-sm font-black text-emerald-600 dark:text-emerald-400 number-font">
+                              <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 number-font">
                                 ৳০
                               </p>
-                              <p className="text-xs text-emerald-500 dark:text-emerald-400 bengali-font font-medium">
-                                ✅ সম্পূর্ণ
-                              </p>
+                              <p className="text-xs text-emerald-500 bengali-font">পূর্ণ</p>
                             </div>
                           )}
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               ) : (
-                <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-lg border border-dashed border-slate-300 dark:border-slate-600">
-                  <div className="w-12 h-12 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 rounded-xl flex items-center justify-center mx-auto mb-2 shadow-inner">
-                    <div className="text-lg">👥</div>
+                <div className="text-center py-8 text-slate-400 dark:text-slate-500">
+                  <div className="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <span className="text-sm">👥</span>
                   </div>
-                  <p className="text-slate-600 dark:text-slate-400 bengali-font text-sm font-semibold">কোনো গ্রাহক নেই</p>
-                  <p className="text-slate-500 dark:text-slate-500 bengali-font text-xs mt-1">প্রথম গ্রাহক যোগ করুন</p>
+                  <p className="text-xs bengali-font">কোনো গ্রাহক নেই</p>
                 </div>
               )}
-              
-
             </TabsContent>
           </Tabs>
         </Card>
