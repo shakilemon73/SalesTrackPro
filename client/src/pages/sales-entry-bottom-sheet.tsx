@@ -15,7 +15,8 @@ import {
   ArrowLeft, Check, DollarSign, User, CreditCard, 
   Calculator, Package, Zap, Phone, Plus, ChevronUp,
   ChevronDown, Clock, MapPin, Hash, Wallet, TrendingUp,
-  Receipt, Shield, Sparkles, X, MessageCircle, CheckCircle2
+  Receipt, Shield, Sparkles, X, MessageCircle, CheckCircle2,
+  Star, Home
 } from "lucide-react";
 
 // Enhanced schema with all fields
@@ -27,6 +28,99 @@ const quickSaleSchema = z.object({
   customerPhone: z.string().optional(),
   notes: z.string().optional(),
 });
+
+// Bottom Success Popup Modal (like the image)
+const SuccessPopup = ({ show, onClose, customerName, amount }: {
+  show: boolean;
+  onClose: () => void;
+  customerName: string;
+  amount: string;
+}) => {
+  if (!show) return null;
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" onClick={onClose} />
+      
+      {/* Popup Modal */}
+      <div className={`fixed bottom-0 left-0 right-0 z-50 transform transition-all duration-500 ${
+        show ? 'translate-y-0' : 'translate-y-full'
+      }`}>
+        <div className="bg-white dark:bg-slate-900 rounded-t-3xl p-6 shadow-2xl">
+          
+          {/* Success Icon with Animation */}
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="relative">
+              {/* Animated Success Circle */}
+              <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center shadow-lg">
+                <Check className="w-10 h-10 text-white animate-bounce" />
+              </div>
+              
+              {/* Sparkle Effects */}
+              <div className="absolute -top-2 -left-2">
+                <Star className="w-4 h-4 text-yellow-400 animate-pulse" />
+              </div>
+              <div className="absolute -top-2 -right-2">
+                <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
+              </div>
+              <div className="absolute -bottom-2 -left-2">
+                <Star className="w-3 h-3 text-pink-400 animate-pulse" />
+              </div>
+              <div className="absolute -bottom-2 -right-2">
+                <Star className="w-3 h-3 text-purple-400 animate-pulse" />
+              </div>
+            </div>
+
+            {/* Success Message */}
+            <div className="space-y-2">
+              <h2 className="text-xl font-black text-slate-900 dark:text-white bengali-font">
+                বিক্রয় সম্পন্ন!
+              </h2>
+              <p className="text-sm text-slate-600 dark:text-slate-400 bengali-font">
+                {customerName} এর জন্য ৳{formatCurrency(parseFloat(amount || "0"))} টাকার বিক্রয় সফল হয়েছে
+              </p>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="flex items-center space-x-4 py-3 px-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-200 dark:border-emerald-800">
+              <div className="flex items-center space-x-2">
+                <Receipt className="w-4 h-4 text-emerald-600" />
+                <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300 bengali-font">
+                  বিক্রয় নং: #{Date.now().toString().slice(-4)}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Clock className="w-4 h-4 text-emerald-600" />
+                <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300 bengali-font">
+                  {new Date().toLocaleTimeString('bn-BD', { hour12: false })}
+                </span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="w-full space-y-3 pt-2">
+              <Button
+                onClick={onClose}
+                className="w-full h-12 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold text-base bengali-font rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200"
+              >
+                <Home className="w-5 h-5 mr-2" />
+                ড্যাশবোর্ডে ফিরুন
+              </Button>
+              
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full h-10 text-emerald-600 dark:text-emerald-400 font-semibold text-sm bengali-font hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
+              >
+                নতুন বিক্রয় করুন
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
 
 // Custom Bottom Toast Component
 const BottomToast = ({ show, message, type, onClose }: {
@@ -53,7 +147,7 @@ const BottomToast = ({ show, message, type, onClose }: {
                <Clock className="w-5 h-5" />;
 
   return (
-    <div className={`fixed bottom-4 left-4 right-4 z-50 transform transition-all duration-500 ${
+    <div className={`fixed bottom-4 left-4 right-4 z-40 transform transition-all duration-500 ${
       show ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
     }`}>
       <div className={`bg-gradient-to-r ${bgColor} p-4 rounded-xl shadow-lg backdrop-blur-xl border border-white/20`}>
@@ -75,6 +169,8 @@ export default function SalesEntryBottomSheet() {
   const [showCustomerSuggestions, setShowCustomerSuggestions] = useState(false);
   const [timeOfDay, setTimeOfDay] = useState('');
   const [toast, setToast] = useState({ show: false, message: '', type: 'info' as 'success' | 'error' | 'info' });
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [successData, setSuccessData] = useState({ customerName: '', amount: '' });
   
   const { toast: systemToast } = useToast();
   const queryClient = useQueryClient();
@@ -136,13 +232,18 @@ export default function SalesEntryBottomSheet() {
       };
       return await supabaseService.createSale(CURRENT_USER_ID, dbSaleData);
     },
-    onSuccess: () => {
-      showToast("🎉 বিক্রয় সফলভাবে রেকর্ড করা হয়েছে!", 'success');
+    onSuccess: (data, variables) => {
+      // Set success data and show popup
+      setSuccessData({
+        customerName: variables.customerName,
+        amount: variables.amount
+      });
+      setShowSuccessPopup(true);
+      
       queryClient.invalidateQueries({ queryKey: ['sales'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       form.reset();
       setSelectedCustomer(null);
-      setTimeout(() => setLocation("/"), 2000);
     },
     onError: () => {
       showToast("❌ বিক্রয় রেকর্ড করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।", 'error');
@@ -513,6 +614,17 @@ export default function SalesEntryBottomSheet() {
         message={toast.message}
         type={toast.type}
         onClose={() => setToast({ ...toast, show: false })}
+      />
+
+      {/* Success Popup Modal */}
+      <SuccessPopup 
+        show={showSuccessPopup}
+        customerName={successData.customerName}
+        amount={successData.amount}
+        onClose={() => {
+          setShowSuccessPopup(false);
+          setLocation("/");
+        }}
       />
     </div>
   );
