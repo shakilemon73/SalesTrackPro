@@ -4,7 +4,8 @@ import { formatCurrency, toBengaliNumber, getBengaliDate } from "@/lib/bengali-u
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { supabaseService } from "@/lib/supabase";
+import { useAuth } from "@/hooks/use-auth";
 import { 
   ArrowLeft, User, Phone, MapPin, Calendar, 
   ShoppingCart, Wallet, TrendingUp, Clock,
@@ -18,20 +19,21 @@ interface CustomerDetailsProps {
 
 export default function CustomerDetailsMobileOptimized({ params }: CustomerDetailsProps) {
   const customerId = params.id;
+  const { userId } = useAuth();
 
   const { data: customer, isLoading: customerLoading, error: customerError } = useQuery({
     queryKey: ['customer', customerId],
-    queryFn: () => supabaseService.getCustomer(CURRENT_USER_ID, customerId),
+    queryFn: () => supabaseService.getCustomer(userId, customerId),
   });
 
   const { data: sales = [] } = useQuery({
-    queryKey: ['sales', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getSales(CURRENT_USER_ID),
+    queryKey: ['sales', userId],
+    queryFn: () => supabaseService.getSales(userId),
   });
 
   const { data: collections = [] } = useQuery({
-    queryKey: ['collections', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getCollections(CURRENT_USER_ID),
+    queryKey: ['collections', userId],
+    queryFn: () => supabaseService.getCollections(userId),
   });
 
 

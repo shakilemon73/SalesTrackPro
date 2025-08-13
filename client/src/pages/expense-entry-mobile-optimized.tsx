@@ -4,7 +4,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useLocation } from "wouter";
-import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { supabaseService } from "@/lib/supabase";
+import { useAuth } from "@/hooks/use-auth";
 import { formatCurrency, toBengaliNumber, getBangladeshTimeISO } from "@/lib/bengali-utils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -43,12 +44,13 @@ export default function ExpenseEntryMobileOptimized() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { userId } = useAuth();
 
   // Get today's expenses
   const { data: todayExpenses = [] } = useQuery({
-    queryKey: ['expenses', CURRENT_USER_ID, 'today'],
+    queryKey: ['expenses', userId, 'today'],
     queryFn: async () => {
-      const expenses = await supabaseService.getExpenses(CURRENT_USER_ID);
+      const expenses = await supabaseService.getExpenses(userId);
       const today = new Date().toDateString();
       return expenses.filter(expense => 
         new Date(expense.expense_date || expense.created_at || new Date()).toDateString() === today
@@ -73,7 +75,7 @@ export default function ExpenseEntryMobileOptimized() {
         description: data.description,
         expense_date: getBangladeshTimeISO(),
       };
-      return await supabaseService.createExpense(CURRENT_USER_ID, expenseData);
+      return await supabaseService.createExpense(userId, expenseData);
     },
     onSuccess: () => {
       toast({

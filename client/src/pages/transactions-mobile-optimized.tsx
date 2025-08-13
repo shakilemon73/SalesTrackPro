@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { supabaseService } from "@/lib/supabase";
+import { useAuth } from "@/hooks/use-auth";
 import { 
   ArrowLeft, ArrowUpRight, ArrowDownRight, 
   Search, Filter, Download, Calendar,
@@ -22,25 +23,26 @@ export default function TransactionsMobileOptimized() {
   const [filterType, setFilterType] = useState("all");
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const { toast } = useToast();
+  const { userId } = useAuth();
 
   const { data: sales = [], isLoading: salesLoading } = useQuery({
-    queryKey: ['sales', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getSales(CURRENT_USER_ID),
+    queryKey: ['sales', userId],
+    queryFn: () => supabaseService.getSales(userId),
   });
 
   const { data: expenses = [], isLoading: expensesLoading } = useQuery({
-    queryKey: ['expenses', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getExpenses(CURRENT_USER_ID),
+    queryKey: ['expenses', userId],
+    queryFn: () => supabaseService.getExpenses(userId),
   });
 
   const { data: collections = [], isLoading: collectionsLoading } = useQuery({
-    queryKey: ['collections', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getCollections(CURRENT_USER_ID),
+    queryKey: ['collections', userId],
+    queryFn: () => supabaseService.getCollections(userId),
   });
 
   const { data: customers = [] } = useQuery({
-    queryKey: ['customers', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
+    queryKey: ['customers', userId],
+    queryFn: () => supabaseService.getCustomers(userId),
   });
 
   const isLoading = salesLoading || expensesLoading || collectionsLoading;

@@ -14,7 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency, toBengaliNumber } from "@/lib/bengali-utils";
-import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { supabaseService } from "@/lib/supabase";
+import { useAuth } from "@/hooks/use-auth";
 import { Search, Plus, Package, AlertTriangle, CheckCircle, XCircle, Filter } from "lucide-react";
 
 const productSchema = z.object({
@@ -35,6 +36,7 @@ export default function InventoryMobileOptimized() {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { userId } = useAuth();
 
   const form = useForm({
     resolver: zodResolver(productSchema),
@@ -50,13 +52,13 @@ export default function InventoryMobileOptimized() {
   });
 
   const { data: products = [], isLoading } = useQuery({
-    queryKey: ['products', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getProducts(CURRENT_USER_ID),
+    queryKey: ['products', userId],
+    queryFn: () => supabaseService.getProducts(userId),
   });
 
   const createProductMutation = useMutation({
     mutationFn: async (productData: any) => {
-      return await supabaseService.createProduct(CURRENT_USER_ID, productData);
+      return await supabaseService.createProduct(userId, productData);
     },
     onSuccess: () => {
       toast({

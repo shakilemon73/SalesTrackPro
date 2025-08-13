@@ -12,7 +12,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency, toBengaliNumber } from "@/lib/bengali-utils";
-import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { supabaseService } from "@/lib/supabase";
+import { useAuth } from "@/hooks/use-auth";
 import { 
   ArrowLeft, Plus, Minus, ShoppingCart, User, 
   Calculator, CreditCard, Banknote, DollarSign,
@@ -43,6 +44,7 @@ export default function SalesEntryMobileOptimized() {
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { userId } = useAuth();
 
   const form = useForm({
     resolver: zodResolver(saleSchema),
@@ -54,13 +56,13 @@ export default function SalesEntryMobileOptimized() {
   });
 
   const { data: customers = [] } = useQuery({
-    queryKey: ['customers', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
+    queryKey: ['customers', userId],
+    queryFn: () => supabaseService.getCustomers(userId),
   });
 
   const { data: products = [] } = useQuery({
-    queryKey: ['products', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getProducts(CURRENT_USER_ID),
+    queryKey: ['products', userId],
+    queryFn: () => supabaseService.getProducts(userId),
   });
 
   const createSaleMutation = useMutation({
@@ -76,7 +78,7 @@ export default function SalesEntryMobileOptimized() {
         items: formData.items,
         sale_date: getBangladeshTimeISO()
       };
-      return await supabaseService.createSale(CURRENT_USER_ID, dbSaleData);
+      return await supabaseService.createSale(userId, dbSaleData);
     },
     onSuccess: () => {
       toast({

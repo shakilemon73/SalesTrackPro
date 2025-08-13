@@ -10,7 +10,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency, toBengaliNumber, getBengaliDate } from "@/lib/bengali-utils";
-import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { supabaseService } from "@/lib/supabase";
+import { useAuth } from "@/hooks/use-auth";
 import { 
   ArrowLeft, Check, DollarSign, User, CreditCard, 
   Calculator, Package, Zap, Phone, Plus, ChevronUp,
@@ -177,6 +178,7 @@ export default function SalesEntryBottomSheet() {
   
   const { toast: systemToast } = useToast();
   const queryClient = useQueryClient();
+  const { userId } = useAuth();
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -204,19 +206,19 @@ export default function SalesEntryBottomSheet() {
   });
 
   const { data: customers = [] } = useQuery({
-    queryKey: ['customers', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
+    queryKey: ['customers', userId],
+    queryFn: () => supabaseService.getCustomers(userId),
   });
 
   const { data: todayStats } = useQuery({
-    queryKey: ['dashboard', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getStats(CURRENT_USER_ID),
+    queryKey: ['dashboard', userId],
+    queryFn: () => supabaseService.getStats(userId),
   });
 
   // Create new customer mutation
   const createCustomerMutation = useMutation({
     mutationFn: async (customerData: any) => {
-      return await supabaseService.createCustomer(CURRENT_USER_ID, {
+      return await supabaseService.createCustomer(userId, {
         name: customerData.customerName,
         phone_number: customerData.customerPhone,
         address: customerData.customerAddress || '',
@@ -265,7 +267,7 @@ export default function SalesEntryBottomSheet() {
         }],
         sale_date: getBangladeshTimeISO()
       };
-      return await supabaseService.createSale(CURRENT_USER_ID, dbSaleData);
+      return await supabaseService.createSale(userId, dbSaleData);
     },
     onSuccess: (data, variables) => {
       // Set success data and show popup
@@ -305,7 +307,7 @@ export default function SalesEntryBottomSheet() {
           total_credit: 0
         });
         
-        const newCustomer = await supabaseService.createCustomer(CURRENT_USER_ID, {
+        const newCustomer = await supabaseService.createCustomer(userId, {
           name: data.customerName.trim(),
           phone_number: data.customerPhone || '',
           address: data.customerAddress || '',
@@ -316,10 +318,10 @@ export default function SalesEntryBottomSheet() {
         
         // Clear cache and update customer list
         const { clearCustomerCache } = await import('@/lib/cache-manager');
-        clearCustomerCache(CURRENT_USER_ID);
+        clearCustomerCache(userId);
         
         queryClient.invalidateQueries({ queryKey: ['customers'] });
-        queryClient.invalidateQueries({ queryKey: ['customers', CURRENT_USER_ID] });
+        queryClient.invalidateQueries({ queryKey: ['customers', userId] });
         setSelectedCustomer(newCustomer);
         
         showToast(`✅ নতুন গ্রাহক ${data.customerName} স্বয়ংক্রিয়ভাবে যোগ করা হয়েছে`, 'success');

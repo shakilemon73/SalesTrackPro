@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabaseService, DEMO_USER_ID } from "@/lib/supabase";
+import { supabaseService } from "@/lib/supabase";
 import { useAuth } from "@/hooks/use-auth";
 import { 
   ArrowLeft, Settings, User, Bell, Shield, Database,
@@ -33,8 +33,17 @@ export default function SettingsMobileOptimized() {
   });
   
   const { toast } = useToast();
-  const { user, signOut } = useAuth();
-  const currentUserId = user?.id || DEMO_USER_ID;
+  const { userId, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Logout error:', error);
+      window.location.reload();
+    }
+  };
 
   // Load saved settings
   useEffect(() => {
@@ -54,35 +63,19 @@ export default function SettingsMobileOptimized() {
 
   // Get actual data for statistics
   const { data: customers = [] } = useQuery({
-    queryKey: ['customers', currentUserId],
-    queryFn: () => supabaseService.getCustomers(currentUserId),
+    queryKey: ['customers', userId],
+    queryFn: () => supabaseService.getCustomers(userId),
   });
 
   const { data: sales = [] } = useQuery({
-    queryKey: ['sales', currentUserId],
-    queryFn: () => supabaseService.getSales(currentUserId),
+    queryKey: ['sales', userId],
+    queryFn: () => supabaseService.getSales(userId),
   });
 
   const { data: stats } = useQuery({
-    queryKey: ['dashboard', currentUserId],
-    queryFn: () => supabaseService.getStats(currentUserId),
+    queryKey: ['dashboard', userId],
+    queryFn: () => supabaseService.getStats(userId),
   });
-
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      toast({
-        title: "লগআউট সফল",
-        description: "আপনি সফলভাবে লগআউট হয়েছেন",
-      });
-    } catch (error) {
-      toast({
-        title: "সমস্যা হয়েছে",
-        description: "লগআউট করতে সমস্যা হয়েছে",
-        variant: "destructive"
-      });
-    }
-  };
 
   const handleSettingsSave = () => {
     const settings = { notifications, autoBackup, darkMode };

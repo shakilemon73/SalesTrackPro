@@ -5,7 +5,7 @@
  */
 
 import { offlineStorage } from './offline-storage';
-import { supabaseService, CURRENT_USER_ID } from './supabase';
+import { supabaseService } from './supabase';
 
 interface SyncStatus {
   issyncing: boolean;
@@ -93,19 +93,19 @@ class SyncManager {
   private async syncCreateAction(table: string, data: any): Promise<void> {
     switch (table) {
       case 'customers':
-        await supabaseService.createCustomer(CURRENT_USER_ID, data);
+        await supabaseService.createCustomer(userId, data);
         break;
       case 'products':
-        await supabaseService.createProduct(CURRENT_USER_ID, data);
+        await supabaseService.createProduct(userId, data);
         break;
       case 'sales':
-        await supabaseService.createSale(CURRENT_USER_ID, data);
+        await supabaseService.createSale(userId, data);
         break;
       case 'expenses':
-        await supabaseService.createExpense(CURRENT_USER_ID, data);
+        await supabaseService.createExpense(userId, data);
         break;
       case 'collections':
-        await supabaseService.createCollection(CURRENT_USER_ID, data);
+        await supabaseService.createCollection(userId, data);
         break;
       default:
         throw new Error(`Unknown table for create: ${table}`);
@@ -191,19 +191,19 @@ class SyncManager {
       
       switch (table) {
         case 'customers':
-          serverData = await supabaseService.getCustomers(CURRENT_USER_ID);
+          serverData = await supabaseService.getCustomers(userId);
           break;
         case 'products':
-          serverData = await supabaseService.getProducts(CURRENT_USER_ID);
+          serverData = await supabaseService.getProducts(userId);
           break;
         case 'sales':
-          serverData = await supabaseService.getSales(CURRENT_USER_ID);
+          serverData = await supabaseService.getSales(userId);
           break;
         case 'expenses':
-          serverData = await supabaseService.getExpenses(CURRENT_USER_ID);
+          serverData = await supabaseService.getExpenses(userId);
           break;
         case 'collections':
-          serverData = await supabaseService.getCollections(CURRENT_USER_ID);
+          serverData = await supabaseService.getCollections(userId);
           break;
         default:
           throw new Error(`Unknown table: ${table}`);

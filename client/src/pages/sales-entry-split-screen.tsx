@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency, toBengaliNumber } from "@/lib/bengali-utils";
-import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { supabaseService } from "@/lib/supabase";
+import { useAuth } from "@/hooks/use-auth";
 import { 
   ArrowLeft, Check, DollarSign, User, CreditCard, 
   Calculator, Package, Zap, Phone, Plus
@@ -30,6 +31,7 @@ export default function SalesEntrySplitScreen() {
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { userId } = useAuth();
 
   const form = useForm({
     resolver: zodResolver(quickSaleSchema),
@@ -41,13 +43,13 @@ export default function SalesEntrySplitScreen() {
   });
 
   const { data: customers = [] } = useQuery({
-    queryKey: ['customers', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
+    queryKey: ['customers', userId],
+    queryFn: () => supabaseService.getCustomers(userId),
   });
 
   const { data: recentSales = [] } = useQuery({
-    queryKey: ['sales', CURRENT_USER_ID, 'recent'],
-    queryFn: () => supabaseService.getSales(CURRENT_USER_ID, 5),
+    queryKey: ['sales', userId, 'recent'],
+    queryFn: () => supabaseService.getSales(userId, 5),
   });
 
   const createSaleMutation = useMutation({
@@ -72,7 +74,7 @@ export default function SalesEntrySplitScreen() {
         }],
         sale_date: getBangladeshTimeISO()
       };
-      return await supabaseService.createSale(CURRENT_USER_ID, dbSaleData);
+      return await supabaseService.createSale(userId, dbSaleData);
     },
     onSuccess: () => {
       toast({

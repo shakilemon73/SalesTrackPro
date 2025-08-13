@@ -6,7 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { supabaseService } from "@/lib/supabase";
+import { useAuth } from "@/hooks/use-auth";
 import { 
   ArrowLeft, TrendingUp, TrendingDown, Calendar,
   BarChart3, PieChart, Users, Package,
@@ -17,25 +18,26 @@ import {
 export default function ReportsMobileOptimized() {
   const [reportPeriod, setReportPeriod] = useState("today");
   const [activeTab, setActiveTab] = useState("overview");
+  const { userId } = useAuth();
 
   const { data: stats } = useQuery({
-    queryKey: ['dashboard', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getStats(CURRENT_USER_ID),
+    queryKey: ['dashboard', userId],
+    queryFn: () => supabaseService.getStats(userId),
   });
 
   const { data: sales = [] } = useQuery({
-    queryKey: ['sales', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getSales(CURRENT_USER_ID),
+    queryKey: ['sales', userId],
+    queryFn: () => supabaseService.getSales(userId),
   });
 
   const { data: expenses = [] } = useQuery({
-    queryKey: ['expenses', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getExpenses(CURRENT_USER_ID),
+    queryKey: ['expenses', userId],
+    queryFn: () => supabaseService.getExpenses(userId),
   });
 
   const { data: customers = [] } = useQuery({
-    queryKey: ['customers', CURRENT_USER_ID],
-    queryFn: () => supabaseService.getCustomers(CURRENT_USER_ID),
+    queryKey: ['customers', userId],
+    queryFn: () => supabaseService.getCustomers(userId),
   });
 
   // Calculate period-based data

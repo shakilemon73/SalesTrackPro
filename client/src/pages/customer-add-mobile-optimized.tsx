@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { isValidBengaliPhone } from "@/lib/bengali-utils";
-import { supabaseService, CURRENT_USER_ID } from "@/lib/supabase";
+import { supabaseService } from "@/lib/supabase";
+import { useAuth } from "@/hooks/use-auth";
 import { 
   ArrowLeft, UserPlus, User, Phone, MapPin, 
   Check, AlertCircle, Save
@@ -29,6 +30,7 @@ export default function CustomerAddMobileOptimized() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { userId } = useAuth();
 
   const form = useForm({
     resolver: zodResolver(customerSchema),
@@ -41,7 +43,7 @@ export default function CustomerAddMobileOptimized() {
 
   const createCustomerMutation = useMutation({
     mutationFn: async (customerData: any) => {
-      return await supabaseService.createCustomer(CURRENT_USER_ID, customerData);
+      return await supabaseService.createCustomer(userId, customerData);
     },
     onSuccess: () => {
       toast({
