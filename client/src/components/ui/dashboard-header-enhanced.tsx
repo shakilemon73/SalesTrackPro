@@ -96,7 +96,7 @@ export default function DashboardHeaderEnhanced({
                   {isLoading ? (
                     <div className="w-12 h-4 bg-emerald-200 rounded animate-pulse"></div>
                   ) : (
-                    formatCurrency(stats?.todaySales || 0)
+                    `${toBengaliNumber(stats?.todaySales || 0)} টাকা`
                   )}
                 </p>
               </div>
@@ -122,7 +122,7 @@ export default function DashboardHeaderEnhanced({
                   {isLoading ? (
                     <div className="w-12 h-4 bg-blue-200 rounded animate-pulse"></div>
                   ) : (
-                    formatCurrency(stats?.todayProfit || 0)
+                    `${toBengaliNumber(stats?.todayProfit || 0)} টাকা`
                   )}
                 </p>
               </div>
@@ -148,7 +148,7 @@ export default function DashboardHeaderEnhanced({
                   {isLoading ? (
                     <div className="w-12 h-4 bg-orange-200 rounded animate-pulse"></div>
                   ) : (
-                    formatCurrency(stats?.pendingCollection || 0)
+                    `${toBengaliNumber(stats?.pendingCollection || 0)} টাকা`
                   )}
                 </p>
               </div>
