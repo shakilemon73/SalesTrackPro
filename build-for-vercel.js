@@ -5,9 +5,9 @@
  * This script prepares the React app for production deployment
  */
 
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
 
 console.log('🏗️  Building দোকান হিসাব for Vercel deployment...\n');
 
@@ -31,10 +31,10 @@ try {
 
   // Step 4: Verify build output
   console.log('4️⃣  Verifying build output...');
-  const distPath = fs.existsSync('dist') ? 'dist' : 'client/dist';
+  const distPath = 'dist/public'; // Vite outputs to dist/public based on vite.config.ts
   
   if (!fs.existsSync(distPath)) {
-    throw new Error('Build output directory not found');
+    throw new Error('Build output directory not found at dist/public');
   }
 
   const buildFiles = fs.readdirSync(distPath);
