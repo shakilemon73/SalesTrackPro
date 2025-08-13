@@ -164,63 +164,63 @@ export default function DashboardMobileOptimized() {
         {/* Ultra-Compact KPIs for 916x412 */}
         <div className="grid grid-cols-2 gap-2">
           {/* Today's Sales - Compact */}
-          <Card className="border-0 shadow-md bg-gradient-to-br from-white via-emerald-50/50 to-emerald-100/80 dark:from-slate-800 dark:to-emerald-900/20 p-3 relative overflow-hidden hover:shadow-lg transition-all duration-200 group">
+          <Card className="border-0 shadow-sm bg-emerald-50/10 dark:bg-emerald-900/10 p-3 relative overflow-hidden hover:shadow-md hover:bg-emerald-50/20 dark:hover:bg-emerald-900/20 transition-all duration-200 group">
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
-                <div className="w-7 h-7 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-sm">
-                  <div className="text-white text-sm">💰</div>
+                <div className="w-7 h-7 bg-gradient-to-br from-emerald-500/10 to-green-600/10 rounded-xl flex items-center justify-center shadow-sm">
+                  <div className="text-emerald-600 text-sm">💰</div>
                 </div>
                 <div>
-                  <p className="text-xs text-emerald-700 dark:text-emerald-300 bengali-font font-semibold">আজকের বিক্রয়</p>
+                  <p className="text-xs text-emerald-700/70 dark:text-emerald-300/70 bengali-font font-semibold">আজকের বিক্রয়</p>
                 </div>
               </div>
               <div>
-                <p className="text-xl font-black text-emerald-800 dark:text-emerald-200 number-font leading-none">
+                <p className="text-xl font-black text-emerald-800/90 dark:text-emerald-200/90 number-font leading-none">
                   ৳{formatCurrency(stats?.todaySales || 0)}
                 </p>
                 <div className="flex items-center space-x-1 mt-1">
-                  <ArrowUpRight className="w-2.5 h-2.5 text-emerald-600" />
-                  <span className="text-emerald-700 dark:text-emerald-400 text-xs bengali-font font-medium">
+                  <ArrowUpRight className="w-2.5 h-2.5 text-emerald-600/70" />
+                  <span className="text-emerald-700/70 dark:text-emerald-400/70 text-xs bengali-font font-medium">
                     +{toBengaliNumber(salesGrowth)}%
                   </span>
                 </div>
               </div>
             </div>
-            <div className="absolute top-1 right-1 text-emerald-300/30 text-sm">📈</div>
+            <div className="absolute top-1 right-1 text-emerald-300/10 text-sm">📈</div>
           </Card>
 
           {/* Pending Collection - Compact */}
-          <Card className="border-0 shadow-md bg-gradient-to-br from-white via-orange-50/50 to-amber-100/80 dark:from-slate-800 dark:to-orange-900/20 p-3 relative overflow-hidden hover:shadow-lg transition-all duration-200 group">
+          <Card className="border-0 shadow-sm bg-orange-50/10 dark:bg-orange-900/10 p-3 relative overflow-hidden hover:shadow-md hover:bg-orange-50/20 dark:hover:bg-orange-900/20 transition-all duration-200 group">
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
-                <div className="w-7 h-7 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center shadow-sm">
-                  <div className="text-white text-sm">🏦</div>
+                <div className="w-7 h-7 bg-gradient-to-br from-orange-500/10 to-amber-600/10 rounded-xl flex items-center justify-center shadow-sm">
+                  <div className="text-orange-600 text-sm">🏦</div>
                 </div>
                 <div>
-                  <p className="text-xs text-orange-700 dark:text-orange-300 bengali-font font-semibold">বাকি আদায়</p>
+                  <p className="text-xs text-orange-700/70 dark:text-orange-300/70 bengali-font font-semibold">বাকি আদায়</p>
                 </div>
               </div>
               <div>
-                <p className="text-xl font-black text-orange-800 dark:text-orange-200 number-font leading-none">
+                <p className="text-xl font-black text-orange-800/90 dark:text-orange-200/90 number-font leading-none">
                   ৳{formatCurrency(stats?.pendingCollection || 0)}
                 </p>
                 <div className="flex items-center space-x-1 mt-1">
-                  <Users className="w-2.5 h-2.5 text-orange-600" />
-                  <span className="text-orange-700 dark:text-orange-400 text-xs bengali-font font-medium">
+                  <Users className="w-2.5 h-2.5 text-orange-600/70" />
+                  <span className="text-orange-700/70 dark:text-orange-400/70 text-xs bengali-font font-medium">
                     {toBengaliNumber(stats?.totalCustomers || 0)} জন
                   </span>
                 </div>
               </div>
             </div>
-            <div className="absolute top-1 right-1 text-orange-300/30 text-sm">💳</div>
+            <div className="absolute top-1 right-1 text-orange-300/10 text-sm">💳</div>
           </Card>
         </div>
 
         {/* Ultra-Compact Actions for 916x412 */}
-        <Card className="border-0 shadow-md bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800 p-2">
+        <Card className="border-0 shadow-sm bg-slate-50/10 dark:bg-slate-800/10 p-2">
           <div className="flex items-center space-x-2 mb-3">
-            <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
-              <div className="text-white text-sm">⚡</div>
+            <div className="w-6 h-6 bg-gradient-to-br from-indigo-500/10 to-purple-600/10 rounded-lg flex items-center justify-center shadow-sm">
+              <div className="text-indigo-600 text-sm">⚡</div>
             </div>
             <div>
               <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">দ্রুত কাজ</h3>
@@ -230,31 +230,31 @@ export default function DashboardMobileOptimized() {
           {/* Primary Actions Row */}
           <div className="grid grid-cols-4 gap-1.5 mb-2">
             <Link to="/sales/new" data-testid="link-sales-new" className="block group">
-              <div className="relative w-full h-14 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 group-active:scale-95">
-                <div className="text-white text-sm mb-0.5">🛒</div>
-                <span className="text-xs text-white bengali-font font-bold text-center leading-tight">বিক্রয়</span>
+              <div className="relative w-full h-14 bg-gradient-to-br from-emerald-500/10 to-green-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-emerald-500/20 transition-all duration-200 group-active:scale-95">
+                <div className="text-emerald-600 text-sm mb-0.5">🛒</div>
+                <span className="text-xs text-emerald-700 bengali-font font-bold text-center leading-tight">বিক্রয়</span>
                 <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
               </div>
             </Link>
             
             <Link to="/customers/new" data-testid="link-customer-new" className="block group">
-              <div className="w-full h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 group-active:scale-95">
-                <div className="text-white text-sm mb-0.5">👥</div>
-                <span className="text-xs text-white bengali-font font-bold text-center leading-tight">গ্রাহক</span>
+              <div className="w-full h-14 bg-gradient-to-br from-blue-500/10 to-indigo-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-blue-500/20 transition-all duration-200 group-active:scale-95">
+                <div className="text-blue-600 text-sm mb-0.5">👥</div>
+                <span className="text-xs text-blue-700 bengali-font font-bold text-center leading-tight">গ্রাহক</span>
               </div>
             </Link>
             
             <Link to="/collection" data-testid="link-collection" className="block group">
-              <div className="w-full h-14 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 group-active:scale-95">
-                <div className="text-white text-sm mb-0.5">💰</div>
-                <span className="text-xs text-white bengali-font font-bold text-center leading-tight">আদায়</span>
+              <div className="w-full h-14 bg-gradient-to-br from-orange-500/10 to-amber-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-orange-500/20 transition-all duration-200 group-active:scale-95">
+                <div className="text-orange-600 text-sm mb-0.5">💰</div>
+                <span className="text-xs text-orange-700 bengali-font font-bold text-center leading-tight">আদায়</span>
               </div>
             </Link>
             
             <Link to="/inventory" data-testid="link-inventory" className="block group">
-              <div className="w-full h-14 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 group-active:scale-95">
-                <div className="text-white text-sm mb-0.5">📦</div>
-                <span className="text-xs text-white bengali-font font-bold text-center leading-tight">স্টক</span>
+              <div className="w-full h-14 bg-gradient-to-br from-purple-500/10 to-violet-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-purple-500/20 transition-all duration-200 group-active:scale-95">
+                <div className="text-purple-600 text-sm mb-0.5">📦</div>
+                <span className="text-xs text-purple-700 bengali-font font-bold text-center leading-tight">স্টক</span>
               </div>
             </Link>
           </div>
