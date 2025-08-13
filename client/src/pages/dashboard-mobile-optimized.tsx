@@ -462,6 +462,18 @@ export default function DashboardMobileOptimized() {
         </Card>
       </div>
       
+      {/* Floating Action Button */}
+      <Link to="/sales/new">
+        <button 
+          className="fixed bottom-20 right-4 w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 rounded-full shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105 active:scale-95 z-40"
+          data-testid="fab-new-sale"
+          title="নতুন বিক্রয়"
+        >
+          <div className="text-white text-lg">🛒</div>
+          <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse border border-white"></div>
+        </button>
+      </Link>
+      
       {/* Minimal bottom spacing for ultra-compact view */}
       <div className="h-8"></div>
     </div>
