@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -31,6 +31,10 @@ import { initializeAndroidOptimizations } from "./lib/android-optimizations";
 
 function Router() {
   const [showCommunicationPanel, setShowCommunicationPanel] = useState(false);
+  const [location] = useLocation();
+  
+  // Hide bottom navigation on specific pages
+  const hideBottomNav = location === "/sales/new" || location === "/customers/new" || location === "/expenses/new";
 
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden w-full">
@@ -50,7 +54,7 @@ function Router() {
 
         <Route component={NotFoundMobileOptimized} />
       </Switch>
-      <BottomNavigationOptimized />
+      {!hideBottomNav && <BottomNavigationOptimized />}
     </div>
   );
 }

@@ -309,19 +309,19 @@ export default function SalesEntryBottomSheet() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
       
-      {/* Header with Context */}
-      <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-emerald-200/50 dark:border-slate-700/50 px-4 py-3 sticky top-0 z-40">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+      {/* Compact Header - Optimized for 917x412 */}
+      <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-emerald-200/50 dark:border-slate-700/50 px-3 py-2 sticky top-0 z-40">
+        <div className="flex items-center justify-between max-w-sm mx-auto">
+          <div className="flex items-center space-x-2">
             <Link to="/">
-              <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-emerald-100 dark:hover:bg-slate-800">
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg hover:bg-emerald-100 dark:hover:bg-slate-800">
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
             <div>
-              <h1 className="text-lg font-black text-slate-900 dark:text-white bengali-font">
+              <h1 className="text-base font-black text-slate-900 dark:text-white bengali-font">
                 নতুন বিক্রয়
               </h1>
               <p className="text-xs text-emerald-700 dark:text-emerald-300 bengali-font font-medium">
@@ -330,27 +330,24 @@ export default function SalesEntryBottomSheet() {
             </div>
           </div>
           
-          <div className="flex items-center space-x-3">
-            <div className="text-right">
-              <p className="text-xs text-slate-600 dark:text-slate-400 bengali-font">আজকের বিক্রয়</p>
-              <p className="text-sm font-bold text-emerald-600 number-font">
-                ৳{formatCurrency(todayStats?.todaySales || 0)}
-              </p>
+          <div className="text-right">
+            <div className="text-xs font-bold text-emerald-600 number-font">
+              ৳{formatCurrency(todayStats?.todaySales || 0)}
             </div>
-            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-md">
-              <TrendingUp className="w-4 h-4 text-white" />
+            <div className="text-xs text-slate-500 dark:text-slate-400 bengali-font">
+              আজ
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content - Single Page Form */}
-      <div className="p-4">
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      {/* Main Content - Optimized for 917x412 */}
+      <div className="p-3 max-w-sm mx-auto">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
           
           {/* Customer Input Section */}
           <Card className="border-2 border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-800">
-            <CardContent className="p-3 space-y-3">
+            <CardContent className="p-2 space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
@@ -386,7 +383,7 @@ export default function SalesEntryBottomSheet() {
                   <Input
                     {...form.register("customerName")}
                     placeholder="নাম টাইপ করুন..."
-                    className="h-10 text-sm bengali-font border-2 focus:border-blue-500 mt-1"
+                    className="h-9 text-sm bengali-font border-2 focus:border-blue-500 mt-1"
                     onFocus={() => setShowCustomerSuggestions(true)}
                     onChange={(e) => {
                       form.setValue("customerName", e.target.value);
@@ -456,7 +453,7 @@ export default function SalesEntryBottomSheet() {
                     <Input
                       {...form.register("customerPhone")}
                       placeholder="01XXXXXXXXX"
-                      className="h-10 number-font border-2 focus:border-green-500 mt-1 text-sm"
+                      className="h-9 number-font border-2 focus:border-green-500 mt-1 text-sm"
                     />
                   </div>
                 )}
@@ -499,9 +496,9 @@ export default function SalesEntryBottomSheet() {
             </CardContent>
           </Card>
 
-          {/* Amount Section */}
+          {/* Amount Section - Compact for 917x412 */}
           <Card className="border-2 border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-800">
-            <CardContent className="p-3 space-y-3">
+            <CardContent className="p-2 space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
@@ -529,7 +526,7 @@ export default function SalesEntryBottomSheet() {
                       {...form.register("amount")}
                       type="number"
                       placeholder="৳ ০"
-                      className="h-11 text-lg pl-10 border-2 focus:border-emerald-500 number-font font-bold"
+                      className="h-10 text-base pl-10 border-2 focus:border-emerald-500 number-font font-bold"
                       data-testid="input-amount"
                     />
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600 font-bold text-base">৳</div>
@@ -547,7 +544,7 @@ export default function SalesEntryBottomSheet() {
                         key={amount}
                         type="button"
                         onClick={() => form.setValue("amount", amount.toString())}
-                        className="h-9 bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors bengali-font"
+                        className="h-8 bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors bengali-font"
                       >
                         ৳{toBengaliNumber(amount)}
                       </button>
@@ -558,9 +555,9 @@ export default function SalesEntryBottomSheet() {
             </CardContent>
           </Card>
 
-          {/* Payment Method Section */}
+          {/* Payment Method Section - Compact */}
           <Card className="border-2 border-orange-200 dark:border-orange-800 bg-white dark:bg-slate-800">
-            <CardContent className="p-3 space-y-3">
+            <CardContent className="p-2 space-y-2">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center">
                   <CreditCard className="w-4 h-4 text-orange-600" />
@@ -576,7 +573,7 @@ export default function SalesEntryBottomSheet() {
                     key={method}
                     type="button"
                     onClick={() => form.setValue("paymentMethod", method as any)}
-                    className={`h-11 rounded-lg border-2 transition-all duration-200 bengali-font font-bold text-sm ${
+                    className={`h-9 rounded-lg border-2 transition-all duration-200 bengali-font font-bold text-sm ${
                       form.watch("paymentMethod") === method
                         ? 'bg-orange-500 border-orange-500 text-white shadow-lg scale-105'
                         : 'bg-white dark:bg-slate-800 border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-300 hover:border-orange-400'
@@ -588,7 +585,7 @@ export default function SalesEntryBottomSheet() {
               </div>
 
               {/* Mixed Payment Details */}
-              {watchedPaymentMethod === "মিশ্র" && (
+              {form.watch("paymentMethod") === "মিশ্র" && (
                 <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800 space-y-2">
                   <h4 className="text-xs font-bold text-orange-700 dark:text-orange-300 bengali-font">মিশ্র পেমেন্টের বিস্তারিত</h4>
                   
@@ -712,7 +709,7 @@ export default function SalesEntryBottomSheet() {
                   </div>
                   
                   {/* Mixed Payment Preview */}
-                  {watchedPaymentMethod === "মিশ্র" && watchedAmount && watchedPaidAmount && (
+                  {form.watch("paymentMethod") === "মিশ্র" && watchedAmount && watchedPaidAmount && (
                     <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="flex justify-between">
@@ -728,7 +725,7 @@ export default function SalesEntryBottomSheet() {
                   )}
                   
                   {/* Due Payment Preview */}
-                  {watchedPaymentMethod === "বাকি" && parseFloat(watchedAmount || "0") > 0 && (
+                  {form.watch("paymentMethod") === "বাকি" && parseFloat(watchedAmount || "0") > 0 && (
                     <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-orange-500 rounded-full"></div>

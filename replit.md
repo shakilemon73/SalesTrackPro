@@ -4,6 +4,12 @@ This project, "দোকান হিসাব" (Dokan Hisab), is a Bengali busi
 # User Preferences
 Preferred communication style: Simple, everyday language.
 
+# Recent Changes
+- **August 13, 2025**: Successfully migrated project from Replit Agent to standard Replit environment
+- **Sales Entry Optimization**: Removed bottom navigation from sales entry page and optimized layout for 917x412 screen size
+- **Mobile UI Enhancements**: Reduced form padding, compacted input heights, and improved spacing for mobile devices
+- **Navigation Improvements**: Bottom navigation now hidden on entry pages (/sales/new, /customers/new, /expenses/new) for better UX
+
 # System Architecture
 
 ## Frontend Architecture
