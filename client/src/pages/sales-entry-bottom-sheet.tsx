@@ -24,8 +24,10 @@ const quickSaleSchema = z.object({
   customerName: z.string().min(1, "গ্রাহকের নাম আবশ্যক"),
   amount: z.string().min(1, "টাকার পরিমাণ আবশ্যক"),
   paymentMethod: z.enum(["নগদ", "বাকি", "মিশ্র"]),
+  paidAmount: z.string().optional(),
   productDescription: z.string().optional(),
   customerPhone: z.string().optional(),
+  customerAddress: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -171,6 +173,7 @@ export default function SalesEntryBottomSheet() {
   const [toast, setToast] = useState({ show: false, message: '', type: 'info' as 'success' | 'error' | 'info' });
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [successData, setSuccessData] = useState({ customerName: '', amount: '' });
+  const [showNewCustomerForm, setShowNewCustomerForm] = useState(false);
   
   const { toast: systemToast } = useToast();
   const queryClient = useQueryClient();
@@ -192,8 +195,10 @@ export default function SalesEntryBottomSheet() {
       customerName: "",
       amount: "",
       paymentMethod: "নগদ" as const,
+      paidAmount: "",
       productDescription: "",
       customerPhone: "",
+      customerAddress: "",
       notes: "",
     },
   });
@@ -208,11 +213,41 @@ export default function SalesEntryBottomSheet() {
     queryFn: () => supabaseService.getStats(CURRENT_USER_ID),
   });
 
+  // Create new customer mutation
+  const createCustomerMutation = useMutation({
+    mutationFn: async (customerData: any) => {
+      return await supabaseService.createCustomer(CURRENT_USER_ID, {
+        name: customerData.customerName,
+        phone_number: customerData.customerPhone,
+        address: customerData.customerAddress || '',
+        total_credit: 0
+      });
+    },
+    onSuccess: (newCustomer, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      setSelectedCustomer(newCustomer);
+      setShowNewCustomerForm(false);
+      showToast(`✅ নতুন গ্রাহক ${variables.customerName} সফলভাবে যোগ করা হয়েছে`, 'success');
+    },
+    onError: () => {
+      showToast("❌ গ্রাহক যোগ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।", 'error');
+    },
+  });
+
   const createSaleMutation = useMutation({
     mutationFn: async (formData: any) => {
       const { getBangladeshTimeISO } = await import('@/lib/bengali-utils');
       const amount = parseFloat(formData.amount);
-      const paidAmount = formData.paymentMethod === "বাকি" ? 0 : amount;
+      
+      let paidAmount = 0;
+      if (formData.paymentMethod === "নগদ") {
+        paidAmount = amount;
+      } else if (formData.paymentMethod === "বাকি") {
+        paidAmount = 0;
+      } else if (formData.paymentMethod === "মিশ্র") {
+        paidAmount = parseFloat(formData.paidAmount || "0");
+      }
+      
       const dueAmount = amount - paidAmount;
       
       const dbSaleData = {
@@ -263,6 +298,7 @@ export default function SalesEntryBottomSheet() {
   const watchedAmount = form.watch("amount");
   const watchedPaymentMethod = form.watch("paymentMethod");
   const watchedCustomerName = form.watch("customerName");
+  const watchedPaidAmount = form.watch("paidAmount");
 
   const selectCustomer = (customer: any) => {
     form.setValue("customerName", customer.name);
@@ -314,31 +350,43 @@ export default function SalesEntryBottomSheet() {
           
           {/* Customer Input Section */}
           <Card className="border-2 border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-800">
-            <CardContent className="p-4 space-y-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
-                  <User className="w-4 h-4 text-blue-600" />
+            <CardContent className="p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                    <User className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">
+                    গ্রাহকের তথ্য
+                  </h3>
+                  {selectedCustomer && (
+                    <Badge className="bg-blue-100 text-blue-700 text-xs">
+                      <Shield className="w-3 h-3 mr-1" />
+                      নিবন্ধিত
+                    </Badge>
+                  )}
                 </div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white bengali-font">
-                  গ্রাহকের তথ্য
-                </h3>
-                {selectedCustomer && (
-                  <Badge className="bg-blue-100 text-blue-700 text-xs">
-                    <Shield className="w-3 h-3 mr-1" />
-                    নিবন্ধিত
-                  </Badge>
+                
+                {!selectedCustomer && watchedCustomerName && filteredCustomers.length === 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowNewCustomerForm(!showNewCustomerForm)}
+                    className="text-xs bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded-lg transition-colors bengali-font font-medium"
+                  >
+                    + নতুন গ্রাহক
+                  </button>
                 )}
               </div>
               
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <div className="relative">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 bengali-font">
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 bengali-font">
                     গ্রাহকের নাম *
                   </label>
                   <Input
                     {...form.register("customerName")}
                     placeholder="নাম টাইপ করুন..."
-                    className="h-12 text-base bengali-font border-2 focus:border-blue-500 mt-1"
+                    className="h-10 text-sm bengali-font border-2 focus:border-blue-500 mt-1"
                     onFocus={() => setShowCustomerSuggestions(true)}
                     onChange={(e) => {
                       form.setValue("customerName", e.target.value);
@@ -349,24 +397,69 @@ export default function SalesEntryBottomSheet() {
                   />
                   
                   {selectedCustomer && (
-                    <div className="absolute right-3 top-9">
-                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                    <div className="absolute right-3 top-7">
+                      <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
                         <Check className="w-3 h-3 text-green-600" />
                       </div>
                     </div>
                   )}
                 </div>
 
-                <div>
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 bengali-font">
-                    ফোন নম্বর
-                  </label>
-                  <Input
-                    {...form.register("customerPhone")}
-                    placeholder="01XXXXXXXXX"
-                    className="h-12 number-font border-2 focus:border-green-500 mt-1"
-                  />
-                </div>
+                {/* New Customer Form */}
+                {showNewCustomerForm && (
+                  <div className="space-y-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <h4 className="text-xs font-bold text-green-700 dark:text-green-300 bengali-font">নতুন গ্রাহক যোগ করুন</h4>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Input
+                          {...form.register("customerPhone")}
+                          placeholder="ফোন নম্বর"
+                          className="h-9 text-xs number-font border-2 focus:border-green-500"
+                        />
+                      </div>
+                      <div>
+                        <Input
+                          {...form.register("customerAddress")}
+                          placeholder="ঠিকানা"
+                          className="h-9 text-xs bengali-font border-2 focus:border-green-500"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex space-x-2">
+                      <Button
+                        type="button"
+                        onClick={() => createCustomerMutation.mutate(form.getValues())}
+                        disabled={createCustomerMutation.isPending}
+                        className="flex-1 h-8 bg-green-600 hover:bg-green-700 text-white text-xs bengali-font"
+                      >
+                        {createCustomerMutation.isPending ? "যোগ হচ্ছে..." : "গ্রাহক যোগ করুন"}
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={() => setShowNewCustomerForm(false)}
+                        variant="outline"
+                        className="h-8 px-3 text-xs"
+                      >
+                        বাতিল
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {!showNewCustomerForm && (
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 bengali-font">
+                      ফোন নম্বর
+                    </label>
+                    <Input
+                      {...form.register("customerPhone")}
+                      placeholder="01XXXXXXXXX"
+                      className="h-10 number-font border-2 focus:border-green-500 mt-1 text-sm"
+                    />
+                  </div>
+                )}
                 
                 {/* Customer Suggestions */}
                 {showCustomerSuggestions && watchedCustomerName && filteredCustomers.length > 0 && (
@@ -408,27 +501,27 @@ export default function SalesEntryBottomSheet() {
 
           {/* Amount Section */}
           <Card className="border-2 border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-800">
-            <CardContent className="p-4 space-y-4">
+            <CardContent className="p-3 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
                     <DollarSign className="w-4 h-4 text-emerald-600" />
                   </div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white bengali-font">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">
                     বিক্রয়ের পরিমাণ
                   </h3>
                 </div>
                 
                 {watchedAmount && (
-                  <div className="text-sm text-emerald-700 dark:text-emerald-300 bengali-font font-medium">
+                  <div className="text-xs text-emerald-700 dark:text-emerald-300 bengali-font font-medium">
                     {toBengaliNumber(parseFloat(watchedAmount))} টাকা
                   </div>
                 )}
               </div>
               
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 bengali-font">
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 bengali-font">
                     মোট টাকা *
                   </label>
                   <div className="relative mt-1">
@@ -436,25 +529,25 @@ export default function SalesEntryBottomSheet() {
                       {...form.register("amount")}
                       type="number"
                       placeholder="৳ ০"
-                      className="h-14 text-xl pl-12 border-2 focus:border-emerald-500 number-font font-bold"
+                      className="h-11 text-lg pl-10 border-2 focus:border-emerald-500 number-font font-bold"
                       data-testid="input-amount"
                     />
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600 font-bold text-lg">৳</div>
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600 font-bold text-base">৳</div>
                   </div>
                 </div>
 
                 {/* Quick Amount Buttons */}
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 bengali-font mb-2 block">
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 bengali-font mb-1 block">
                     দ্রুত নির্বাচন
                   </label>
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-4 gap-1">
                     {[50, 100, 200, 500].map((amount) => (
                       <button
                         key={amount}
                         type="button"
                         onClick={() => form.setValue("amount", amount.toString())}
-                        className="h-12 bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-200 dark:border-emerald-800 rounded-xl text-sm font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors bengali-font"
+                        className="h-9 bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors bengali-font"
                       >
                         ৳{toBengaliNumber(amount)}
                       </button>
@@ -467,23 +560,23 @@ export default function SalesEntryBottomSheet() {
 
           {/* Payment Method Section */}
           <Card className="border-2 border-orange-200 dark:border-orange-800 bg-white dark:bg-slate-800">
-            <CardContent className="p-4 space-y-4">
+            <CardContent className="p-3 space-y-3">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center">
                   <CreditCard className="w-4 h-4 text-orange-600" />
                 </div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white bengali-font">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">
                   পেমেন্ট পদ্ধতি
                 </h3>
               </div>
               
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2">
                 {["নগদ", "বাকি", "মিশ্র"].map((method) => (
                   <button
                     key={method}
                     type="button"
                     onClick={() => form.setValue("paymentMethod", method as any)}
-                    className={`h-14 rounded-xl border-2 transition-all duration-200 bengali-font font-bold text-base ${
+                    className={`h-11 rounded-lg border-2 transition-all duration-200 bengali-font font-bold text-sm ${
                       form.watch("paymentMethod") === method
                         ? 'bg-orange-500 border-orange-500 text-white shadow-lg scale-105'
                         : 'bg-white dark:bg-slate-800 border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-300 hover:border-orange-400'
@@ -493,41 +586,90 @@ export default function SalesEntryBottomSheet() {
                   </button>
                 ))}
               </div>
+
+              {/* Mixed Payment Details */}
+              {watchedPaymentMethod === "মিশ্র" && (
+                <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800 space-y-2">
+                  <h4 className="text-xs font-bold text-orange-700 dark:text-orange-300 bengali-font">মিশ্র পেমেন্টের বিস্তারিত</h4>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-xs font-semibold text-orange-700 dark:text-orange-300 bengali-font">
+                        মোট টাকা
+                      </label>
+                      <div className="bg-orange-100 dark:bg-orange-900/30 p-2 rounded-lg border border-orange-300 dark:border-orange-700">
+                        <span className="text-sm font-bold text-orange-700 dark:text-orange-300 number-font">
+                          ৳{formatCurrency(parseFloat(watchedAmount || "0"))}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="text-xs font-semibold text-orange-700 dark:text-orange-300 bengali-font">
+                        পেইড টাকা *
+                      </label>
+                      <Input
+                        {...form.register("paidAmount")}
+                        type="number"
+                        placeholder="০"
+                        className="h-9 text-sm number-font border-2 focus:border-orange-500"
+                        onChange={(e) => {
+                          const paid = parseFloat(e.target.value || "0");
+                          const total = parseFloat(watchedAmount || "0");
+                          if (paid > total) {
+                            form.setValue("paidAmount", watchedAmount);
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Due Calculation */}
+                  {watchedPaidAmount && (
+                    <div className="flex justify-between items-center p-2 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                      <span className="text-xs font-semibold text-red-700 dark:text-red-300 bengali-font">বাকি থাকবে:</span>
+                      <span className="text-sm font-bold text-red-600 dark:text-red-400 number-font">
+                        ৳{formatCurrency(Math.max(0, parseFloat(watchedAmount || "0") - parseFloat(watchedPaidAmount || "0")))}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 
           {/* Product & Notes Section */}
           <Card className="border-2 border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800">
-            <CardContent className="p-4 space-y-4">
+            <CardContent className="p-3 space-y-3">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
                   <Package className="w-4 h-4 text-purple-600" />
                 </div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white bengali-font">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">
                   অতিরিক্ত তথ্য
                 </h3>
               </div>
               
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 bengali-font">
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 bengali-font">
                     পণ্যের বিবরণ
                   </label>
                   <Input
                     {...form.register("productDescription")}
                     placeholder="পণ্যের নাম লিখুন..."
-                    className="h-12 bengali-font border-2 focus:border-purple-500 mt-1"
+                    className="h-10 bengali-font border-2 focus:border-purple-500 mt-1 text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 bengali-font">
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 bengali-font">
                     বিশেষ নোট
                   </label>
                   <textarea
                     {...form.register("notes")}
                     placeholder="কোনো বিশেষ তথ্য..."
-                    className="w-full h-20 p-3 border-2 border-slate-200 dark:border-slate-700 rounded-lg focus:border-purple-500 bengali-font text-sm resize-none mt-1"
+                    className="w-full h-16 p-2 border-2 border-slate-200 dark:border-slate-700 rounded-lg focus:border-purple-500 bengali-font text-xs resize-none mt-1"
                   />
                 </div>
               </div>
@@ -537,30 +679,30 @@ export default function SalesEntryBottomSheet() {
           {/* Live Preview */}
           {(watchedAmount || watchedCustomerName) && (
             <Card className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border-2 border-emerald-300 dark:border-emerald-700">
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2 mb-3">
-                  <Zap className="w-5 h-5 text-emerald-600" />
-                  <h4 className="text-base font-bold text-slate-900 dark:text-white bengali-font">
+              <CardContent className="p-3">
+                <div className="flex items-center space-x-2 mb-2">
+                  <Zap className="w-4 h-4 text-emerald-600" />
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">
                     লাইভ প্রিভিউ
                   </h4>
                 </div>
                 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600 dark:text-slate-400 bengali-font">গ্রাহক:</span>
-                    <span className="text-sm font-semibold text-slate-900 dark:text-white bengali-font">
+                    <span className="text-xs text-slate-600 dark:text-slate-400 bengali-font">গ্রাহক:</span>
+                    <span className="text-xs font-semibold text-slate-900 dark:text-white bengali-font">
                       {watchedCustomerName || "নাম নেই"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600 dark:text-slate-400 bengali-font">মোট:</span>
-                    <span className="text-lg font-black text-emerald-600 number-font">
+                    <span className="text-xs text-slate-600 dark:text-slate-400 bengali-font">মোট:</span>
+                    <span className="text-sm font-black text-emerald-600 number-font">
                       ৳{formatCurrency(parseFloat(watchedAmount || "0"))}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600 dark:text-slate-400 bengali-font">পদ্ধতি:</span>
-                    <Badge className={`text-sm ${
+                    <span className="text-xs text-slate-600 dark:text-slate-400 bengali-font">পদ্ধতি:</span>
+                    <Badge className={`text-xs ${
                       watchedPaymentMethod === "নগদ" ? "bg-green-100 text-green-700" :
                       watchedPaymentMethod === "বাকি" ? "bg-orange-100 text-orange-700" :
                       "bg-blue-100 text-blue-700"
@@ -569,11 +711,28 @@ export default function SalesEntryBottomSheet() {
                     </Badge>
                   </div>
                   
-                  {form.watch("paymentMethod") === "বাকি" && parseFloat(watchedAmount || "0") > 0 && (
-                    <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800 mt-2">
+                  {/* Mixed Payment Preview */}
+                  {watchedPaymentMethod === "মিশ্র" && watchedAmount && watchedPaidAmount && (
+                    <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-blue-700 dark:text-blue-300 bengali-font">পেইড:</span>
+                          <span className="font-bold text-blue-600 number-font">৳{formatCurrency(parseFloat(watchedPaidAmount))}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-red-700 dark:text-red-300 bengali-font">বাকি:</span>
+                          <span className="font-bold text-red-600 number-font">৳{formatCurrency(Math.max(0, parseFloat(watchedAmount) - parseFloat(watchedPaidAmount)))}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Due Payment Preview */}
+                  {watchedPaymentMethod === "বাকি" && parseFloat(watchedAmount || "0") > 0 && (
+                    <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
                       <div className="flex items-center space-x-2">
-                        <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                        <span className="text-sm text-orange-700 dark:text-orange-300 bengali-font font-medium">
+                        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                        <span className="text-xs text-orange-700 dark:text-orange-300 bengali-font font-medium">
                           বাকি থাকবে: ৳{formatCurrency(parseFloat(watchedAmount || "0"))}
                         </span>
                       </div>
@@ -589,17 +748,17 @@ export default function SalesEntryBottomSheet() {
             <Button
               type="submit"
               disabled={createSaleMutation.isPending || !watchedCustomerName || !watchedAmount}
-              className="w-full h-16 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold text-lg bengali-font rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
+              className="w-full h-12 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold text-sm bengali-font rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
               data-testid="button-submit-sale"
             >
               {createSaleMutation.isPending ? (
                 <div className="flex items-center space-x-2">
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                   <span>সেভ হচ্ছে...</span>
                 </div>
               ) : (
                 <div className="flex items-center space-x-2">
-                  <Check className="w-6 h-6" />
+                  <Check className="w-5 h-5" />
                   <span>বিক্রয় সম্পন্ন করুন</span>
                 </div>
               )}
