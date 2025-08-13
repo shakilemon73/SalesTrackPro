@@ -49,10 +49,10 @@ function Router() {
         <Route path="/settings" component={SettingsMobileOptimized} />
         <Route path="/sales/new" component={SalesEntryBottomSheet} />
         <Route path="/customers/new" component={CustomerAddMobileOptimized} />
-        <Route path="/customers/:id" component={CustomerDetailsMobileOptimized} />
         <Route path="/customers/:id/edit">
           {(params) => <CustomerEditMobileOptimized customerId={params.id} />}
         </Route>
+        <Route path="/customers/:id" component={CustomerDetailsMobileOptimized} />
         <Route path="/inventory" component={InventoryMobileOptimizedFixed} />
         <Route path="/collection" component={CollectionMobileOptimized} />
         <Route path="/expenses/new" component={ExpenseEntryMobileOptimized} />
