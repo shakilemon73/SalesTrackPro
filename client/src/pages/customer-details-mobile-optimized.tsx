@@ -129,10 +129,12 @@ export default function CustomerDetailsMobileOptimized({ params }: CustomerDetai
               </div>
             </div>
             
-            <Button variant="outline" size="sm" className="h-8 px-3 text-xs">
-              <Edit className="w-3 h-3 mr-1" />
-              এডিট
-            </Button>
+            <Link to={`/customers/${customerId}/edit`}>
+              <Button variant="outline" size="sm" className="h-8 px-3 text-xs" data-testid="button-edit-customer">
+                <Edit className="w-3 h-3 mr-1" />
+                এডিট
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

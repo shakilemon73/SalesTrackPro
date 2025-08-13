@@ -16,6 +16,7 @@ import SalesEntrySplitScreen from "@/pages/sales-entry-split-screen";
 import SalesEntryBottomSheet from "@/pages/sales-entry-bottom-sheet";
 import CustomerAddMobileOptimized from "@/pages/customer-add-mobile-optimized";
 import CustomerDetailsMobileOptimized from "@/pages/customer-details-mobile-optimized";
+import CustomerEditMobileOptimized from "@/pages/customer-edit-mobile-optimized";
 import CollectionMobileOptimized from "@/pages/collection-mobile-optimized";
 import ExpenseEntryMobileOptimized from "@/pages/expense-entry-mobile-optimized";
 import InventoryMobileOptimizedFixed from "@/pages/inventory-mobile-optimized-fixed";
@@ -36,7 +37,7 @@ function Router() {
   const [location] = useLocation();
   
   // Hide bottom navigation on specific pages
-  const hideBottomNav = location === "/sales/new" || location === "/customers/new" || location === "/expenses/new";
+  const hideBottomNav = location === "/sales/new" || location === "/customers/new" || location === "/expenses/new" || location.includes("/edit");
 
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden w-full">
@@ -49,6 +50,9 @@ function Router() {
         <Route path="/sales/new" component={SalesEntryBottomSheet} />
         <Route path="/customers/new" component={CustomerAddMobileOptimized} />
         <Route path="/customers/:id" component={CustomerDetailsMobileOptimized} />
+        <Route path="/customers/:id/edit">
+          {(params) => <CustomerEditMobileOptimized customerId={params.id} />}
+        </Route>
         <Route path="/inventory" component={InventoryMobileOptimizedFixed} />
         <Route path="/collection" component={CollectionMobileOptimized} />
         <Route path="/expenses/new" component={ExpenseEntryMobileOptimized} />
