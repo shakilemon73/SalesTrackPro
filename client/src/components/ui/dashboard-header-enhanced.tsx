@@ -89,16 +89,16 @@ export default function DashboardHeaderEnhanced({
           >
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] font-medium text-emerald-600 bengali-font mb-0.5">
+                <div className="text-[10px] font-medium text-emerald-600 bengali-font mb-0.5">
                   আজকের বিক্রয়
-                </p>
-                <p className="text-sm font-bold text-emerald-800 bengali-font leading-tight">
+                </div>
+                <div className="text-sm font-bold text-emerald-800 bengali-font leading-tight">
                   {isLoading ? (
                     <div className="w-12 h-4 bg-emerald-200 rounded animate-pulse"></div>
                   ) : (
                     `${toBengaliNumber(stats?.todaySales || 0)} টাকা`
                   )}
-                </p>
+                </div>
               </div>
               <div className="text-emerald-500">
                 <TrendingUp size={14} />
@@ -115,16 +115,16 @@ export default function DashboardHeaderEnhanced({
           >
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] font-medium text-blue-600 bengali-font mb-0.5">
+                <div className="text-[10px] font-medium text-blue-600 bengali-font mb-0.5">
                   আজকের লাভ
-                </p>
-                <p className="text-sm font-bold text-blue-800 bengali-font leading-tight">
+                </div>
+                <div className="text-sm font-bold text-blue-800 bengali-font leading-tight">
                   {isLoading ? (
                     <div className="w-12 h-4 bg-blue-200 rounded animate-pulse"></div>
                   ) : (
                     `${toBengaliNumber(stats?.todayProfit || 0)} টাকা`
                   )}
-                </p>
+                </div>
               </div>
               <div className="text-blue-500">
                 <TrendingUp size={14} />
@@ -141,16 +141,16 @@ export default function DashboardHeaderEnhanced({
           >
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] font-medium text-orange-600 bengali-font mb-0.5">
+                <div className="text-[10px] font-medium text-orange-600 bengali-font mb-0.5">
                   বাকি আদায়
-                </p>
-                <p className="text-sm font-bold text-orange-800 bengali-font leading-tight">
+                </div>
+                <div className="text-sm font-bold text-orange-800 bengali-font leading-tight">
                   {isLoading ? (
                     <div className="w-12 h-4 bg-orange-200 rounded animate-pulse"></div>
                   ) : (
                     `${toBengaliNumber(stats?.pendingCollection || 0)} টাকা`
                   )}
-                </p>
+                </div>
               </div>
               <div className="text-orange-500">
                 <TrendingDown size={14} />
