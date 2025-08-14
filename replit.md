@@ -5,6 +5,7 @@ This project, "দোকান হিসাব" (Dokan Hisab), is a Bengali busi
 Preferred communication style: Simple, everyday language.
 
 # Recent Changes
+- **August 14, 2025**: TRANSACTION UX IMPROVEMENT - Replaced transaction details page navigation with smooth bottom sheet modal for better mobile UX and user retention
 - **August 13, 2025**: MIGRATION TO REPLIT COMPLETED - Successfully migrated project from Replit Agent to standard Replit environment with all packages installed and Vite server running properly
 - **Customer Navigation Fixed**: Resolved 404 error page issue when clicking customer profiles by adding proper authentication loading states and null checks
 - **Database Query Optimization**: Fixed null user ID database errors by implementing proper query guards and loading states

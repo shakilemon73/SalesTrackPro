@@ -1,12 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "wouter";
 import { getBengaliDate, formatCurrency, toBengaliNumber } from "@/lib/bengali-utils";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
 import { supabaseService } from "@/lib/supabase";
 import { useAuth } from "@/hooks/use-auth";
@@ -14,7 +15,8 @@ import {
   ArrowLeft, ArrowUpRight, ArrowDownRight, 
   Search, Filter, Download, Calendar,
   TrendingUp, Wallet, ShoppingCart,
-  FileText, Eye, Clock
+  FileText, Eye, Clock, Edit3, Trash2,
+  User, CreditCard, Hash, Copy, X
 } from "lucide-react";
 import jsPDF from 'jspdf';
 
@@ -22,8 +24,11 @@ export default function TransactionsMobileOptimized() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { toast } = useToast();
   const { userId } = useAuth();
+  const queryClient = useQueryClient();
 
   const { data: sales = [], isLoading: salesLoading } = useQuery({
     queryKey: ['sales', userId],
@@ -135,6 +140,44 @@ export default function TransactionsMobileOptimized() {
     }
   };
 
+  const handleTransactionClick = (transaction: any) => {
+    setSelectedTransaction(transaction);
+    setIsSheetOpen(true);
+  };
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (transaction: any) => {
+      if (!userId || !transaction) throw new Error("Invalid transaction or user");
+      
+      switch (transaction.type) {
+        case 'sale':
+          return supabaseService.deleteSale(transaction.id);
+        case 'expense':
+          return supabaseService.deleteExpense(transaction.id);
+        default:
+          throw new Error("Delete not supported for this transaction type");
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "সফল!",
+        description: "লেনদেন মুছে ফেলা হয়েছে",
+      });
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
+      setIsSheetOpen(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "ত্রুটি!",
+        description: "লেনদেন মুছতে সমস্যা হয়েছে",
+        variant: "destructive",
+      });
+    },
+  });
+
 
 
   return (
@@ -241,40 +284,42 @@ export default function TransactionsMobileOptimized() {
         <div className="space-y-2">
           {filteredTransactions.length > 0 ? (
             filteredTransactions.slice(0, 50).map((transaction, index) => (
-              <Link key={`${transaction.type}-${transaction.id || index}`} to={`/transactions/${transaction.type}/${transaction.id}`}>
-                <Card className="border-0 shadow-sm p-3 hover:shadow-md transition-shadow cursor-pointer">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center">
-                        {getTransactionIcon(transaction.type)}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-slate-900 dark:text-white bengali-font truncate">
-                          {transaction.description}
-                        </p>
-                        <div className="flex items-center space-x-2 text-xs text-slate-500">
-                          <span>{transaction.method}</span>
-                          <span>•</span>
-                          <span>{new Date(transaction.date).toLocaleDateString('bn-BD')}</span>
-                        </div>
-                      </div>
+              <Card 
+                key={`${transaction.type}-${transaction.id || index}`} 
+                className="border-0 shadow-sm p-3 hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => handleTransactionClick(transaction)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center">
+                      {getTransactionIcon(transaction.type)}
                     </div>
-                    <div className="text-right">
-                      <p className={`text-sm font-bold number-font ${getTransactionColor(transaction.type)}`}>
-                        {transaction.type === 'expense' ? '-' : '+'}
-                        {formatCurrency(transaction.amount)}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white bengali-font truncate">
+                        {transaction.description}
                       </p>
-                      <Badge 
-                        variant="outline" 
-                        className="text-xs h-4 px-1"
-                      >
-                        {transaction.type === 'sale' ? 'বিক্রয়' : 
-                         transaction.type === 'expense' ? 'খরচ' : 'আদায়'}
-                      </Badge>
+                      <div className="flex items-center space-x-2 text-xs text-slate-500">
+                        <span>{transaction.method}</span>
+                        <span>•</span>
+                        <span>{new Date(transaction.date).toLocaleDateString('bn-BD')}</span>
+                      </div>
                     </div>
                   </div>
-                </Card>
-              </Link>
+                  <div className="text-right">
+                    <p className={`text-sm font-bold number-font ${getTransactionColor(transaction.type)}`}>
+                      {transaction.type === 'expense' ? '-' : '+'}
+                      {formatCurrency(transaction.amount)}
+                    </p>
+                    <Badge 
+                      variant="outline" 
+                      className="text-xs h-4 px-1"
+                    >
+                      {transaction.type === 'sale' ? 'বিক্রয়' : 
+                       transaction.type === 'expense' ? 'খরচ' : 'আদায়'}
+                    </Badge>
+                  </div>
+                </div>
+              </Card>
             ))
           ) : (
             <Card className="border-0 shadow-sm p-6 text-center">
@@ -318,6 +363,169 @@ export default function TransactionsMobileOptimized() {
         {/* Professional bottom spacing for navigation */}
         <div className="h-24"></div>
       </div>
+
+      {/* Transaction Details Bottom Sheet */}
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SheetContent side="bottom" className="h-[90vh] overflow-y-auto">
+          {selectedTransaction && (
+            <div className="space-y-6">
+              <SheetHeader className="border-b pb-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                      {getTransactionIcon(selectedTransaction.type)}
+                    </div>
+                    <div>
+                      <SheetTitle className="text-lg bengali-font">
+                        {selectedTransaction.type === 'sale' ? 'বিক্রয়ের তথ্য' : 
+                         selectedTransaction.type === 'expense' ? 'খরচের তথ্য' : 'আদায়ের তথ্য'}
+                      </SheetTitle>
+                      <p className="text-sm text-slate-500">
+                        {new Date(selectedTransaction.date).toLocaleDateString('bn-BD', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setIsSheetOpen(false)}>
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </SheetHeader>
+
+              {/* Transaction ID */}
+              <div className="flex items-center justify-center space-x-2 text-slate-500">
+                <Hash className="w-4 h-4" />
+                <span className="text-sm font-mono">
+                  {selectedTransaction.id?.slice(-8).toUpperCase()}
+                </span>
+                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                  <Copy className="w-3 h-3" />
+                </Button>
+              </div>
+
+              {/* Amount Display */}
+              <Card className="border-0 shadow-lg bg-gradient-to-br from-slate-50 to-slate-100">
+                <CardContent className="p-6 text-center">
+                  <p className="text-sm text-slate-600 bengali-font mb-2">
+                    {selectedTransaction.type === 'sale' ? 'বিক্রয়ের পরিমাণ' : 
+                     selectedTransaction.type === 'expense' ? 'খরচের পরিমাণ' : 'আদায়ের পরিমাণ'}
+                  </p>
+                  <p className={`text-4xl font-black number-font ${getTransactionColor(selectedTransaction.type)}`}>
+                    {selectedTransaction.type === 'expense' ? '-' : '+'}৳{formatCurrency(selectedTransaction.amount)}
+                  </p>
+                  
+                  {selectedTransaction.type === 'sale' && selectedTransaction.due_amount > 0 && (
+                    <div className="flex items-center justify-center space-x-4 text-sm mt-3">
+                      <span className="text-green-600">
+                        পরিশোধিত: ৳{formatCurrency(selectedTransaction.paid_amount || 0)}
+                      </span>
+                      <span className="text-red-600">
+                        বাকি: ৳{formatCurrency(selectedTransaction.due_amount || 0)}
+                      </span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Transaction Details */}
+              <div className="space-y-4">
+                {/* Customer/Description */}
+                <div className="flex items-center space-x-3 p-4 bg-slate-50 rounded-xl">
+                  <User className="w-5 h-5 text-slate-600" />
+                  <div>
+                    <p className="text-sm font-medium text-slate-700 bengali-font">
+                      {selectedTransaction.type === 'sale' ? 'গ্রাহক' : 'বিবরণ'}
+                    </p>
+                    <p className="text-base text-slate-900 bengali-font">
+                      {selectedTransaction.type === 'sale' ? selectedTransaction.customer_name : 
+                       selectedTransaction.description || 'বিবরণ নেই'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Payment Method */}
+                <div className="flex items-center space-x-3 p-4 bg-slate-50 rounded-xl">
+                  <CreditCard className="w-5 h-5 text-slate-600" />
+                  <div>
+                    <p className="text-sm font-medium text-slate-700 bengali-font">পেমেন্ট পদ্ধতি</p>
+                    <p className="text-base text-slate-900 bengali-font">
+                      {selectedTransaction.method || 'নগদ'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Date & Time */}
+                <div className="flex items-center space-x-3 p-4 bg-slate-50 rounded-xl">
+                  <Calendar className="w-5 h-5 text-slate-600" />
+                  <div>
+                    <p className="text-sm font-medium text-slate-700 bengali-font">তারিখ ও সময়</p>
+                    <p className="text-base text-slate-900 bengali-font">
+                      {getBengaliDate(new Date(selectedTransaction.date))}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Products (for sales) */}
+                {selectedTransaction.type === 'sale' && selectedTransaction.items && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-slate-700 bengali-font">পণ্যের তালিকা</p>
+                    <div className="space-y-2">
+                      {selectedTransaction.items.map((item: any, index: number) => (
+                        <div key={index} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                          <div>
+                            <p className="text-sm font-medium bengali-font">{item.productName}</p>
+                            <p className="text-xs text-slate-500">
+                              পরিমাণ: {toBengaliNumber(item.quantity)} × ৳{formatCurrency(parseFloat(item.unitPrice))}
+                            </p>
+                          </div>
+                          <p className="text-sm font-bold number-font">
+                            ৳{formatCurrency(item.totalPrice)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              {(selectedTransaction.type === 'sale' || selectedTransaction.type === 'expense') && (
+                <div className="flex space-x-3 pt-4 border-t">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 h-12"
+                    onClick={() => {
+                      // Navigate to edit page
+                      setIsSheetOpen(false);
+                      window.location.href = `/transactions/${selectedTransaction.type}/${selectedTransaction.id}`;
+                    }}
+                  >
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    সম্পাদনা
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 h-12 text-red-600 border-red-200 hover:bg-red-50"
+                    onClick={() => deleteMutation.mutate(selectedTransaction)}
+                    disabled={deleteMutation.isPending}
+                  >
+                    {deleteMutation.isPending ? (
+                      <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin mr-2" />
+                    ) : (
+                      <Trash2 className="w-4 h-4 mr-2" />
+                    )}
+                    মুছুন
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
