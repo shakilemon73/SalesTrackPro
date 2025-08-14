@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: '#FFFFFF',
     padding: 30,
-    fontFamily: 'Helvetica, sans-serif', // Temporarily use system fonts for stability
+    fontFamily: 'Helvetica', // Use built-in Helvetica font
   },
   header: {
     backgroundColor: '#2563eb',
@@ -498,11 +498,15 @@ export const generatePDF = async (component: React.ReactElement, filename: strin
     console.log('PDF download initiated successfully');
   } catch (error) {
     console.error('PDF generation error details:', error);
-    console.error('Error message:', error?.message);
-    console.error('Error stack:', error?.stack);
+    
+    // Type-safe error handling
+    const err = error as Error;
+    const errorMessage = err?.message || 'Unknown error occurred';
+    
+    console.error('Error message:', errorMessage);
+    console.error('Error stack:', err?.stack);
     
     // Provide user-friendly error message
-    const errorMessage = error?.message || 'Unknown error occurred';
     if (errorMessage.includes('font') || errorMessage.includes('Font')) {
       throw new Error('PDF font loading failed. Please try again or contact support.');
     } else {

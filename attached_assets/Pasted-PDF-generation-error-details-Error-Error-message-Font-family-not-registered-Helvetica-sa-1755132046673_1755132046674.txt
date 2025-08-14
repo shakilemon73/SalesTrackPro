@@ -1,0 +1,73 @@
+PDF generation error details: 
+Error {}
+
+Error message: Font family not registered: Helvetica, sans-serif. Please register it calling Font.register() method.
+Error stack: Error: Font family not registered: Helvetica, sans-serif. Please register it calling Font.register() method.
+    at FontStore.getFont (https://16c66d12-2aa1-42bd-8a4f-8aaacf17b2e9-00-dgaujx7hb5nk.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@react-pdf_renderer.js?v=ecfa4164:86989:15)
+    at FontStore.load (https://16c66d12-2aa1-42bd-8a4f-8aaacf17b2e9-00-dgaujx7hb5nk.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@react-pdf_renderer.js?v=ecfa4164:86994:25)
+    at https://16c66d12-2aa1-42bd-8a4f-8aaacf17b2e9-00-dgaujx7hb5nk.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@react-pdf_renderer.js?v=ecfa4164:96428:68
+    at Array.map (<anonymous>)
+    at fetchAssets (https://16c66d12-2aa1-42bd-8a4f-8aaacf17b2e9-00-dgaujx7hb5nk.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@react-pdf_renderer.js?v=ecfa4164:96428:37)
+    at resolveAssets (https://16c66d12-2aa1-42bd-8a4f-8aaacf17b2e9-00-dgaujx7hb5nk.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@react-pdf_renderer.js?v=ecfa4164:96449:20)
+    at https://16c66d12-2aa1-42bd-8a4f-8aaacf17b2e9-00-dgaujx7hb5nk.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@react-pdf_renderer.js?v=ecfa4164:87115:20
+    at async render3 (https://16c66d12-2aa1-42bd-8a4f-8aaacf17b2e9-00-dgaujx7hb5nk.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@react-pdf_renderer.js?v=ecfa4164:108691:21)
+    at async Object.toBlob (https://16c66d12-2aa1-42bd-8a4f-8aaacf17b2e9-00-dgaujx7hb5nk.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@react-pdf_renderer.js?v=ecfa4164:108711:9)
+    at async generatePDF (https://16c66d12-2aa1-42bd-8a4f-8aaacf17b2e9-00-dgaujx7hb5nk.spock.replit.dev/src/lib/react-pdf-generator.tsx:971:18)
+
+লেনদেন সমূহ
+মোট ৩টি
+PDF
+বিক্রয়
+
+২৫০ টাকা
+
+খরচ
+
+০ টাকা
+
+নিট
+
+২৫০ টাকা
+
+লেনদেন খুঁজুন...
+
+সব
+সংগ্রহ - আবু সাইদ
+
+নগদ
+•
+১৪/৮/২০২৫
++৫০ টাকা
+
+আদায়
+বিক্রয় - SHAKIL AHMED
+
+নগদ
+•
+১৪/৮/২০২৫
++৫০ টাকা
+
+বিক্রয়
+বিক্রয় - আবু সাইদ
+
+বাকি
+•
+১৪/৮/২০২৫
++২০০ টাকা
+
+বিক্রয়
+দ্রুত কাজ
+
+নতুন বিক্রয়
+
+খরচ এন্ট্রি
+
+হোম
+
+স্টক
+
+লেনদেন
+
+গ্রাহক
+
+রিপোর্ট
