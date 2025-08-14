@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,8 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency, toBengaliNumber, getBengaliDate } from "@/lib/bengali-utils";
 import { hybridAuth } from "@/lib/hybrid-auth";
-import { useHybridCreateSale, useHybridCustomers, useHybridCreateCustomer } from "@/hooks/use-hybrid-data";
+import { useHybridCreateSale, useHybridCustomers, useHybridCreateCustomer, useHybridStats } from "@/hooks/use-hybrid-data";
 import { useNetworkStatus } from "@/hooks/use-network-status";
+import { supabase, supabaseService } from "@/lib/supabase";
 import { 
   ArrowLeft, Check, DollarSign, User, CreditCard, 
   Calculator, Package, Zap, Phone, Plus, ChevronUp,
@@ -179,8 +181,10 @@ export default function SalesEntryBottomSheet() {
   
   const { toast: systemToast } = useToast();
   const user = hybridAuth.getCurrentUser();
+  const userId = user?.user_id;
   const { isOnline } = useNetworkStatus();
   const { data: customers = [] } = useHybridCustomers();
+  const { data: todayStats } = useHybridStats();
   const createSale = useHybridCreateSale();
   const createCustomer = useHybridCreateCustomer();
 
@@ -195,21 +199,7 @@ export default function SalesEntryBottomSheet() {
     setToast({ show: true, message, type });
   };
 
-  const form = useForm({
-    resolver: zodResolver(quickSaleSchema),
-    defaultValues: {
-      customerName: "",
-      amount: "",
-      paymentMethod: "নগদ" as const,
-      paidAmount: "",
-      productDescription: "",
-      customerPhone: "",
-      customerAddress: "",
-      notes: "",
-    },
-  });
-
-  // Create new customer mutation
+  // Create new customer function
   const handleCreateCustomer = async (customerData: any) => {
     if (!user?.user_id) {
       throw new Error('User not authenticated');
@@ -231,6 +221,28 @@ export default function SalesEntryBottomSheet() {
       throw error;
     }
   };
+
+  // Define createCustomerMutation
+  const createCustomerMutation = useMutation({
+    mutationFn: handleCreateCustomer,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+    }
+  });
+
+  const form = useForm({
+    resolver: zodResolver(quickSaleSchema),
+    defaultValues: {
+      customerName: "",
+      amount: "",
+      paymentMethod: "নগদ" as const,
+      paidAmount: "",
+      productDescription: "",
+      customerPhone: "",
+      customerAddress: "",
+      notes: "",
+    },
+  });
 
   const createSaleMutation = useMutation({
     mutationFn: async (formData: any) => {
@@ -648,7 +660,7 @@ export default function SalesEntryBottomSheet() {
               </div>
 
               {/* Mixed Payment Details */}
-              {form.watch("paymentMethod") === "মিশ্র" && (
+              {watchedPaymentMethod === "মিশ্র" && (
                 <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800 space-y-2">
                   <h4 className="text-xs font-bold text-orange-700 dark:text-orange-300 bengali-font">মিশ্র পেমেন্টের বিস্তারিত</h4>
                   
@@ -772,7 +784,7 @@ export default function SalesEntryBottomSheet() {
                   </div>
                   
                   {/* Mixed Payment Preview */}
-                  {form.watch("paymentMethod") === "মিশ্র" && watchedAmount && watchedPaidAmount && (
+                  {watchedPaymentMethod === "মিশ্র" && watchedAmount && watchedPaidAmount && (
                     <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="flex justify-between">
@@ -788,7 +800,7 @@ export default function SalesEntryBottomSheet() {
                   )}
                   
                   {/* Due Payment Preview */}
-                  {form.watch("paymentMethod") === "বাকি" && parseFloat(watchedAmount || "0") > 0 && (
+                  {watchedPaymentMethod === "বাকি" && parseFloat(watchedAmount || "0") > 0 && (
                     <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
