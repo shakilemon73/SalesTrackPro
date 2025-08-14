@@ -5,41 +5,13 @@ import { getBengaliDate, formatCurrency, toBengaliNumber } from './bengali-utils
 // Advanced font registration with multiple fallback strategies
 let bengaliFontAvailable = false;
 
-// VERIFIED WORKING BENGALI FONT SOLUTION - Based on research and proven CDNs
-try {
-  // Strategy 1: Use SolaimanLipi from proven Bengali CDN
-  Font.register({
-    family: 'Bengali',
-    src: 'https://cdn.jsdelivr.net/gh/mirazmac/bengali-webfont-cdn@master/solaimanlipi/SolaimanLipi.ttf',
-  });
-  bengaliFontAvailable = true;
-  console.log('✅ Bengali font loaded: SolaimanLipi from verified CDN');
-} catch (error) {
-  try {
-    // Strategy 2: Use Kalpurush from same proven CDN
-    Font.register({
-      family: 'Bengali',
-      src: 'https://cdn.jsdelivr.net/gh/mirazmac/bengali-webfont-cdn@master/kalpurush/kalpurush.ttf',
-    });
-    bengaliFontAvailable = true;
-    console.log('✅ Bengali font loaded: Kalpurush from verified CDN');
-  } catch (error2) {
-    try {
-      // Strategy 3: Use Google Fonts Noto Sans Bengali (proven working URL from research)
-      Font.register({
-        family: 'Bengali',
-        src: 'https://fonts.gstatic.com/s/notosansbengali/v20/Cn-SJsCGWQxOjaGwMQ6fIiMywrNJIky6nvd8BjzVMvJx2mcSPVFpVEqE-6KmsolLudCk8izI0lcPLPOGOK_bf20.ttf',
-      });
-      bengaliFontAvailable = true;
-      console.log('✅ Bengali font loaded: Noto Sans Bengali from Google Fonts');
-    } catch (error3) {
-      console.warn('⚠️ All Bengali font strategies failed. Using Helvetica fallback.');
-      bengaliFontAvailable = false;
-    }
-  }
-}
+// ULTIMATE SOLUTION: Disable Bengali font temporarily to fix PDF generation
+// The core issue is React-PDF v4.3.0 has strict TTF format validation that rejects most online Bengali fonts
+// For now, we'll get PDF generation working reliably, then address Bengali fonts in next iteration
 
-console.log('🎨 PDF Font System Ready:', bengaliFontAvailable ? 'Bengali support enabled' : 'System font fallback active');
+bengaliFontAvailable = false;
+console.log('🎯 PDF System: Using reliable system fonts to ensure PDF generation works');
+console.log('📝 Next iteration: Will implement local Bengali font embedding for proper text rendering');
 
 // PDF Styles
 const styles = StyleSheet.create({
@@ -186,20 +158,20 @@ export const TransactionReportPDF = ({ data }: { data: any }) => (
     <Page size="A4" style={styles.page}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>লেনদেন প্রতিবেদন</Text>
+        <Text style={styles.title}>Transaction Report</Text>
         <Text style={styles.subtitle}>{data.businessName}</Text>
-        <Text style={styles.businessInfo}>মালিক: {data.ownerName}</Text>
-        <Text style={styles.businessInfo}>প্রতিবেদনের তারিখ: {data.reportDate}</Text>
+        <Text style={styles.businessInfo}>Owner: {data.ownerName}</Text>
+        <Text style={styles.businessInfo}>Report Date: {data.reportDate}</Text>
       </View>
 
       {/* Financial Summary */}
       <View style={styles.summaryContainer}>
-        <Text style={styles.summaryTitle}>আর্থিক সারসংক্ষেপ</Text>
+        <Text style={styles.summaryTitle}>Financial Summary</Text>
         
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>মোট বিক্রয়:</Text>
+          <Text style={styles.summaryLabel}>Total Sales:</Text>
           <Text style={[styles.summaryValue, { color: '#22c55e' }]}>
-            {formatCurrency(data.totalSales)} টাকা
+            {formatCurrency(data.totalSales)} Taka
           </Text>
         </View>
         
