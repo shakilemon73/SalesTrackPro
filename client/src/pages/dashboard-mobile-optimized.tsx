@@ -1,7 +1,8 @@
 import { toBengaliNumber, formatCurrency, getBengaliDate } from "@/lib/bengali-utils";
 import { Link } from "wouter";
-import { useOfflineAuth } from "@/hooks/use-offline-auth";
-import { usePureOfflineStats, usePureOfflineSales, usePureOfflineCustomers } from "@/hooks/use-pure-offline-data";
+import { hybridAuth } from "@/lib/hybrid-auth";
+import { useHybridStats, useHybridSales, useHybridCustomers } from "@/hooks/use-hybrid-data";
+import { useNetworkStatus } from "@/hooks/use-network-status";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,7 +28,9 @@ export default function DashboardMobileOptimized() {
   const [activeTab, setActiveTab] = useState('transactions');
   const [selectedView, setSelectedView] = useState('sales');
   const { toast } = useToast();
-  const { user, isLoading: authLoading } = useOfflineAuth();
+  const user = hybridAuth.getCurrentUser();
+  const { isOnline } = useNetworkStatus();
+  const authLoading = false;
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -36,14 +39,14 @@ export default function DashboardMobileOptimized() {
     else setTimeOfDay('শুভ সন্ধ্যা');
   }, []);
 
-  const { data: stats, isLoading: statsLoading, error: statsError } = usePureOfflineStats();
-  const { data: recentSales = [] } = usePureOfflineSales(2);
-  const { data: customers = [] } = usePureOfflineCustomers();
+  const { data: stats, isLoading: statsLoading, error: statsError } = useHybridStats();
+  const { data: recentSales = [] } = useHybridSales(2);
+  const { data: customers = [] } = useHybridCustomers();
 
 
 
   // Show skeleton while auth or stats are loading
-  if (authLoading || (!!user?.id && statsLoading)) {
+  if (authLoading || (!!user?.user_id && statsLoading)) {
     return <DashboardSkeleton />;
   }
 
@@ -79,13 +82,25 @@ export default function DashboardMobileOptimized() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pb-16">
       
+      {/* Connection Status */}
+      <div className={`px-4 py-2 text-center text-sm ${
+        isOnline 
+          ? 'bg-green-50 text-green-700 border-b border-green-200' 
+          : 'bg-orange-50 text-orange-700 border-b border-orange-200'
+      }`}>
+        <div className="flex items-center justify-center gap-2">
+          <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-orange-500'}`}></div>
+          {isOnline ? '🌐 অনলাইন মোড - ডেটা সিঙ্ক হচ্ছে' : '📱 অফলাইন মোড - স্থানীয় ডেটা ব্যবহার হচ্ছে'}
+        </div>
+      </div>
+
       {/* Enhanced Header with Key Metrics */}
       <DashboardHeaderEnhanced
         timeOfDay={timeOfDay}
         stats={{
           todaySales: stats?.totalSales || 0,
           todayProfit: stats?.profit || 0,
-          pendingCollection: stats?.totalDue || 0,
+          pendingCollection: stats?.pendingCollection || 0,
           salesCount: stats?.salesCount || 0
         }}
         isLoading={statsLoading}
@@ -136,7 +151,7 @@ export default function DashboardMobileOptimized() {
               </div>
               <div>
                 <p className="text-xl font-black text-orange-800 dark:text-orange-200 number-font leading-none">
-                  ৳{formatCurrency(stats?.totalDue || 0)}
+                  ৳{formatCurrency(stats?.pendingCollection || 0)}
                 </p>
                 <div className="flex items-center space-x-1 mt-1">
                   <Users className="w-2.5 h-2.5 text-orange-600" />

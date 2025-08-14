@@ -3,8 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import OfflineAuthGuard from "@/components/auth/offline-auth-guard";
-import { OfflineAuthProvider } from "@/hooks/use-offline-auth";
+import HybridAuthGuard from "@/components/auth/hybrid-auth-guard";
 
 import NotFoundMobileOptimized from "@/pages/not-found-mobile-optimized";
 import DashboardMobileOptimized from "@/pages/dashboard-mobile-optimized";
@@ -70,11 +69,11 @@ function Router() {
         <Route path="/" component={DashboardMobileOptimized} />
         <Route path="/dashboard" component={DashboardMobileOptimized} />
         <Route path="/transactions" component={TransactionsMobileOptimized} />
-        <Route path="/customers" component={CustomersMobileOptimizedOffline} />
+        <Route path="/customers" component={CustomersMobileOptimized} />
         <Route path="/reports" component={ReportsMobileOptimized} />
         <Route path="/settings" component={SettingsMobileOptimized} />
-        <Route path="/sales/new" component={SalesEntryPureOffline} />
-        <Route path="/customers/new" component={CustomerAddMobileOptimizedOffline} />
+        <Route path="/sales/new" component={SalesEntryBottomSheet} />
+        <Route path="/customers/new" component={CustomerAddMobileOptimized} />
         <Route path="/customers/:id/edit">
           {(params) => <CustomerEditMobileOptimized customerId={params.id} />}
         </Route>
@@ -133,11 +132,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <OfflineAuthProvider>
-          <OfflineAuthGuard>
-            <Router />
-          </OfflineAuthGuard>
-        </OfflineAuthProvider>
+        <HybridAuthGuard>
+          <Router />
+        </HybridAuthGuard>
       </TooltipProvider>
     </QueryClientProvider>
   );

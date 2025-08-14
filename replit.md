@@ -5,22 +5,22 @@ A comprehensive mobile-first business management application tailored for Bengal
 
 ## Recent Changes (August 14, 2025)
 
-### Complete Migration to Pure Offline-First Architecture (Latest)
+### Hybrid Online/Offline System - Like TaliKhata/HishabPati (Latest)
 **Completed Tasks:**
-- ✅ **Pure Offline Authentication**: Implemented complete offline auth system with localStorage
-- ✅ **Pure Offline Data Hooks**: Created hooks that work completely without internet connection
-- ✅ **Offline Storage System**: Enhanced offline storage manager for local data persistence
-- ✅ **Main Component Updates**: Migrated dashboard, sales entry, and customer management to pure offline
-- ✅ **Authentication Guard**: Implemented offline-first authentication with account creation
-- ✅ **Route Updates**: Switched all main routes to use pure offline components
+- ✅ **Hybrid Authentication**: First login requires internet, then works offline like TaliKhata
+- ✅ **Hybrid Data Hooks**: Same components work online/offline with automatic sync
+- ✅ **Network Status Detection**: Real-time online/offline status monitoring
+- ✅ **Data Synchronization**: Online data syncs to local, offline uses local with sync queue
+- ✅ **Connection Status UI**: Visual indicators showing online/offline mode
+- ✅ **Same Page Architecture**: No separate offline pages, same UI for both modes
 
 **Technical Implementation:**
-- Created `offline-auth.ts` for complete offline user management
-- Implemented `use-offline-auth.tsx` and `use-pure-offline-data.tsx` hooks
-- Built `offline-auth-guard.tsx` for authentication without internet dependency
-- Created `sales-entry-pure-offline.tsx` for offline sales entry
-- Developed `customers-mobile-optimized-offline.tsx` for offline customer management
-- Updated main App.tsx routing to use offline-first components
+- Created `hybrid-auth.ts` for TaliKhata-style authentication (internet for first login only)
+- Implemented `use-hybrid-data.tsx` hooks that sync online data locally and use offline when needed
+- Built `hybrid-auth-guard.tsx` for proper online/offline authentication flow
+- Added `use-network-status.tsx` for real-time connection monitoring
+- Updated dashboard with connection status indicators
+- Integrated hybrid system with existing components
 
 ### Migration from Replit Agent to Replit Environment
 **Completed Tasks:**
