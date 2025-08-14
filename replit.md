@@ -35,6 +35,7 @@ A comprehensive mobile-first business management application tailored for Bengal
 - Vite development server running successfully on port 5000
 - Removed OfflineStatus component from main App.tsx header
 - Removed connection status indicators from authentication guard
+- Removed dashboard connection status banner showing "🌐 অনলাইন মোড - ডেটা সিঙ্ক হচ্ছে"
 - Clean, distraction-free UI without network status alerts
 - All hybrid online/offline functionality still works behind the scenes
 

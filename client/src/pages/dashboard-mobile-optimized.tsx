@@ -82,17 +82,7 @@ export default function DashboardMobileOptimized() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pb-16">
       
-      {/* Connection Status */}
-      <div className={`px-4 py-2 text-center text-sm ${
-        isOnline 
-          ? 'bg-green-50 text-green-700 border-b border-green-200' 
-          : 'bg-orange-50 text-orange-700 border-b border-orange-200'
-      }`}>
-        <div className="flex items-center justify-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-orange-500'}`}></div>
-          {isOnline ? '🌐 অনলাইন মোড - ডেটা সিঙ্ক হচ্ছে' : '📱 অফলাইন মোড - স্থানীয় ডেটা ব্যবহার হচ্ছে'}
-        </div>
-      </div>
+
 
       {/* Enhanced Header with Key Metrics */}
       <DashboardHeaderEnhanced
