@@ -175,10 +175,10 @@ class HybridAuthManager {
   }
 }
 
-// Initialize demo user for immediate testing
+// Initialize demo user with proper UUID for immediate testing
 const initializeDemoUser = () => {
   const demoAuth: StoredAuth = {
-    user_id: 'demo-user-12345',
+    user_id: '550e8400-e29b-41d4-a716-446655440000', // Proper UUID format
     email: 'demo@dokanhisab.com',
     name: 'ডেমো ব্যবসায়ী',
     phone: '01712345678',
@@ -191,7 +191,7 @@ const initializeDemoUser = () => {
   // Only create demo user if no existing auth data
   if (!localStorage.getItem('dokan_hisab_auth')) {
     localStorage.setItem('dokan_hisab_auth', JSON.stringify(demoAuth));
-    console.log('🎯 DEMO USER: Created for immediate testing');
+    console.log('🎯 DEMO USER: Created with proper UUID for testing');
   }
 };
 

@@ -218,9 +218,9 @@ export function useHybridCreateCustomer() {
       await offlineStorage.store('customers', newCustomer);
       console.log('📱 HYBRID: Customer stored locally');
 
-      if (isOnline) {
+      if (isOnline && user.user_id !== '550e8400-e29b-41d4-a716-446655440000') {
         try {
-          // Try to sync with Supabase
+          // Try to sync with Supabase (only for real users, not demo)
           const onlineCustomer = await supabaseService.createCustomer(user.user_id, {
             name: customerData.name,
             phone_number: customerData.phone_number,
@@ -240,6 +240,8 @@ export function useHybridCreateCustomer() {
           console.warn('🌐 HYBRID: Failed to sync customer, keeping local');
           return newCustomer;
         }
+      } else if (user.user_id === '550e8400-e29b-41d4-a716-446655440000') {
+        console.log('📱 HYBRID: Demo user - customer stored offline only');
       }
 
       return newCustomer;
@@ -273,9 +275,9 @@ export function useHybridCreateSale() {
       await offlineStorage.store('sales', newSale);
       console.log('📱 HYBRID: Sale stored locally');
 
-      if (isOnline) {
+      if (isOnline && user.user_id !== '550e8400-e29b-41d4-a716-446655440000') {
         try {
-          // Try to sync with Supabase
+          // Try to sync with Supabase (only for real users, not demo)
           const onlineSale = await supabaseService.createSale(user.user_id, saleData);
           
           // Update local storage with server data
@@ -324,9 +326,9 @@ export function useHybridCreateExpense() {
       await offlineStorage.store('expenses', newExpense);
       console.log('📱 HYBRID: Expense stored locally');
 
-      if (isOnline) {
+      if (isOnline && user.user_id !== '550e8400-e29b-41d4-a716-446655440000') {
         try {
-          // Try to sync with Supabase
+          // Try to sync with Supabase (only for real users, not demo)
           const onlineExpense = await supabaseService.createExpense(user.user_id, expenseData);
           
           // Update local storage with server ID
