@@ -22,6 +22,8 @@ import TransactionDetailsMobileOptimized from "@/pages/transaction-details-mobil
 import CollectionMobileOptimized from "@/pages/collection-mobile-optimized";
 import ExpenseEntryMobileOptimized from "@/pages/expense-entry-mobile-optimized";
 import InventoryMobileOptimizedFixed from "@/pages/inventory-mobile-optimized-fixed";
+import AnalyticsMobileOptimized from "@/pages/analytics-mobile-optimized";
+import NotificationsMobileOptimized from "@/pages/notifications-mobile-optimized";
 import BottomNavigationOptimized from "@/components/ui/bottom-navigation-optimized";
 import CommunicationPanel from "@/components/ui/communication-panel";
 import FloatingActionMenu from "@/components/ui/floating-action-menu";
@@ -79,6 +81,8 @@ function Router() {
         <Route path="/inventory" component={InventoryMobileOptimizedFixed} />
         <Route path="/collection" component={CollectionMobileOptimized} />
         <Route path="/expenses/new" component={ExpenseEntryMobileOptimized} />
+        <Route path="/analytics" component={AnalyticsMobileOptimized} />
+        <Route path="/notifications" component={NotificationsMobileOptimized} />
 
 
           <Route component={NotFoundMobileOptimized} />
