@@ -246,8 +246,24 @@ export function useHybridCreateCustomer() {
 
       return newCustomer;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customers', user?.user_id, 'hybrid'] });
+    onSuccess: (newCustomer) => {
+      // Optimistic update for immediate UI response
+      queryClient.setQueryData(['customers', user?.user_id, 'hybrid'], (old: any) => {
+        return old ? [newCustomer, ...old] : [newCustomer];
+      });
+      
+      // Update stats optimistically
+      queryClient.setQueryData(['stats', user?.user_id, 'hybrid'], (old: any) => {
+        if (!old) return old;
+        return { ...old, totalCustomers: (old.totalCustomers || 0) + 1 };
+      });
+
+      // Invalidate all related queries for instant cross-page updates
+      queryClient.invalidateQueries({ queryKey: ['customers', user?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ['stats', user?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ['sales', user?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ['expenses', user?.user_id] });
+      console.log('🔄 HYBRID: All queries invalidated after customer creation');
     },
   });
 }
@@ -296,9 +312,30 @@ export function useHybridCreateSale() {
 
       return newSale;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['sales', user?.user_id, 'hybrid'] });
-      queryClient.invalidateQueries({ queryKey: ['stats', user?.user_id, 'hybrid'] });
+    onSuccess: (newSale) => {
+      // Optimistic update for immediate UI response
+      queryClient.setQueryData(['sales', user?.user_id, 'hybrid'], (old: any) => {
+        return old ? [newSale, ...old] : [newSale];
+      });
+      
+      // Update stats optimistically
+      queryClient.setQueryData(['stats', user?.user_id, 'hybrid'], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          totalSales: (old.totalSales || 0) + (newSale.total_amount || 0),
+          salesCount: (old.salesCount || 0) + 1,
+          todaySales: (old.todaySales || 0) + (newSale.total_amount || 0),
+          profit: (old.profit || 0) + ((newSale.total_amount || 0) - (newSale.cost || 0)),
+        };
+      });
+
+      // Invalidate all related queries for instant cross-page updates
+      queryClient.invalidateQueries({ queryKey: ['sales', user?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ['stats', user?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ['customers', user?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ['expenses', user?.user_id] });
+      console.log('🔄 HYBRID: All queries invalidated after sale creation');
     },
   });
 }
@@ -347,9 +384,28 @@ export function useHybridCreateExpense() {
 
       return newExpense;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expenses', user?.user_id, 'hybrid'] });
-      queryClient.invalidateQueries({ queryKey: ['stats', user?.user_id, 'hybrid'] });
+    onSuccess: (newExpense) => {
+      // Optimistic update for immediate UI response
+      queryClient.setQueryData(['expenses', user?.user_id, 'hybrid'], (old: any) => {
+        return old ? [newExpense, ...old] : [newExpense];
+      });
+      
+      // Update stats optimistically
+      queryClient.setQueryData(['stats', user?.user_id, 'hybrid'], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          totalExpenses: (old.totalExpenses || 0) + (newExpense.amount || 0),
+          profit: (old.profit || 0) - (newExpense.amount || 0),
+        };
+      });
+
+      // Invalidate all related queries for instant cross-page updates
+      queryClient.invalidateQueries({ queryKey: ['expenses', user?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ['stats', user?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ['sales', user?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ['customers', user?.user_id] });
+      console.log('🔄 HYBRID: All queries invalidated after expense creation');
     },
   });
 }
@@ -399,10 +455,13 @@ export function useHybridCreateCollection() {
       return newCollection;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['collections', user?.user_id, 'hybrid'] });
-      queryClient.invalidateQueries({ queryKey: ['sales', user?.user_id, 'hybrid'] });
-      queryClient.invalidateQueries({ queryKey: ['customers', user?.user_id, 'hybrid'] });
-      queryClient.invalidateQueries({ queryKey: ['stats', user?.user_id, 'hybrid'] });
+      // Invalidate all related queries for instant cross-page updates
+      queryClient.invalidateQueries({ queryKey: ['collections', user?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ['stats', user?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ['customers', user?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ['sales', user?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ['expenses', user?.user_id] });
+      console.log('🔄 HYBRID: All queries invalidated after collection creation');
     },
   });
 }

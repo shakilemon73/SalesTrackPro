@@ -650,7 +650,7 @@ export default function SalesEntryBottomSheet() {
                   <button
                     key={method}
                     type="button"
-                    onClick={() => form.setValue("paymentMethod", method)}
+                    onClick={() => form.setValue("paymentMethod", method as PaymentMethod)}
                     className={`h-9 rounded-lg border-2 transition-all duration-200 bengali-font font-bold text-sm ${
                       form.watch("paymentMethod") === method
                         ? 'bg-orange-500 border-orange-500 text-white shadow-lg scale-105'
@@ -663,7 +663,7 @@ export default function SalesEntryBottomSheet() {
               </div>
 
               {/* Mixed Payment Details */}
-              {watchedPaymentMethod === paymentMethods[2] && (
+              {watchedPaymentMethod === "মিশ্র" && (
                 <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800 space-y-2">
                   <h4 className="text-xs font-bold text-orange-700 dark:text-orange-300 bengali-font">মিশ্র পেমেন্টের বিস্তারিত</h4>
                   
@@ -787,7 +787,7 @@ export default function SalesEntryBottomSheet() {
                   </div>
                   
                   {/* Mixed Payment Preview */}
-                  {watchedPaymentMethod === paymentMethods[2] && watchedAmount && watchedPaidAmount && (
+                  {watchedPaymentMethod === "মিশ্র" && watchedAmount && watchedPaidAmount && (
                     <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="flex justify-between">
@@ -803,7 +803,7 @@ export default function SalesEntryBottomSheet() {
                   )}
                   
                   {/* Due Payment Preview */}
-                  {watchedPaymentMethod === paymentMethods[1] && parseFloat(watchedAmount || "0") > 0 && (
+                  {watchedPaymentMethod === "বাকি" && parseFloat(watchedAmount || "0") > 0 && (
                     <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-orange-500 rounded-full"></div>

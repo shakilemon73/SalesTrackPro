@@ -20,9 +20,11 @@ import {
   Trash2, Package, Check, AlertCircle
 } from "lucide-react";
 
+const paymentMethods = ["নগদ", "বাকি", "মিশ্র"] as const;
+
 const saleSchema = z.object({
   customerName: z.string().min(1, "গ্রাহকের নাম আবশ্যক"),
-  paymentMethod: z.enum(["নগদ", "বাকি", "মিশ্র"]),
+  paymentMethod: z.enum(paymentMethods),
   paidAmount: z.string().min(1, "পেমেন্ট পরিমাণ আবশ্যক"),
 });
 
@@ -422,7 +424,7 @@ export default function SalesEntryMobileOptimized() {
                   {/* Payment Method */}
                   <div className="space-y-2">
                     <Label className="text-xs bengali-font">পেমেন্ট পদ্ধতি</Label>
-                    <Select value={form.watch("paymentMethod")} onValueChange={(value) => form.setValue("paymentMethod", value as "নগদ" | "বাকি" | "মিশ্র")}>
+                    <Select value={form.watch("paymentMethod")} onValueChange={(value) => form.setValue("paymentMethod", value as typeof paymentMethods[number])}>
                       <SelectTrigger className="h-10 text-sm">
                         <SelectValue />
                       </SelectTrigger>
