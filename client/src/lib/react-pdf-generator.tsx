@@ -2,12 +2,17 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Font, pdf } from '@react-pdf/renderer';
 import { getBengaliDate, formatCurrency, toBengaliNumber } from './bengali-utils';
 
-// Note: Bengali font registration temporarily disabled to prevent font format errors
-// Will be re-enabled once font loading issue is resolved
-// Font.register({
-//   family: 'NotoSansBengali', 
-//   src: 'path/to/bengali/font.ttf'
-// });
+// Register fonts for PDF generation
+try {
+  // Register Bengali font
+  Font.register({
+    family: 'NotoSansBengali',
+    src: 'https://fonts.gstatic.com/s/notosansbengali/v20/Cn-SJsCGWQxOjTbR24EMuSaqP77YHd4P-C_qeSLPPVHV6rIg8A.ttf',
+  });
+  console.log('Bengali font registered successfully');
+} catch (error) {
+  console.warn('Bengali font registration failed:', error);
+}
 
 // PDF Styles
 const styles = StyleSheet.create({
@@ -15,7 +20,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: '#FFFFFF',
     padding: 30,
-    fontFamily: 'Helvetica', // Use built-in Helvetica font
+    fontFamily: 'NotoSansBengali', // Use Bengali font for proper text rendering
   },
   header: {
     backgroundColor: '#2563eb',
