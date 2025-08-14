@@ -1,0 +1,29 @@
+DashboardOfflineDemo is not defined
+DashboardOfflineDemo is not defined
+The above error occurred in the <Router> component:
+
+    at Router (https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/src/App.tsx?t=1755136445529:50:63)
+    at AuthGuard (https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/src/components/auth/auth-guard.tsx:21:37)
+    at Provider (https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-XOUBXFGS.js?v=add1805c:38:15)
+    at TooltipProvider (https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=add1805c:62:5)
+    at QueryClientProvider (https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=add1805c:2934:3)
+    at App (https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/src/App.tsx?t=1755136445529:211:3)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+at Router (https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/src/App.tsx?t=1755136445529:50:63)
+at AuthGuard (https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/src/components/auth/auth-guard.tsx:21:37)
+at Provider (https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-XOUBXFGS.js?v=add1805c:38:15)
+at TooltipProvider (https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=add1805c:62:5)
+at QueryClientProvider (https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=add1805c:2934:3)
+at App (https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/src/App.tsx?t=1755136445529:211:3)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+at t.value (https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
+DashboardOfflineDemo is not defined
+[hmr] Failed to reload /src/pages/dashboard-offline-demo.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above)
