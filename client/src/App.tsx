@@ -92,7 +92,7 @@ function Router() {
 
         {/* Communication Panel */}
         {showCommunicationPanel && (
-          <CommunicationPanel onClose={() => setShowCommunicationPanel(false)} />
+          <CommunicationPanel />
         )}
       </div>
     </div>
