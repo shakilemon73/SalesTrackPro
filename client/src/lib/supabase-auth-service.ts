@@ -222,5 +222,34 @@ export const authService = {
 
     if (error) throw error;
     return data;
+  },
+
+  // Collections functions
+  async getCollections(userId: string, limit?: number) {
+    let query = supabase
+      .from('collections')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (limit) query = query.limit(limit);
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  },
+
+  async createCollection(userId: string, collectionData: any) {
+    const { data, error } = await supabase
+      .from('collections')
+      .insert({
+        ...collectionData,
+        user_id: userId
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   }
 };

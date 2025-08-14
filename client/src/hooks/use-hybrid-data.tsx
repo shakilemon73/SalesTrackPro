@@ -469,14 +469,69 @@ export function useHybridCreateCollection() {
 
       return newCollection;
     },
-    onSuccess: () => {
-      // Invalidate all related queries for instant cross-page updates
+    onSuccess: (newCollection) => {
+      // Optimistic update for immediate UI response
+      queryClient.setQueryData(['collections', user?.user_id, 'hybrid'], (old: any) => {
+        return old ? [newCollection, ...old] : [newCollection];
+      });
+
+      // Force immediate refetch for all related data
       queryClient.invalidateQueries({ queryKey: ['collections', user?.user_id] });
       queryClient.invalidateQueries({ queryKey: ['stats', user?.user_id] });
       queryClient.invalidateQueries({ queryKey: ['customers', user?.user_id] });
       queryClient.invalidateQueries({ queryKey: ['sales', user?.user_id] });
       queryClient.invalidateQueries({ queryKey: ['expenses', user?.user_id] });
-      console.log('🔄 HYBRID: All queries invalidated after collection creation');
+      
+      // Force immediate refetch 
+      queryClient.refetchQueries({ queryKey: ['collections', user?.user_id] });
+      queryClient.refetchQueries({ queryKey: ['stats', user?.user_id] });
+      
+      console.log('🔄 HYBRID: All queries invalidated and refetched after collection creation');
     },
+  });
+}
+
+// Hybrid collections hook
+export function useHybridCollections(limit?: number) {
+  const { isOnline } = useNetworkStatus();
+  const user = hybridAuth.getCurrentUser();
+  
+  return useQuery({
+    queryKey: ['collections', user?.user_id, 'hybrid', limit],
+    queryFn: async () => {
+      if (!user?.user_id) return [];
+
+      if (isOnline) {
+        try {
+          const onlineData = await supabaseService.getCollections(user.user_id, limit);
+          
+          // Store locally
+          for (const collection of onlineData) {
+            await offlineStorage.store('collections', collection);
+          }
+          
+          console.log('🌐 HYBRID: Collections synced from online');
+          return onlineData;
+        } catch (error) {
+          console.warn('🌐 HYBRID: Online fetch failed, using offline data');
+          const offlineData = await offlineStorage.getAll('collections', user.user_id);
+          const sortedData = offlineData.sort((a, b) => 
+            new Date(b.collection_date || b.created_at).getTime() - 
+            new Date(a.collection_date || a.created_at).getTime()
+          );
+          return limit ? sortedData.slice(0, limit) : sortedData;
+        }
+      } else {
+        console.log('📱 HYBRID: Using offline collections data');
+        const offlineData = await offlineStorage.getAll('collections', user.user_id);
+        const sortedData = offlineData.sort((a, b) => 
+          new Date(b.collection_date || b.created_at).getTime() - 
+          new Date(a.collection_date || a.created_at).getTime()
+        );
+        return limit ? sortedData.slice(0, limit) : sortedData;
+      }
+    },
+    enabled: !!user?.user_id,
+    staleTime: isOnline ? 30000 : Infinity,
   });
 }
