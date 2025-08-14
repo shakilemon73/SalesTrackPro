@@ -250,41 +250,49 @@ export default function TransactionsMobileOptimized() {
       {/* Content Container */}
       <div className="px-4 py-4 space-y-4">
         
-        {/* Summary Cards - 3 Column Compact Grid */}
-        <div className="grid grid-cols-3 gap-2">
-          <Card className="border-0 shadow-md bg-gradient-to-br from-green-500 to-emerald-600 text-white p-3">
-            <div className="text-center space-y-1">
-              <TrendingUp className="w-4 h-4 mx-auto text-green-200" />
-              <p className="text-xs text-green-100 bengali-font">বিক্রয়</p>
-              <p className="text-sm font-bold number-font">
-                {formatCurrency(totals.sales)}
-              </p>
+        {/* Summary Cards - Mobile Framework Grid */}
+        <div className="grid-container">
+          <div className="grid-row">
+            <div className="col-4">
+              <Card className="border-0 shadow-md bg-gradient-to-br from-green-500 to-emerald-600 text-white p-3">
+                <div className="text-center space-y-1">
+                  <TrendingUp className="w-4 h-4 mx-auto text-green-200" />
+                  <p className="text-xs text-green-100 bengali-font">বিক্রয়</p>
+                  <p className="text-sm font-bold number-font">
+                    {formatCurrency(totals.sales)}
+                  </p>
+                </div>
+              </Card>
             </div>
-          </Card>
 
-          <Card className="border-0 shadow-md bg-gradient-to-br from-red-500 to-rose-600 text-white p-3">
-            <div className="text-center space-y-1">
-              <ArrowDownRight className="w-4 h-4 mx-auto text-red-200" />
-              <p className="text-xs text-red-100 bengali-font">খরচ</p>
-              <p className="text-sm font-bold number-font">
-                {formatCurrency(totals.expenses)}
-              </p>
+            <div className="col-4">
+              <Card className="border-0 shadow-md bg-gradient-to-br from-red-500 to-rose-600 text-white p-3">
+                <div className="text-center space-y-1">
+                  <ArrowDownRight className="w-4 h-4 mx-auto text-red-200" />
+                  <p className="text-xs text-red-100 bengali-font">খরচ</p>
+                  <p className="text-sm font-bold number-font">
+                    {formatCurrency(totals.expenses)}
+                  </p>
+                </div>
+              </Card>
             </div>
-          </Card>
 
-          <Card className="border-0 shadow-md bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-3">
-            <div className="text-center space-y-1">
-              <Wallet className="w-4 h-4 mx-auto text-blue-200" />
-              <p className="text-xs text-blue-100 bengali-font">নিট</p>
-              <p className="text-sm font-bold number-font">
-                {formatCurrency(totals.net)}
-              </p>
+            <div className="col-4">
+              <Card className="border-0 shadow-md bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-3">
+                <div className="text-center space-y-1">
+                  <Wallet className="w-4 h-4 mx-auto text-blue-200" />
+                  <p className="text-xs text-blue-100 bengali-font">নিট</p>
+                  <p className="text-sm font-bold number-font">
+                    {formatCurrency(totals.net)}
+                  </p>
+                </div>
+              </Card>
             </div>
-          </Card>
+          </div>
         </div>
 
-        {/* Search and Filter - Compact Row */}
-        <div className="flex space-x-2">
+        {/* Search and Filter - Mobile Framework */}
+        <div className="flex-row gap-2">
           <div className="flex-1">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 text-slate-400" />

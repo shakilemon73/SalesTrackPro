@@ -144,7 +144,7 @@ export default function InventoryMobileOptimizedFixed() {
           {/* Add Product Dialog */}
           <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full">
+              <Button className="btn-touch-target bg-blue-600 hover:bg-blue-700 text-white">
                 <Plus className="w-4 h-4 mr-1" />
                 যোগ করুন
               </Button>

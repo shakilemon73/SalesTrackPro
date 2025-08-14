@@ -260,24 +260,26 @@ export default function CollectionMobileOptimized() {
 
                 {/* Quick Amount Buttons */}
                 {selectedCustomer && (
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid-container">
+                    <div className="grid-row">
                     {[
                       Math.floor(selectedCustomer.totalDue * 0.25),
                       Math.floor(selectedCustomer.totalDue * 0.5),
                       Math.floor(selectedCustomer.totalDue * 0.75),
                       selectedCustomer.totalDue
                     ].map((amount) => (
-                      <Button
-                        key={amount}
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-8 text-xs"
-                        onClick={() => form.setValue("amount", amount.toString())}
-                      >
-                        {amount === selectedCustomer.totalDue ? 'সব' : formatCurrency(amount)}
-                      </Button>
+                      <div key={amount} className="col-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="btn-touch-target w-full"
+                          onClick={() => form.setValue("amount", amount.toString())}
+                        >
+                          {amount === selectedCustomer.totalDue ? 'সব' : formatCurrency(amount)}
+                        </Button>
+                      </div>
                     ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -288,7 +290,7 @@ export default function CollectionMobileOptimized() {
             {/* Action Button */}
             <Button 
               type="submit"
-              className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white font-medium"
+              className="btn-touch-target w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium"
               disabled={createCollectionMutation.isPending}
             >
               {createCollectionMutation.isPending ? (

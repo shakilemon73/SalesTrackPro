@@ -193,31 +193,39 @@ export default function SettingsMobileOptimized() {
       {/* Content Container */}
       <div className="px-4 py-4 space-y-4">
         
-        {/* App Statistics - Compact Cards */}
-        <div className="grid grid-cols-3 gap-2">
-          <Card className="border-0 shadow-md p-3 text-center">
-            <Activity className="w-4 h-4 mx-auto text-emerald-600 mb-1" />
-            <p className="text-xs text-slate-500 bengali-font">মোট গ্রাহক</p>
-            <p className="text-lg font-bold text-slate-900 dark:text-white number-font">
-              {toBengaliNumber(customers.length)}
-            </p>
-          </Card>
+        {/* App Statistics - Mobile Framework Grid */}
+        <div className="grid-container">
+          <div className="grid-row">
+            <div className="col-4">
+              <Card className="border-0 shadow-md p-3 text-center">
+                <Activity className="w-4 h-4 mx-auto text-emerald-600 mb-1" />
+                <p className="text-xs text-slate-500 bengali-font">মোট গ্রাহক</p>
+                <p className="text-lg font-bold text-slate-900 dark:text-white number-font">
+                  {toBengaliNumber(customers.length)}
+                </p>
+              </Card>
+            </div>
           
-          <Card className="border-0 shadow-md p-3 text-center">
-            <BarChart3 className="w-4 h-4 mx-auto text-blue-600 mb-1" />
-            <p className="text-xs text-slate-500 bengali-font">মোট বিক্রয়</p>
-            <p className="text-lg font-bold text-slate-900 dark:text-white number-font">
-              {toBengaliNumber(sales.length)}
-            </p>
-          </Card>
+            <div className="col-4">
+              <Card className="border-0 shadow-md p-3 text-center">
+                <BarChart3 className="w-4 h-4 mx-auto text-blue-600 mb-1" />
+                <p className="text-xs text-slate-500 bengali-font">মোট বিক্রয়</p>
+                <p className="text-lg font-bold text-slate-900 dark:text-white number-font">
+                  {toBengaliNumber(sales.length)}
+                </p>
+              </Card>
+            </div>
           
-          <Card className="border-0 shadow-md p-3 text-center">
-            <Clock className="w-4 h-4 mx-auto text-purple-600 mb-1" />
-            <p className="text-xs text-slate-500 bengali-font">সর্বশেষ</p>
-            <p className="text-xs font-medium text-slate-900 dark:text-white">
-              {getBengaliDate()}
-            </p>
-          </Card>
+            <div className="col-4">
+              <Card className="border-0 shadow-md p-3 text-center">
+                <Clock className="w-4 h-4 mx-auto text-purple-600 mb-1" />
+                <p className="text-xs text-slate-500 bengali-font">সর্বশেষ</p>
+                <p className="text-xs font-medium text-slate-900 dark:text-white">
+                  {getBengaliDate()}
+                </p>
+              </Card>
+            </div>
+          </div>
         </div>
 
         {/* Business Information */}

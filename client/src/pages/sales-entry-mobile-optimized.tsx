@@ -467,20 +467,22 @@ export default function SalesEntryMobileOptimized() {
                     )}
                   </div>
 
-                  {/* Quick Amount Buttons */}
-                  <div className="grid grid-cols-4 gap-2">
-                    {[100, 500, 1000, totalAmount].map((amount) => (
-                      <Button
-                        key={amount}
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-8 text-xs"
-                        onClick={() => form.setValue("paidAmount", amount.toString())}
-                      >
-                        {formatCurrency(amount)}
-                      </Button>
-                    ))}
+                  {/* Quick Amount Buttons - Mobile Framework Grid */}
+                  <div className="grid-container">
+                    <div className="grid-row">
+                      {[100, 500, 1000, totalAmount].map((amount) => (
+                        <div key={amount} className="col-3">
+                          <Button
+                            type="button"
+                            className="btn-touch-target w-full"
+                            variant="outline"
+                            onClick={() => form.setValue("paidAmount", amount.toString())}
+                          >
+                            {amount === totalAmount ? "সব" : formatCurrency(amount)}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </Card>

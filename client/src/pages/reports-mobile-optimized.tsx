@@ -165,67 +165,79 @@ export default function ReportsMobileOptimized() {
       {/* Content Container */}
       <div className="px-4 py-4 space-y-4">
         
-        {/* Period Summary Cards - 2x2 Grid */}
-        <div className="grid grid-cols-2 gap-3">
-          <Card className="border-0 shadow-md bg-gradient-to-br from-green-500 to-emerald-600 text-white p-4">
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-green-100 bengali-font">বিক্রয়</p>
-                <TrendingUp className="w-4 h-4 text-green-200" />
-              </div>
-              <p className="text-xl font-bold number-font">
-                {formatCurrency(periodTotals.sales)}
-              </p>
-              <p className="text-green-200 text-xs">
-                {toBengaliNumber(filteredSales.length)}টি লেনদেন
-              </p>
+        {/* Period Summary Cards - Mobile Framework 2x2 Grid */}
+        <div className="grid-container">
+          <div className="grid-row">
+            <div className="col-6">
+              <Card className="border-0 shadow-md bg-gradient-to-br from-green-500 to-emerald-600 text-white p-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-green-100 bengali-font">বিক্রয়</p>
+                      <TrendingUp className="w-4 h-4 text-green-200" />
+                    </div>
+                    <p className="text-xl font-bold number-font">
+                      {formatCurrency(periodTotals.sales)}
+                    </p>
+                    <p className="text-green-200 text-xs">
+                      {toBengaliNumber(filteredSales.length)}টি লেনদেন
+                    </p>
+                  </div>
+                </Card>
             </div>
-          </Card>
 
-          <Card className="border-0 shadow-md bg-gradient-to-br from-red-500 to-rose-600 text-white p-4">
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-red-100 bengali-font">খরচ</p>
-                <TrendingDown className="w-4 h-4 text-red-200" />
-              </div>
-              <p className="text-xl font-bold number-font">
-                {formatCurrency(periodTotals.expenses)}
-              </p>
-              <p className="text-red-200 text-xs">
-                {toBengaliNumber(filteredExpenses.length)}টি খরচ
-              </p>
+            <div className="col-6">
+              <Card className="border-0 shadow-md bg-gradient-to-br from-red-500 to-rose-600 text-white p-4">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-red-100 bengali-font">খরচ</p>
+                    <TrendingDown className="w-4 h-4 text-red-200" />
+                  </div>
+                  <p className="text-xl font-bold number-font">
+                    {formatCurrency(periodTotals.expenses)}
+                  </p>
+                  <p className="text-red-200 text-xs">
+                    {toBengaliNumber(filteredExpenses.length)}টি খরচ
+                  </p>
+                </div>
+              </Card>
             </div>
-          </Card>
+          </div>
 
-          <Card className="border-0 shadow-md bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-4">
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-blue-100 bengali-font">লাভ</p>
-                <Target className="w-4 h-4 text-blue-200" />
-              </div>
-              <p className="text-xl font-bold number-font">
-                {formatCurrency(periodTotals.profit)}
-              </p>
-              <p className="text-blue-200 text-xs">
-                {toBengaliNumber(periodTotals.margin.toFixed(1))}% মার্জিন
-              </p>
+          <div className="grid-row">
+            <div className="col-6">
+              <Card className="border-0 shadow-md bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-4">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-blue-100 bengali-font">লাভ</p>
+                    <Target className="w-4 h-4 text-blue-200" />
+                  </div>
+                  <p className="text-xl font-bold number-font">
+                    {formatCurrency(periodTotals.profit)}
+                  </p>
+                  <p className="text-blue-200 text-xs">
+                    {toBengaliNumber(periodTotals.margin.toFixed(1))}% মার্জিন
+                  </p>
+                </div>
+              </Card>
             </div>
-          </Card>
 
-          <Card className="border-0 shadow-md bg-gradient-to-br from-purple-500 to-violet-600 text-white p-4">
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-purple-100 bengali-font">গ্রাহক</p>
-                <Users className="w-4 h-4 text-purple-200" />
-              </div>
-              <p className="text-xl font-bold number-font">
-                {toBengaliNumber(customers.length)}
-              </p>
-              <p className="text-purple-200 text-xs">
-                সক্রিয় গ্রাহক
-              </p>
+            <div className="col-6">
+              <Card className="border-0 shadow-md bg-gradient-to-br from-purple-500 to-violet-600 text-white p-4">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-purple-100 bengali-font">গ্রাহক</p>
+                    <Users className="w-4 h-4 text-purple-200" />
+                  </div>
+                  <p className="text-xl font-bold number-font">
+                    {toBengaliNumber(customers.length)}
+                  </p>
+                  <p className="text-purple-200 text-xs">
+                    সক্রিয় গ্রাহক
+                  </p>
+                </div>
+              </Card>
             </div>
-          </Card>
+          </div>
         </div>
 
         {/* Tab Navigation */}

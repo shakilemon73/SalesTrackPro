@@ -158,25 +158,28 @@ export default function ExpenseEntryMobileOptimized() {
               </h3>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid-container">
+              <div className="grid-row">
               {expenseCategories.map((category) => {
                 const Icon = category.icon;
                 const isSelected = form.watch("category") === category.value;
                 return (
-                  <Button
-                    key={category.value}
-                    type="button"
-                    variant={isSelected ? "default" : "outline"}
-                    className={`h-12 flex items-center space-x-2 ${
-                      isSelected ? "bg-emerald-500 hover:bg-emerald-600" : ""
-                    }`}
-                    onClick={() => form.setValue("category", category.value)}
-                  >
-                    <Icon className={`w-4 h-4 ${isSelected ? "text-white" : category.color}`} />
-                    <span className="text-xs bengali-font">{category.value}</span>
-                  </Button>
+                  <div key={category.value} className="col-6">
+                    <Button
+                      type="button"
+                      variant={isSelected ? "default" : "outline"}
+                      className={`btn-touch-target w-full flex items-center space-x-2 ${
+                        isSelected ? "bg-emerald-500 hover:bg-emerald-600" : ""
+                      }`}
+                      onClick={() => form.setValue("category", category.value)}
+                    >
+                      <Icon className={`w-4 h-4 ${isSelected ? "text-white" : category.color}`} />
+                      <span className="text-xs bengali-font">{category.value}</span>
+                    </Button>
+                  </div>
                 );
               })}
+              </div>
             </div>
             
             {form.formState.errors.category && (
@@ -218,19 +221,21 @@ export default function ExpenseEntryMobileOptimized() {
               </div>
 
               {/* Quick Amount Buttons */}
-              <div className="grid grid-cols-4 gap-2">
-                {[50, 100, 500, 1000].map((amount) => (
-                  <Button
-                    key={amount}
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-8 text-xs"
-                    onClick={() => form.setValue("amount", amount.toString())}
-                  >
-                    {formatCurrency(amount)}
-                  </Button>
-                ))}
+              <div className="grid-container">
+                <div className="grid-row">
+                  {[50, 100, 500, 1000].map((amount) => (
+                    <div key={amount} className="col-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="btn-touch-target w-full"
+                        onClick={() => form.setValue("amount", amount.toString())}
+                      >
+                        {formatCurrency(amount)}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </Card>
@@ -297,7 +302,7 @@ export default function ExpenseEntryMobileOptimized() {
           {/* Action Button */}
           <Button 
             type="submit"
-            className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white font-medium"
+            className="btn-touch-target w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium"
             disabled={createExpenseMutation.isPending}
           >
             {createExpenseMutation.isPending ? (

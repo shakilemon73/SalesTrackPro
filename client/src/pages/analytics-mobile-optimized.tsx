@@ -60,23 +60,25 @@ export default function AnalyticsMobileOptimized() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid-container">
+              <div className="grid-row">
               {[
                 { key: 'today', label: 'আজ' },
                 { key: 'week', label: 'সপ্তাহ' },
                 { key: 'month', label: 'মাস' },
                 { key: 'year', label: 'বছর' }
               ].map((period) => (
-                <Button
-                  key={period.key}
-                  variant={selectedPeriod === period.key ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedPeriod(period.key as any)}
-                  className="text-xs"
-                >
-                  {period.label}
-                </Button>
+                <div key={period.key} className="col-3">
+                  <Button
+                    variant={selectedPeriod === period.key ? "default" : "outline"}
+                    onClick={() => setSelectedPeriod(period.key as any)}
+                    className="btn-touch-target w-full"
+                  >
+                    {period.label}
+                  </Button>
+                </div>
               ))}
+              </div>
             </div>
           </CardContent>
         </Card>

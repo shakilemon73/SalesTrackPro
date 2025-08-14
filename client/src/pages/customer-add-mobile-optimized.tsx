@@ -205,7 +205,7 @@ export default function CustomerAddMobileOptimized() {
           <div className="space-y-3">
             <Button 
               type="submit"
-              className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white font-medium"
+              className="btn-touch-target w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium"
               disabled={createCustomerMutation.isPending}
             >
               {createCustomerMutation.isPending ? (
