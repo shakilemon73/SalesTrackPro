@@ -10,8 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { isValidBengaliPhone } from "@/lib/bengali-utils";
-import { supabaseService } from "@/lib/supabase";
-import { useAuth } from "@/hooks/use-auth";
+import { hybridAuth } from "@/lib/hybrid-auth";
+import { useHybridCreateCustomer } from "@/hooks/use-hybrid-data";
+import { useNetworkStatus } from "@/hooks/use-network-status";
 import { 
   ArrowLeft, UserPlus, User, Phone, MapPin, 
   Check, AlertCircle, Save
@@ -29,8 +30,8 @@ const customerSchema = z.object({
 export default function CustomerAddMobileOptimized() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const { userId } = useAuth();
+  const user = hybridAuth.getCurrentUser();
+  const { isOnline } = useNetworkStatus();
 
   const form = useForm({
     resolver: zodResolver(customerSchema),
@@ -41,30 +42,23 @@ export default function CustomerAddMobileOptimized() {
     },
   });
 
-  const createCustomerMutation = useMutation({
-    mutationFn: async (customerData: any) => {
-      if (!userId) {
-        throw new Error('User not authenticated');
-      }
-      return await supabaseService.createCustomer(userId, customerData);
-    },
-    onSuccess: () => {
-      toast({
-        title: "সফল!",
-        description: "গ্রাহক সফলভাবে যোগ করা হয়েছে",
-      });
-      queryClient.invalidateQueries({ queryKey: ['customers'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      setLocation("/customers");
-    },
-    onError: () => {
-      toast({
-        title: "ত্রুটি!",
-        description: "গ্রাহক যোগ করতে সমস্যা হয়েছে",
-        variant: "destructive",
-      });
-    },
-  });
+  const createCustomerMutation = useHybridCreateCustomer();
+
+  const handleSuccess = () => {
+    toast({
+      title: "সফল!",
+      description: isOnline ? "গ্রাহক সফলভাবে যোগ করা হয়েছে এবং সিঙ্ক হয়েছে" : "গ্রাহক স্থানীয়ভাবে সংরক্ষিত হয়েছে",
+    });
+    setLocation("/customers");
+  };
+
+  const handleError = () => {
+    toast({
+      title: "ত্রুটি!",
+      description: "গ্রাহক যোগ করতে সমস্যা হয়েছে",
+      variant: "destructive",
+    });
+  };
 
   const onSubmit = (data: z.infer<typeof customerSchema>) => {
     const customerData = {
@@ -73,7 +67,10 @@ export default function CustomerAddMobileOptimized() {
       address: data.address?.trim() || undefined,
     };
     
-    createCustomerMutation.mutate(customerData);
+    createCustomerMutation.mutate(customerData, {
+      onSuccess: handleSuccess,
+      onError: handleError,
+    });
   };
 
   return (

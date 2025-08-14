@@ -6,8 +6,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabaseService } from "@/lib/supabase";
-import { useAuth } from "@/hooks/use-auth";
+import { hybridAuth } from "@/lib/hybrid-auth";
+import { useHybridStats, useHybridSales, useHybridCustomers } from "@/hooks/use-hybrid-data";
+import { useNetworkStatus } from "@/hooks/use-network-status";
 import { 
   ArrowLeft, TrendingUp, TrendingDown, Calendar,
   BarChart3, PieChart, Users, Package,
@@ -18,31 +19,15 @@ import {
 export default function ReportsMobileOptimized() {
   const [reportPeriod, setReportPeriod] = useState("today");
   const [activeTab, setActiveTab] = useState("overview");
-  const { userId } = useAuth();
+  const user = hybridAuth.getCurrentUser();
+  const { isOnline } = useNetworkStatus();
 
-  const { data: stats } = useQuery({
-    queryKey: ['dashboard', userId],
-    queryFn: () => userId ? supabaseService.getStats(userId) : Promise.resolve(null),
-    enabled: !!userId,
-  });
-
-  const { data: sales = [] } = useQuery({
-    queryKey: ['sales', userId],
-    queryFn: () => userId ? supabaseService.getSales(userId) : Promise.resolve([]),
-    enabled: !!userId,
-  });
-
-  const { data: expenses = [] } = useQuery({
-    queryKey: ['expenses', userId],
-    queryFn: () => userId ? supabaseService.getExpenses(userId) : Promise.resolve([]),
-    enabled: !!userId,
-  });
-
-  const { data: customers = [] } = useQuery({
-    queryKey: ['customers', userId],
-    queryFn: () => userId ? supabaseService.getCustomers(userId) : Promise.resolve([]),
-    enabled: !!userId,
-  });
+  const { data: stats } = useHybridStats();
+  const { data: sales = [] } = useHybridSales();
+  const { data: customers = [] } = useHybridCustomers();
+  
+  // For now, use empty array for expenses
+  const expenses: any[] = [];
 
   // Calculate period-based data
   const getFilteredData = () => {

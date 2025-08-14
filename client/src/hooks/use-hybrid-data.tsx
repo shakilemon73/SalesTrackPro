@@ -300,3 +300,107 @@ export function useHybridCreateSale() {
     },
   });
 }
+
+// Hybrid create expense
+export function useHybridCreateExpense() {
+  const { isOnline } = useNetworkStatus();
+  const user = hybridAuth.getCurrentUser();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (expenseData: any) => {
+      if (!user?.user_id) throw new Error('User not authenticated');
+
+      const newExpense = {
+        ...expenseData,
+        user_id: user.user_id,
+        id: crypto.randomUUID(),
+        created_at: new Date().toISOString(),
+        expense_date: expenseData.expense_date || new Date().toISOString(),
+        sync_status: isOnline ? 'synced' : 'pending_sync'
+      };
+
+      // Always store locally first
+      await offlineStorage.store('expenses', newExpense);
+      console.log('📱 HYBRID: Expense stored locally');
+
+      if (isOnline) {
+        try {
+          // Try to sync with Supabase
+          const onlineExpense = await supabaseService.createExpense(user.user_id, expenseData);
+          
+          // Update local storage with server ID
+          await offlineStorage.update('expenses', newExpense.id, {
+            ...onlineExpense,
+            sync_status: 'synced'
+          });
+          
+          console.log('🌐 HYBRID: Expense synced to server');
+          return onlineExpense;
+        } catch (error) {
+          console.warn('🌐 HYBRID: Failed to sync expense, keeping local');
+          return newExpense;
+        }
+      }
+
+      return newExpense;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses', user?.user_id, 'hybrid'] });
+      queryClient.invalidateQueries({ queryKey: ['stats', user?.user_id, 'hybrid'] });
+    },
+  });
+}
+
+// Hybrid create collection
+export function useHybridCreateCollection() {
+  const { isOnline } = useNetworkStatus();
+  const user = hybridAuth.getCurrentUser();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (collectionData: any) => {
+      if (!user?.user_id) throw new Error('User not authenticated');
+
+      const newCollection = {
+        ...collectionData,
+        user_id: user.user_id,
+        id: crypto.randomUUID(),
+        created_at: new Date().toISOString(),
+        collection_date: collectionData.collection_date || new Date().toISOString(),
+        sync_status: isOnline ? 'synced' : 'pending_sync'
+      };
+
+      // Always store locally first
+      await offlineStorage.store('collections', newCollection);
+      console.log('📱 HYBRID: Collection stored locally');
+
+      if (isOnline) {
+        try {
+          // Try to sync with Supabase
+          const onlineCollection = await supabaseService.createCollection(user.user_id, collectionData);
+          
+          // Update local storage with server ID
+          await offlineStorage.update('collections', newCollection.id, {
+            ...onlineCollection,
+            sync_status: 'synced'
+          });
+          
+          console.log('🌐 HYBRID: Collection synced to server');
+          return onlineCollection;
+        } catch (error) {
+          console.warn('🌐 HYBRID: Failed to sync collection, keeping local');
+          return newCollection;
+        }
+      }
+
+      return newCollection;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['collections', user?.user_id, 'hybrid'] });
+      queryClient.invalidateQueries({ queryKey: ['sales', user?.user_id, 'hybrid'] });
+      queryClient.invalidateQueries({ queryKey: ['customers', user?.user_id, 'hybrid'] });
+      queryClient.invalidateQueries({ queryKey: ['stats', user?.user_id, 'hybrid'] });
+    },
+  });
+}

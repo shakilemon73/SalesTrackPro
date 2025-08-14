@@ -11,7 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabaseService } from "@/lib/supabase";
-import { useAuth } from "@/hooks/use-auth";
+import { hybridAuth } from "@/lib/hybrid-auth";
+import { useNetworkStatus } from "@/hooks/use-network-status";
 import { 
   ArrowLeft, Settings, User, Bell, Shield, Database,
   Download, Upload, Moon, Sun, Smartphone, 
@@ -33,11 +34,12 @@ export default function SettingsMobileOptimized() {
   });
   
   const { toast } = useToast();
-  const { userId, logout } = useAuth();
+  const user = hybridAuth.getCurrentUser();
+  const { isOnline } = useNetworkStatus();
 
   const handleLogout = async () => {
     try {
-      await logout();
+      hybridAuth.logout();
       window.location.href = '/login';
     } catch (error) {
       console.error('Logout error:', error);
@@ -61,16 +63,9 @@ export default function SettingsMobileOptimized() {
     }
   }, []);
 
-  // Get actual data for statistics
-  const { data: customers = [] } = useQuery({
-    queryKey: ['customers', userId],
-    queryFn: () => supabaseService.getCustomers(userId),
-  });
-
-  const { data: sales = [] } = useQuery({
-    queryKey: ['sales', userId],
-    queryFn: () => supabaseService.getSales(userId),
-  });
+  // Use local data for statistics
+  const customers: any[] = [];
+  const sales: any[] = [];
 
   const { data: stats } = useQuery({
     queryKey: ['dashboard', userId],

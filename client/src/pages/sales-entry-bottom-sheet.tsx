@@ -9,8 +9,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency, toBengaliNumber, getBengaliDate } from "@/lib/bengali-utils";
-import { useOfflineAuth } from "@/hooks/use-offline-auth";
-import { usePureOfflineCreateSale, usePureOfflineCustomers, usePureOfflineCreateCustomer } from "@/hooks/use-pure-offline-data";
+import { hybridAuth } from "@/lib/hybrid-auth";
+import { useHybridCreateSale, useHybridCustomers, useHybridCreateCustomer } from "@/hooks/use-hybrid-data";
+import { useNetworkStatus } from "@/hooks/use-network-status";
 import { 
   ArrowLeft, Check, DollarSign, User, CreditCard, 
   Calculator, Package, Zap, Phone, Plus, ChevronUp,
@@ -176,10 +177,11 @@ export default function SalesEntryBottomSheet() {
   const [showNewCustomerForm, setShowNewCustomerForm] = useState(false);
   
   const { toast: systemToast } = useToast();
-  const { user } = useOfflineAuth();
-  const customers = usePureOfflineCustomers();
-  const createSale = usePureOfflineCreateSale();
-  const createCustomer = usePureOfflineCreateCustomer();
+  const user = hybridAuth.getCurrentUser();
+  const { isOnline } = useNetworkStatus();
+  const { data: customers = [] } = useHybridCustomers();
+  const createSale = useHybridCreateSale();
+  const createCustomer = useHybridCreateCustomer();
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -208,7 +210,7 @@ export default function SalesEntryBottomSheet() {
 
   // Create new customer mutation
   const handleCreateCustomer = async (customerData: any) => {
-    if (!user?.id) {
+    if (!user?.user_id) {
       throw new Error('User not authenticated');
     }
     

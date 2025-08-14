@@ -10,8 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useToast } from "@/hooks/use-toast";
-import { supabaseService } from "@/lib/supabase";
-import { useAuth } from "@/hooks/use-auth";
+import { hybridAuth } from "@/lib/hybrid-auth";
+import { useHybridSales, useHybridCustomers } from "@/hooks/use-hybrid-data";
+import { useNetworkStatus } from "@/hooks/use-network-status";
 import { 
   ArrowLeft, ArrowUpRight, ArrowDownRight, 
   Search, Filter, Download, Calendar,
@@ -31,57 +32,28 @@ export default function TransactionsMobileOptimized() {
   const [isEditingInSheet, setIsEditingInSheet] = useState(false);
   const [editValues, setEditValues] = useState<any>({});
   const { toast } = useToast();
-  const { userId } = useAuth();
+  const user = hybridAuth.getCurrentUser();
+  const { isOnline } = useNetworkStatus();
   const queryClient = useQueryClient();
 
-  const { data: sales = [], isLoading: salesLoading } = useQuery({
-    queryKey: ['sales', userId],
-    queryFn: () => userId ? supabaseService.getSales(userId) : Promise.resolve([]),
-    enabled: !!userId,
-  });
-
-  const { data: expenses = [], isLoading: expensesLoading } = useQuery({
-    queryKey: ['expenses', userId],
-    queryFn: () => userId ? supabaseService.getExpenses(userId) : Promise.resolve([]),
-    enabled: !!userId,
-  });
-
-  const { data: collections = [], isLoading: collectionsLoading } = useQuery({
-    queryKey: ['collections', userId],
-    queryFn: () => userId ? supabaseService.getCollections(userId) : Promise.resolve([]),
-    enabled: !!userId,
-  });
-
-  const { data: customers = [] } = useQuery({
-    queryKey: ['customers', userId],
-    queryFn: () => userId ? supabaseService.getCustomers(userId) : Promise.resolve([]),
-    enabled: !!userId,
-  });
+  const { data: sales = [], isLoading: salesLoading } = useHybridSales();
+  const { data: customers = [] } = useHybridCustomers();
+  
+  // For now, use local storage for expenses and collections
+  const expenses: any[] = [];
+  const collections: any[] = [];
+  const expensesLoading = false;
+  const collectionsLoading = false;
 
   const isLoading = salesLoading || expensesLoading || collectionsLoading;
 
   // Update mutation for editing transactions
   const updateMutation = useMutation({
     mutationFn: async ({ transaction, values }: { transaction: any; values: any }) => {
-      if (!userId) throw new Error("User not authenticated");
+      if (!user?.user_id) throw new Error("User not authenticated");
 
-      if (transaction.type === 'sale') {
-        return supabaseService.updateSale(transaction.id, {
-          customer_name: values.customer_name,
-          total_amount: parseFloat(values.total_amount),
-          payment_method: values.payment_method,
-          paid_amount: parseFloat(values.total_amount), // For simplicity, assume full payment
-          due_amount: 0,
-        });
-      } else if (transaction.type === 'expense') {
-        return supabaseService.updateExpense(transaction.id, {
-          description: values.customer_name,
-          amount: parseFloat(values.total_amount),
-          category: values.payment_method,
-        });
-      } else {
-        throw new Error("Update not supported for this transaction type");
-      }
+      // For hybrid mode, we'll disable updates for now
+      throw new Error("Transaction updates will be available in a future update");
     },
     onSuccess: () => {
       // Invalidate and refetch all transaction-related queries

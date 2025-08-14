@@ -6,8 +6,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { supabaseService } from "@/lib/supabase";
-import { useAuth } from "@/hooks/use-auth";
+import { hybridAuth } from "@/lib/hybrid-auth";
+import { useHybridCustomers, useHybridSales } from "@/hooks/use-hybrid-data";
+import { useNetworkStatus } from "@/hooks/use-network-status";
 import { CustomerListSkeleton } from "@/components/loading-skeletons";
 import { 
   ArrowLeft, Search, UserPlus, Phone, MapPin,
@@ -17,26 +18,14 @@ import {
 
 export default function CustomersMobileOptimized() {
   const [searchTerm, setSearchTerm] = useState("");
-  const { userId, isLoading: authLoading } = useAuth();
+  const user = hybridAuth.getCurrentUser();
+  const { isOnline } = useNetworkStatus();
+  
+  const { data: customers = [], isLoading } = useHybridCustomers();
+  const { data: sales = [] } = useHybridSales();
 
-  const { data: customers = [], isLoading } = useQuery({
-    queryKey: ['customers', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-      const data = await supabaseService.getCustomers(userId);
-      return data || [];
-    },
-    enabled: !!userId,
-  });
-
-  const { data: sales = [] } = useQuery({
-    queryKey: ['sales', userId],
-    queryFn: () => userId ? supabaseService.getSales(userId) : Promise.resolve([]),
-    enabled: !!userId,
-  });
-
-  // Show skeleton loading state while auth is loading or data is loading
-  if (authLoading || (!!userId && isLoading)) {
+  // Show skeleton loading state while data is loading
+  if (!!user?.user_id && isLoading) {
     return <CustomerListSkeleton />;
   }
 

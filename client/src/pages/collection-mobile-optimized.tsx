@@ -4,8 +4,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useLocation } from "wouter";
-import { supabaseService } from "@/lib/supabase";
-import { useAuth } from "@/hooks/use-auth";
+import { hybridAuth } from "@/lib/hybrid-auth";
+import { useHybridCustomers, useHybridSales, useHybridCreateCollection } from "@/hooks/use-hybrid-data";
+import { useNetworkStatus } from "@/hooks/use-network-status";
 import { formatCurrency, toBengaliNumber } from "@/lib/bengali-utils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -31,18 +32,11 @@ type CollectionFormData = z.infer<typeof collectionSchema>;
 export default function CollectionMobileOptimized() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const { userId } = useAuth();
+  const user = hybridAuth.getCurrentUser();
+  const { isOnline } = useNetworkStatus();
 
-  const { data: customers = [] } = useQuery({
-    queryKey: ['customers', userId],
-    queryFn: () => supabaseService.getCustomers(userId),
-  });
-
-  const { data: sales = [] } = useQuery({
-    queryKey: ['sales', userId],
-    queryFn: () => supabaseService.getSales(userId),
-  });
+  const { data: customers = [] } = useHybridCustomers();
+  const { data: sales = [] } = useHybridSales();
 
   const form = useForm<CollectionFormData>({
     resolver: zodResolver(collectionSchema),
@@ -67,39 +61,8 @@ export default function CollectionMobileOptimized() {
   const selectedCustomer = customersWithDue.find(c => c.id === selectedCustomerId);
   const maxCollectableAmount = selectedCustomer?.totalDue || 0;
 
-  const createCollectionMutation = useMutation({
-    mutationFn: async (data: CollectionFormData) => {
-      const collectionAmount = parseFloat(data.amount);
-      
-      const { getBangladeshTimeISO } = await import('@/lib/bengali-utils');
-      const collectionData = {
-        customer_id: data.customer_id,
-        amount: collectionAmount,
-        collection_date: getBangladeshTimeISO(),
-      };
-      
-      return await supabaseService.createCollection(userId, collectionData);
-    },
-    onSuccess: () => {
-      toast({
-        title: "সফল!",
-        description: "টাকা আদায় সফলভাবে রেকর্ড করা হয়েছে",
-      });
-      queryClient.invalidateQueries({ queryKey: ['collections'] });
-      queryClient.invalidateQueries({ queryKey: ['sales'] });
-      queryClient.invalidateQueries({ queryKey: ['customers'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      setLocation("/");
-    },
-    onError: (error) => {
-      console.error('Collection creation error:', error);
-      toast({
-        title: "ত্রুটি!",
-        description: "টাকা আদায় রেকর্ড করতে সমস্যা হয়েছে",
-        variant: "destructive",
-      });
-    },
-  });
+  const createCollectionMutation = useHybridCreateCollection();
+
 
   const onSubmit = (data: CollectionFormData) => {
     const collectionAmount = parseFloat(data.amount);
@@ -113,7 +76,30 @@ export default function CollectionMobileOptimized() {
       return;
     }
     
-    createCollectionMutation.mutate(data);
+    const { getBangladeshTimeISO } = require('@/lib/bengali-utils');
+    const collectionData = {
+      customer_id: data.customer_id,
+      amount: collectionAmount,
+      collection_date: getBangladeshTimeISO(),
+    };
+
+    createCollectionMutation.mutate(collectionData, {
+      onSuccess: () => {
+        toast({
+          title: "সফল!",
+          description: isOnline ? "টাকা আদায় সফলভাবে রেকর্ড করা হয়েছে এবং সিঙ্ক হয়েছে" : "টাকা আদায় স্থানীয়ভাবে সংরক্ষিত হয়েছে",
+        });
+        setLocation("/");
+      },
+      onError: (error) => {
+        console.error('Collection creation error:', error);
+        toast({
+          title: "ত্রুটি!",
+          description: "টাকা আদায় রেকর্ড করতে সমস্যা হয়েছে",
+          variant: "destructive",
+        });
+      },
+    });
   };
 
   return (
