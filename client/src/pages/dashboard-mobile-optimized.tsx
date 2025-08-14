@@ -97,150 +97,161 @@ export default function DashboardMobileOptimized() {
         onRefresh={() => window.location.reload()}
       />
 
-      {/* Ultra-Compact Content for 916x412 Screen */}
-      <div className="px-2 py-3 space-y-3">
+      {/* Mobile Framework Container */}
+      <div className="container px-2 py-3">
         
-        {/* Ultra-Compact KPIs for 916x412 */}
-        <div className="grid grid-cols-2 gap-2">
-          {/* Today's Sales - Compact */}
-          <Card className="border-0 shadow-md bg-gradient-to-br from-white via-emerald-50/50 to-emerald-100/80 dark:from-slate-800 dark:to-emerald-900/20 p-3 relative overflow-hidden hover:shadow-lg transition-all duration-200 group">
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <div className="w-7 h-7 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-sm">
+        {/* Mobile Framework Grid - KPIs */}
+        <div className="row mb-3">
+          <div className="col-6">
+            {/* Today's Sales - Using Mobile Framework */}
+            <div className="card shadow-md p-3 position-relative" style={{
+              background: 'linear-gradient(135deg, white 0%, rgba(16, 185, 129, 0.05) 50%, rgba(16, 185, 129, 0.08) 100%)'
+            }}>
+              <div className="d-flex align-items-center mb-2">
+                <div className="w-7 h-7 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl d-flex align-items-center justify-content-center shadow-sm mr-2">
                   <div className="text-white text-sm">💰</div>
                 </div>
                 <div>
-                  <p className="text-xs text-emerald-700 dark:text-emerald-300 bengali-font font-semibold">আজকের বিক্রয়</p>
+                  <p className="text-xs text-emerald-700 dark:text-emerald-300 bengali-font font-weight-semibold mb-0">আজকের বিক্রয়</p>
                 </div>
               </div>
               <div>
-                <p className="text-xl font-black text-emerald-800 dark:text-emerald-200 number-font leading-none">
+                <p className="text-xl font-weight-bold text-emerald-800 dark:text-emerald-200 number-font mb-1">
                   ৳{formatCurrency(stats?.totalSales || 0)}
                 </p>
-                <div className="flex items-center space-x-1 mt-1">
-                  <ArrowUpRight className="w-2.5 h-2.5 text-emerald-600" />
-                  <span className="text-emerald-700 dark:text-emerald-400 text-xs bengali-font font-medium">
+                <div className="d-flex align-items-center">
+                  <ArrowUpRight className="w-2.5 h-2.5 text-emerald-600 mr-1" />
+                  <span className="text-emerald-700 dark:text-emerald-400 text-xs bengali-font font-weight-medium">
                     +{toBengaliNumber(salesGrowth)}%
                   </span>
                 </div>
               </div>
+              <div className="position-absolute" style={{top: '4px', right: '4px', fontSize: '14px', opacity: '0.3'}}>📈</div>
             </div>
-            <div className="absolute top-1 right-1 text-emerald-300/30 text-sm">📈</div>
-          </Card>
+          </div>
+          <div className="col-6">
 
-          {/* Pending Collection - Compact */}
-          <Card className="border-0 shadow-md bg-gradient-to-br from-white via-orange-50/50 to-amber-100/80 dark:from-slate-800 dark:to-orange-900/20 p-3 relative overflow-hidden hover:shadow-lg transition-all duration-200 group">
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <div className="w-7 h-7 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center shadow-sm">
+            {/* Pending Collection - Using Mobile Framework */}
+            <div className="card shadow-md p-3 position-relative" style={{
+              background: 'linear-gradient(135deg, white 0%, rgba(251, 146, 60, 0.05) 50%, rgba(251, 146, 60, 0.08) 100%)'
+            }}>
+              <div className="d-flex align-items-center mb-2">
+                <div className="w-7 h-7 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl d-flex align-items-center justify-content-center shadow-sm mr-2">
                   <div className="text-white text-sm">🏦</div>
                 </div>
                 <div>
-                  <p className="text-xs text-orange-700 dark:text-orange-300 bengali-font font-semibold">বাকি আদায়</p>
+                  <p className="text-xs text-orange-700 dark:text-orange-300 bengali-font font-weight-semibold mb-0">বাকি আদায়</p>
                 </div>
               </div>
               <div>
-                <p className="text-xl font-black text-orange-800 dark:text-orange-200 number-font leading-none">
+                <p className="text-xl font-weight-bold text-orange-800 dark:text-orange-200 number-font mb-1">
                   ৳{formatCurrency(stats?.pendingCollection || 0)}
                 </p>
-                <div className="flex items-center space-x-1 mt-1">
-                  <Users className="w-2.5 h-2.5 text-orange-600" />
-                  <span className="text-orange-700 dark:text-orange-400 text-xs bengali-font font-medium">
+                <div className="d-flex align-items-center">
+                  <Users className="w-2.5 h-2.5 text-orange-600 mr-1" />
+                  <span className="text-orange-700 dark:text-orange-400 text-xs bengali-font font-weight-medium">
                     {toBengaliNumber(stats?.totalCustomers || 0)} জন
                   </span>
                 </div>
               </div>
+              <div className="position-absolute" style={{top: '4px', right: '4px', fontSize: '14px', opacity: '0.3'}}>💳</div>
             </div>
-            <div className="absolute top-1 right-1 text-orange-300/30 text-sm">💳</div>
-          </Card>
+          </div>
         </div>
 
-        {/* Ultra-Compact Actions for 916x412 */}
-        <Card className="border-0 shadow-md bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800 p-2">
-          <div className="flex items-center space-x-2 mb-3">
-            <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
+        {/* Mobile Framework Actions */}
+        <div className="card shadow-md p-2">
+          <div className="d-flex align-items-center mb-3">
+            <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg d-flex align-items-center justify-content-center shadow-sm mr-2">
               <div className="text-white text-sm">⚡</div>
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">দ্রুত কাজ</h3>
+              <h3 className="text-sm font-weight-bold text-slate-900 dark:text-white bengali-font">দ্রুত কাজ</h3>
             </div>
           </div>
           
-          {/* Primary Actions Row */}
-          <div className="grid grid-cols-4 gap-1.5 mb-2">
-            <Link to="/sales/new" data-testid="link-sales-new" className="block group">
-              <div className="relative w-full h-14 bg-gradient-to-br from-emerald-500/10 to-green-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-emerald-500/20 transition-all duration-200 group-active:scale-95">
-                <div className="text-emerald-600 text-sm mb-0.5">🛒</div>
-                <span className="text-xs text-emerald-700 bengali-font font-bold text-center leading-tight">বিক্রয়</span>
-                <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-              </div>
-            </Link>
-            
-            <Link to="/customers/new" data-testid="link-customer-new" className="block group">
-              <div className="w-full h-14 bg-gradient-to-br from-blue-500/10 to-indigo-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-blue-500/20 transition-all duration-200 group-active:scale-95">
-                <div className="text-blue-600 text-sm mb-0.5">👥</div>
-                <span className="text-xs text-blue-700 bengali-font font-bold text-center leading-tight">গ্রাহক</span>
-              </div>
-            </Link>
-            
-            <Link to="/collection" data-testid="link-collection" className="block group">
-              <div className="w-full h-14 bg-gradient-to-br from-orange-500/10 to-amber-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-orange-500/20 transition-all duration-200 group-active:scale-95">
-                <div className="text-orange-600 text-sm mb-0.5">💰</div>
-                <span className="text-xs text-orange-700 bengali-font font-bold text-center leading-tight">আদায়</span>
-              </div>
-            </Link>
-            
-            <Link to="/inventory" data-testid="link-inventory" className="block group">
-              <div className="w-full h-14 bg-gradient-to-br from-purple-500/10 to-violet-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-purple-500/20 transition-all duration-200 group-active:scale-95">
-                <div className="text-purple-600 text-sm mb-0.5">📦</div>
-                <span className="text-xs text-purple-700 bengali-font font-bold text-center leading-tight">স্টক</span>
-              </div>
-            </Link>
+          {/* Primary Actions Row using Mobile Framework */}
+          <div className="row mb-2">
+            <div className="col-3">
+              <Link to="/sales/new" data-testid="link-sales-new" className="btn btn-touch-target text-center">
+                <div className="card-mini p-2 text-center bg-emerald-50 hover-scale">
+                  <div className="text-emerald-600 text-sm mb-1">🛒</div>
+                  <span className="text-xs text-emerald-700 bengali-font font-weight-bold">বিক্রয়</span>
+                </div>
+              </Link>
+            </div>
+            <div className="col-3">
+              <Link to="/customers/new" data-testid="link-customer-new" className="btn btn-touch-target text-center">
+                <div className="card-mini p-2 text-center bg-blue-50 hover-scale">
+                  <div className="text-blue-600 text-sm mb-1">👥</div>
+                  <span className="text-xs text-blue-700 bengali-font font-weight-bold">গ্রাহক</span>
+                </div>
+              </Link>
+            </div>
+            <div className="col-3">
+              <Link to="/collection" data-testid="link-collection" className="btn btn-touch-target text-center">
+                <div className="card-mini p-2 text-center bg-orange-50 hover-scale">
+                  <div className="text-orange-600 text-sm mb-1">💰</div>
+                  <span className="text-xs text-orange-700 bengali-font font-weight-bold">আদায়</span>
+                </div>
+              </Link>
+            </div>
+            <div className="col-3">
+              <Link to="/inventory" data-testid="link-inventory" className="btn btn-touch-target text-center">
+                <div className="card-mini p-2 text-center bg-purple-50 hover-scale">
+                  <div className="text-purple-600 text-sm mb-1">📦</div>
+                  <span className="text-xs text-purple-700 bengali-font font-weight-bold">স্টক</span>
+                </div>
+              </Link>
+            </div>
           </div>
           
           {/* Secondary Actions Row */}
-          <div className="grid grid-cols-4 gap-1.5">
-            <Link to="/expenses/new" data-testid="link-expense-new" className="block group">
-              <div className="w-full h-14 bg-gradient-to-br from-red-500/10 to-pink-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-red-500/20 transition-all duration-200 group-active:scale-95">
-                <div className="text-red-600 text-sm mb-0.5">📝</div>
-                <span className="text-xs text-red-700 bengali-font font-bold text-center leading-tight">খরচ</span>
-              </div>
-            </Link>
-            
-            <Link to="/transactions" data-testid="link-transactions" className="block group">
-              <div className="w-full h-14 bg-gradient-to-br from-teal-500/10 to-cyan-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-teal-500/20 transition-all duration-200 group-active:scale-95">
-                <div className="text-teal-600 text-sm mb-0.5">📊</div>
-                <span className="text-xs text-teal-700 bengali-font font-bold text-center leading-tight">হিসাব</span>
-              </div>
-            </Link>
-            
-            <button className="group" data-testid="button-calculator">
-              <div className="w-full h-14 bg-gradient-to-br from-slate-500/10 to-gray-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-slate-500/20 transition-all duration-200 group-active:scale-95">
-                <div className="text-slate-600 text-sm mb-0.5">🧮</div>
-                <span className="text-xs text-slate-700 bengali-font font-bold text-center leading-tight">ক্যালক</span>
-              </div>
-            </button>
-            
-            <button 
-              className="group"
-              onClick={() => toast({ title: "WhatsApp রিপোর্ট", description: "রিপোর্ট পাঠানো হচ্ছে..." })}
-              data-testid="button-whatsapp"
-            >
-              <div className="w-full h-14 bg-gradient-to-br from-green-500/10 to-emerald-600/10 rounded-xl flex flex-col items-center justify-center p-1.5 shadow-sm hover:shadow-md hover:scale-105 hover:bg-green-500/20 transition-all duration-200 group-active:scale-95">
-                <div className="text-green-600 text-sm mb-0.5">📱</div>
-                <span className="text-xs text-green-700 bengali-font font-bold text-center leading-tight">মেসেজ</span>
-              </div>
-            </button>
+          <div className="row">
+            <div className="col-3">
+              <Link to="/expenses/new" data-testid="link-expense-new" className="btn btn-touch-target text-center">
+                <div className="card-mini p-2 text-center bg-red-50 hover-scale">
+                  <div className="text-red-600 text-sm mb-1">📝</div>
+                  <span className="text-xs text-red-700 bengali-font font-weight-bold">খরচ</span>
+                </div>
+              </Link>
+            </div>
+            <div className="col-3">
+              <Link to="/transactions" data-testid="link-transactions" className="btn btn-touch-target text-center">
+                <div className="card-mini p-2 text-center bg-teal-50 hover-scale">
+                  <div className="text-teal-600 text-sm mb-1">📊</div>
+                  <span className="text-xs text-teal-700 bengali-font font-weight-bold">হিসাব</span>
+                </div>
+              </Link>
+            </div>
+            <div className="col-3">
+              <button className="btn btn-touch-target text-center w-100" data-testid="button-calculator">
+                <div className="card-mini p-2 text-center bg-slate-50 hover-scale">
+                  <div className="text-slate-600 text-sm mb-1">🧮</div>
+                  <span className="text-xs text-slate-700 bengali-font font-weight-bold">ক্যালক</span>
+                </div>
+              </button>
+            </div>
+            <div className="col-3">
+              <button 
+                className="btn btn-touch-target text-center w-100"
+                onClick={() => toast({ title: "WhatsApp রিপোর্ট", description: "রিপোর্ট পাঠানো হচ্ছে..." })}
+                data-testid="button-whatsapp"
+              >
+                <div className="card-mini p-2 text-center bg-green-50 hover-scale">
+                  <div className="text-green-600 text-sm mb-1">📱</div>
+                  <span className="text-xs text-green-700 bengali-font font-weight-bold">মেসেজ</span>
+                </div>
+              </button>
+            </div>
           </div>
-        </Card>
+        </div>
 
-
-
-        {/* World-Class Business Intelligence Dashboard - Mobile Optimized */}
-        <Card className="border-0 shadow-lg bg-white dark:bg-slate-900 rounded-2xl overflow-hidden">
-          {/* Mobile-Optimized Header */}
-          <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-850 px-3 py-2 border-b border-slate-200 dark:border-slate-700">
-            <div className="flex items-center justify-between">
+        {/* Business Intelligence Dashboard - Mobile Framework */}
+        <div className="card shadow-lg bg-white dark:bg-slate-900 rounded-2xl overflow-hidden">
+          {/* Mobile Framework Header */}
+          <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-850 p-3 border-b border-slate-200 dark:border-slate-700">
+            <div className="d-flex align-items-center justify-content-between">
               <div className="flex items-center space-x-2">
                 <div className="w-7 h-7 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
                   <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -427,7 +438,7 @@ export default function DashboardMobileOptimized() {
               </TabsContent>
             </Tabs>
           </div>
-        </Card>
+        </div>
       </div>
       
 

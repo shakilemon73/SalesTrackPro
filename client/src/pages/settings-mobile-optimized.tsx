@@ -68,8 +68,9 @@ export default function SettingsMobileOptimized() {
   const sales: any[] = [];
 
   const { data: stats } = useQuery({
-    queryKey: ['dashboard', userId],
-    queryFn: () => supabaseService.getStats(userId),
+    queryKey: ['dashboard', user?.user_id],
+    queryFn: () => supabaseService.getStats(user?.user_id),
+    enabled: !!user?.user_id,
   });
 
   const handleSettingsSave = () => {
