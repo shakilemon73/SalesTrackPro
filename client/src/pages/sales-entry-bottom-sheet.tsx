@@ -24,10 +24,13 @@ import {
 } from "lucide-react";
 
 // Enhanced schema with all fields
+const paymentMethods = ["নগদ", "বাকি", "মিশ্র"] as const;
+type PaymentMethod = typeof paymentMethods[number];
+
 const quickSaleSchema = z.object({
   customerName: z.string().min(1, "গ্রাহকের নাম আবশ্যক"),
   amount: z.string().min(1, "টাকার পরিমাণ আবশ্যক"),
-  paymentMethod: z.enum(["নগদ", "বাকি", "মিশ্র"] as const),
+  paymentMethod: z.enum(paymentMethods),
   paidAmount: z.string().optional(),
   productDescription: z.string().optional(),
   customerPhone: z.string().optional(),
@@ -643,11 +646,11 @@ export default function SalesEntryBottomSheet() {
               </div>
               
               <div className="grid grid-cols-3 gap-2">
-                {["নগদ", "বাকি", "মিশ্র"].map((method) => (
+                {paymentMethods.map((method) => (
                   <button
                     key={method}
                     type="button"
-                    onClick={() => form.setValue("paymentMethod", method as any)}
+                    onClick={() => form.setValue("paymentMethod", method)}
                     className={`h-9 rounded-lg border-2 transition-all duration-200 bengali-font font-bold text-sm ${
                       form.watch("paymentMethod") === method
                         ? 'bg-orange-500 border-orange-500 text-white shadow-lg scale-105'
@@ -660,7 +663,7 @@ export default function SalesEntryBottomSheet() {
               </div>
 
               {/* Mixed Payment Details */}
-              {watchedPaymentMethod === "মিশ্র" && (
+              {watchedPaymentMethod === paymentMethods[2] && (
                 <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800 space-y-2">
                   <h4 className="text-xs font-bold text-orange-700 dark:text-orange-300 bengali-font">মিশ্র পেমেন্টের বিস্তারিত</h4>
                   
@@ -784,7 +787,7 @@ export default function SalesEntryBottomSheet() {
                   </div>
                   
                   {/* Mixed Payment Preview */}
-                  {watchedPaymentMethod === "মিশ্র" && watchedAmount && watchedPaidAmount && (
+                  {watchedPaymentMethod === paymentMethods[2] && watchedAmount && watchedPaidAmount && (
                     <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="flex justify-between">
@@ -800,7 +803,7 @@ export default function SalesEntryBottomSheet() {
                   )}
                   
                   {/* Due Payment Preview */}
-                  {watchedPaymentMethod === "বাকি" && parseFloat(watchedAmount || "0") > 0 && (
+                  {watchedPaymentMethod === paymentMethods[1] && parseFloat(watchedAmount || "0") > 0 && (
                     <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-orange-500 rounded-full"></div>

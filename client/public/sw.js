@@ -3,9 +3,9 @@
  * Implements comprehensive offline functionality for Bengali entrepreneurs
  */
 
-const CACHE_NAME = 'dokan-hisab-v1.0.0';
-const STATIC_CACHE = 'dokan-hisab-static-v1.0.0';
-const DATA_CACHE = 'dokan-hisab-data-v1.0.0';
+const CACHE_NAME = 'dokan-hisab-v1.1.0';
+const STATIC_CACHE = 'dokan-hisab-static-v1.1.0';
+const DATA_CACHE = 'dokan-hisab-data-v1.1.0';
 
 // Assets to cache for offline functionality
 const STATIC_ASSETS = [
