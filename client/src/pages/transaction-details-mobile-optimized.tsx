@@ -162,19 +162,17 @@ export default function TransactionDetailsMobileOptimized({ type, id }: Transact
     mutationFn: async (data: TransactionEditForm) => {
       if (!userId || !transaction) throw new Error("Invalid transaction or user");
       
-      const updateData = {
-        customer_name: data.customer_name,
-        total_amount: parseFloat(data.total_amount),
-        paid_amount: parseFloat(data.paid_amount || "0"),
-        due_amount: parseFloat(data.total_amount) - parseFloat(data.paid_amount || "0"),
-        payment_method: data.payment_method,
-        description: data.description || "",
-        items: data.items || [],
-      };
-
       switch (type) {
         case 'sale':
-          return supabaseService.updateSale(transaction.id, updateData);
+          const saleUpdateData = {
+            customer_name: data.customer_name,
+            total_amount: parseFloat(data.total_amount),
+            paid_amount: parseFloat(data.paid_amount || "0"),
+            due_amount: parseFloat(data.total_amount) - parseFloat(data.paid_amount || "0"),
+            payment_method: data.payment_method,
+            items: data.items || [],
+          };
+          return supabaseService.updateSale(transaction.id, saleUpdateData);
         case 'expense':
           return supabaseService.updateExpense(transaction.id, {
             description: data.description || data.customer_name,

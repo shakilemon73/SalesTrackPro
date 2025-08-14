@@ -5,6 +5,7 @@ This project, "দোকান হিসাব" (Dokan Hisab), is a Bengali busi
 Preferred communication style: Simple, everyday language.
 
 # Recent Changes
+- **August 14, 2025**: REPLIT MIGRATION COMPLETED SUCCESSFULLY - Successfully migrated project from Replit Agent to standard Replit environment with all dependencies installed and Vite server running properly. Fixed critical database schema mismatch where sales table updates included non-existent 'description' column, ensuring proper separation between sales and expense table structures.
 - **August 14, 2025**: TRANSACTION EDIT 404 ERROR FIXED - Fixed critical routing issue where transaction edit buttons were navigating to non-existent routes (/sales/id/edit, /expenses/id/edit) causing 404 errors. Updated navigation to use existing transaction details page (/transactions/type/id) which has inline edit functionality.
 - **August 14, 2025**: PDF GENERATION STABILIZED - Temporarily disabled problematic Bengali font loading and switched to English labels with system fonts to ensure reliable PDF generation without "Unknown font format" errors.
 - **August 14, 2025**: REPLIT MIGRATION COMPLETED - Successfully migrated project from Replit Agent to standard Replit environment with all dependencies installed and Vite server running properly. Fixed PDF generation font format errors by temporarily disabling Bengali font registration for system stability.
