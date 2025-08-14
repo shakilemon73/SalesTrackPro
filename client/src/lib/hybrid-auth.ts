@@ -175,5 +175,30 @@ class HybridAuthManager {
   }
 }
 
+// Initialize demo user for immediate testing
+const initializeDemoUser = () => {
+  const demoAuth: StoredAuth = {
+    user_id: 'demo-user-12345',
+    email: 'demo@dokanhisab.com',
+    name: 'ডেমো ব্যবসায়ী',
+    phone: '01712345678',
+    business_name: 'ডেমো দোকান',
+    auth_token: 'demo-token',
+    last_sync: new Date().toISOString(),
+    created_at: new Date().toISOString()
+  };
+
+  // Only create demo user if no existing auth data
+  if (!localStorage.getItem('dokan_hisab_auth')) {
+    localStorage.setItem('dokan_hisab_auth', JSON.stringify(demoAuth));
+    console.log('🎯 DEMO USER: Created for immediate testing');
+  }
+};
+
+// Initialize demo user when module loads
+if (typeof window !== 'undefined') {
+  initializeDemoUser();
+}
+
 export const hybridAuth = new HybridAuthManager();
 export type { StoredAuth };
