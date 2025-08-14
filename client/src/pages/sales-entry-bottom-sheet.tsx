@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,8 +9,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency, toBengaliNumber, getBengaliDate } from "@/lib/bengali-utils";
-import { supabaseService } from "@/lib/supabase";
-import { useAuth } from "@/hooks/use-auth";
+import { useOfflineAuth } from "@/hooks/use-offline-auth";
+import { usePureOfflineCreateSale, usePureOfflineCustomers, usePureOfflineCreateCustomer } from "@/hooks/use-pure-offline-data";
 import { 
   ArrowLeft, Check, DollarSign, User, CreditCard, 
   Calculator, Package, Zap, Phone, Plus, ChevronUp,
@@ -177,8 +176,10 @@ export default function SalesEntryBottomSheet() {
   const [showNewCustomerForm, setShowNewCustomerForm] = useState(false);
   
   const { toast: systemToast } = useToast();
-  const queryClient = useQueryClient();
-  const { userId } = useAuth();
+  const { user } = useOfflineAuth();
+  const customers = usePureOfflineCustomers();
+  const createSale = usePureOfflineCreateSale();
+  const createCustomer = usePureOfflineCreateCustomer();
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -205,41 +206,28 @@ export default function SalesEntryBottomSheet() {
     },
   });
 
-  const { data: customers = [] } = useQuery({
-    queryKey: ['customers', userId],
-    queryFn: () => userId ? supabaseService.getCustomers(userId) : Promise.resolve([]),
-    enabled: !!userId,
-  });
-
-  const { data: todayStats } = useQuery({
-    queryKey: ['dashboard', userId],
-    queryFn: () => userId ? supabaseService.getStats(userId) : Promise.resolve(null),
-    enabled: !!userId,
-  });
-
   // Create new customer mutation
-  const createCustomerMutation = useMutation({
-    mutationFn: async (customerData: any) => {
-      if (!userId) {
-        throw new Error('User not authenticated');
-      }
-      return await supabaseService.createCustomer(userId, {
+  const handleCreateCustomer = async (customerData: any) => {
+    if (!user?.id) {
+      throw new Error('User not authenticated');
+    }
+    
+    try {
+      const newCustomer = await createCustomer.mutateAsync({
         name: customerData.customerName,
         phone_number: customerData.customerPhone,
         address: customerData.customerAddress || '',
-        total_credit: 0
       });
-    },
-    onSuccess: (newCustomer, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      
       setSelectedCustomer(newCustomer);
       setShowNewCustomerForm(false);
-      showToast(`✅ নতুন গ্রাহক ${variables.customerName} সফলভাবে যোগ করা হয়েছে`, 'success');
-    },
-    onError: () => {
+      showToast(`✅ নতুন গ্রাহক ${customerData.customerName} সফলভাবে যোগ করা হয়েছে`, 'success');
+      return newCustomer;
+    } catch (error) {
       showToast("❌ গ্রাহক যোগ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।", 'error');
-    },
-  });
+      throw error;
+    }
+  };
 
   const createSaleMutation = useMutation({
     mutationFn: async (formData: any) => {

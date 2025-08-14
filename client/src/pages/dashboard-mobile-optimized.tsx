@@ -1,8 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
 import { toBengaliNumber, formatCurrency, getBengaliDate } from "@/lib/bengali-utils";
 import { Link } from "wouter";
-import { supabaseService } from "@/lib/supabase";
-import { useAuth } from "@/hooks/use-auth";
+import { useOfflineAuth } from "@/hooks/use-offline-auth";
+import { usePureOfflineStats, usePureOfflineSales, usePureOfflineCustomers } from "@/hooks/use-pure-offline-data";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,7 +27,7 @@ export default function DashboardMobileOptimized() {
   const [activeTab, setActiveTab] = useState('transactions');
   const [selectedView, setSelectedView] = useState('sales');
   const { toast } = useToast();
-  const { userId, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = useOfflineAuth();
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -37,42 +36,14 @@ export default function DashboardMobileOptimized() {
     else setTimeOfDay('শুভ সন্ধ্যা');
   }, []);
 
-  const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useQuery({
-    queryKey: ['dashboard', userId],
-    queryFn: () => userId ? supabaseService.getStats(userId) : Promise.resolve(null),
-    staleTime: 0,
-    gcTime: 0,
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    enabled: !!userId,
-  });
-
-  const { data: recentSales = [] } = useQuery({
-    queryKey: ['sales', userId, 'recent'],
-    queryFn: () => userId ? supabaseService.getSales(userId, 2) : Promise.resolve([]),
-    staleTime: 0,
-    gcTime: 0,
-    enabled: !!userId,
-  });
-
-  const { data: lowStockProducts = [] } = useQuery({
-    queryKey: ['products', userId, 'low-stock'],
-    queryFn: () => userId ? supabaseService.getLowStockProducts(userId) : Promise.resolve([]),
-    enabled: !!userId,
-  });
-
-  const { data: customers = [] } = useQuery({
-    queryKey: ['customers', userId],
-    queryFn: () => userId ? supabaseService.getCustomers(userId) : Promise.resolve([]),
-    staleTime: 0,
-    gcTime: 0,
-    enabled: !!userId,
-  });
+  const { data: stats, isLoading: statsLoading, error: statsError } = usePureOfflineStats();
+  const { data: recentSales = [] } = usePureOfflineSales(2);
+  const { data: customers = [] } = usePureOfflineCustomers();
 
 
 
   // Show skeleton while auth or stats are loading
-  if (authLoading || (!!userId && statsLoading)) {
+  if (authLoading || (!!user?.id && statsLoading)) {
     return <DashboardSkeleton />;
   }
 
@@ -90,7 +61,7 @@ export default function DashboardMobileOptimized() {
             </p>
           </div>
           <Button 
-            onClick={() => refetchStats()} 
+            onClick={() => window.location.reload()} 
             className="bg-emerald-600 hover:bg-emerald-700"
             data-testid="button-retry-stats"
           >
@@ -102,7 +73,7 @@ export default function DashboardMobileOptimized() {
     );
   }
 
-  const salesGrowth = stats?.todaySales && stats.todaySales > 0 ? 12.5 : 0;
+  const salesGrowth = stats?.totalSales && stats.totalSales > 0 ? 12.5 : 0;
   const profitMargin = stats?.totalSales && stats.totalSales > 0 && stats.profit ? (stats.profit / stats.totalSales) * 100 : 0;
 
   return (
@@ -111,9 +82,14 @@ export default function DashboardMobileOptimized() {
       {/* Enhanced Header with Key Metrics */}
       <DashboardHeaderEnhanced
         timeOfDay={timeOfDay}
-        stats={stats}
+        stats={{
+          todaySales: stats?.totalSales || 0,
+          todayProfit: stats?.profit || 0,
+          pendingCollection: stats?.totalDue || 0,
+          salesCount: stats?.salesCount || 0
+        }}
         isLoading={statsLoading}
-        onRefresh={() => refetchStats()}
+        onRefresh={() => window.location.reload()}
       />
 
       {/* Ultra-Compact Content for 916x412 Screen */}
@@ -134,7 +110,7 @@ export default function DashboardMobileOptimized() {
               </div>
               <div>
                 <p className="text-xl font-black text-emerald-800 dark:text-emerald-200 number-font leading-none">
-                  ৳{formatCurrency(stats?.todaySales || 0)}
+                  ৳{formatCurrency(stats?.totalSales || 0)}
                 </p>
                 <div className="flex items-center space-x-1 mt-1">
                   <ArrowUpRight className="w-2.5 h-2.5 text-emerald-600" />
@@ -160,7 +136,7 @@ export default function DashboardMobileOptimized() {
               </div>
               <div>
                 <p className="text-xl font-black text-orange-800 dark:text-orange-200 number-font leading-none">
-                  ৳{formatCurrency(stats?.pendingCollection || 0)}
+                  ৳{formatCurrency(stats?.totalDue || 0)}
                 </p>
                 <div className="flex items-center space-x-1 mt-1">
                   <Users className="w-2.5 h-2.5 text-orange-600" />

@@ -111,6 +111,59 @@ class OfflineStorageManager {
     return this.get(table, userId);
   }
 
+  // Get single item by ID
+  async getById(table: string, id: string): Promise<any | null> {
+    if (!this.db) await this.init();
+    
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([table], 'readonly');
+      const store = transaction.objectStore(table);
+      const request = store.get(id);
+      
+      request.onsuccess = () => {
+        resolve(request.result || null);
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  // Update existing data
+  async update(table: string, id: string, data: any): Promise<void> {
+    if (!this.db) await this.init();
+    
+    const existing = await this.getById(table, id);
+    if (!existing) {
+      throw new Error(`Item with id ${id} not found in ${table}`);
+    }
+    
+    const updatedData = {
+      ...existing,
+      ...data,
+      id, // Keep original ID
+      offline_timestamp: Date.now(),
+      offline_synced: false
+    };
+    
+    return this.store(table, updatedData);
+  }
+
+  // Delete data
+  async delete(table: string, id: string): Promise<void> {
+    if (!this.db) await this.init();
+    
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([table], 'readwrite');
+      const store = transaction.objectStore(table);
+      const request = store.delete(id);
+      
+      request.onsuccess = () => {
+        console.log(`📱 OFFLINE: Deleted ${table} data:`, id);
+        resolve();
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
   // Add pending action for sync (new interface)
   async addPendingAction(actionData: OfflineData): Promise<void> {
     if (!this.db) await this.init();
