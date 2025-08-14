@@ -7,7 +7,7 @@ import AuthGuard from "@/components/auth/auth-guard";
 
 import NotFoundMobileOptimized from "@/pages/not-found-mobile-optimized";
 import DashboardMobileOptimized from "@/pages/dashboard-mobile-optimized";
-import DashboardOfflineDemo from "@/pages/dashboard-offline-demo";
+
 import TransactionsMobileOptimized from "@/pages/transactions-mobile-optimized";
 import CustomersMobileOptimized from "@/pages/customers-mobile-optimized";
 import ReportsMobileOptimized from "@/pages/reports-mobile-optimized";
@@ -63,7 +63,7 @@ function Router() {
       {/* Main Content with top offset for status bar */}
       <div className="pt-12">
         <Switch>
-        <Route path="/" component={DashboardOfflineDemo} />
+        <Route path="/" component={DashboardMobileOptimized} />
         <Route path="/dashboard" component={DashboardMobileOptimized} />
         <Route path="/transactions" component={TransactionsMobileOptimized} />
         <Route path="/customers" component={CustomersMobileOptimized} />
