@@ -156,7 +156,11 @@ async function cacheFirst(request, cacheName) {
     const networkResponse = await fetch(request);
     
     if (networkResponse && networkResponse.status === 200) {
-      cache.put(request, networkResponse.clone());
+      // Skip caching for extension URLs
+      if (!request.url.startsWith('chrome-extension:') && 
+          !request.url.startsWith('moz-extension:')) {
+        cache.put(request, networkResponse.clone());
+      }
     }
     
     return networkResponse;
