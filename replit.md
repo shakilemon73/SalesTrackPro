@@ -5,9 +5,9 @@ This project, "দোকান হিসাব" (Dokan Hisab), is a Bengali busi
 Preferred communication style: Simple, everyday language.
 
 # Recent Changes
+- **August 14, 2025**: REPLIT MIGRATION COMPLETED - Successfully migrated project from Replit Agent to standard Replit environment with all dependencies installed and Vite server running properly. Fixed PDF generation font format errors by temporarily disabling Bengali font registration for system stability.
 - **August 14, 2025**: LATEX PDF GENERATION SYSTEM - Replaced jsPDF with comprehensive React-PDF system supporting Bengali language, professional A4 formatting, context-based document design with systematic background generation capability. Features include transaction reports, sales invoices, and customer statements with proper Bengali typography and mobile banking app-inspired design.
 - **August 14, 2025**: TRANSACTION UX IMPROVEMENT - Replaced transaction details page navigation with smooth bottom sheet modal for better mobile UX and user retention
-- **August 13, 2025**: MIGRATION TO REPLIT COMPLETED - Successfully migrated project from Replit Agent to standard Replit environment with all packages installed and Vite server running properly
 - **Customer Navigation Fixed**: Resolved 404 error page issue when clicking customer profiles by adding proper authentication loading states and null checks
 - **Database Query Optimization**: Fixed null user ID database errors by implementing proper query guards and loading states
 - **TypeScript Errors Resolved**: Fixed all parseFloat type issues and null reference errors across customer components

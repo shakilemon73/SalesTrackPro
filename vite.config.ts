@@ -24,7 +24,7 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5000,
-    allowedHosts: ['d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev'],
+    allowedHosts: ['16c66d12-2aa1-42bd-8a4f-8aaacf17b2e9-00-dgaujx7hb5nk.spock.replit.dev'],
     fs: {
       strict: true,
       deny: ["**/.*"],

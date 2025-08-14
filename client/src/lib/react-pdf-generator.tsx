@@ -2,11 +2,12 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Font, pdf } from '@react-pdf/renderer';
 import { getBengaliDate, formatCurrency, toBengaliNumber } from './bengali-utils';
 
-// Register Bengali font (using a web font fallback)
-Font.register({
-  family: 'NotoSansBengali',
-  src: 'https://fonts.gstatic.com/s/notosansbengali/v13/Cn-SJsCGWQxOjTbR24EMuSaqP77YHd4P9oPvdGLyPV0.woff2',
-});
+// Note: Bengali font registration temporarily disabled to prevent font format errors
+// Will be re-enabled once font loading issue is resolved
+// Font.register({
+//   family: 'NotoSansBengali', 
+//   src: 'path/to/bengali/font.ttf'
+// });
 
 // PDF Styles
 const styles = StyleSheet.create({
@@ -14,7 +15,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: '#FFFFFF',
     padding: 30,
-    fontFamily: 'NotoSansBengali',
+    fontFamily: 'Helvetica, sans-serif', // Temporarily use system fonts for stability
   },
   header: {
     backgroundColor: '#2563eb',
@@ -473,17 +474,39 @@ export const CustomerStatementPDF = ({ customer, transactions, businessInfo }: {
 // PDF Generation Functions
 export const generatePDF = async (component: React.ReactElement, filename: string) => {
   try {
-    const blob = await pdf(component).toBlob();
+    console.log('Starting PDF generation...');
+    
+    // Create PDF instance with explicit error handling
+    const pdfInstance = pdf(component);
+    
+    console.log('Creating blob...');
+    const blob = await pdfInstance.toBlob();
+    
+    console.log('PDF blob created successfully, size:', blob.size);
+    
+    // Create download
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     link.download = filename;
+    link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    
+    console.log('PDF download initiated successfully');
   } catch (error) {
-    console.error('PDF generation error:', error);
-    throw error;
+    console.error('PDF generation error details:', error);
+    console.error('Error message:', error?.message);
+    console.error('Error stack:', error?.stack);
+    
+    // Provide user-friendly error message
+    const errorMessage = error?.message || 'Unknown error occurred';
+    if (errorMessage.includes('font') || errorMessage.includes('Font')) {
+      throw new Error('PDF font loading failed. Please try again or contact support.');
+    } else {
+      throw new Error('PDF generation failed: ' + errorMessage);
+    }
   }
 };
