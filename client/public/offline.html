@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অফলাইন - দোকান হিসাব</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans Bengali', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .offline-container {
+            max-width: 400px;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        
+        .icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+        
+        .features {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        
+        .features h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .feature-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .check {
+            color: #22c55e;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+        
+        .retry-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .retry-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .status {
+            margin-top: 20px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        
+        .connection-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .online {
+            background: #22c55e;
+            color: white;
+        }
+        
+        .offline {
+            background: #ef4444;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-indicator" id="connectionStatus">
+        <span class="pulse">অফলাইন</span>
+    </div>
+    
+    <div class="offline-container">
+        <div class="icon">📱</div>
+        
+        <h1>অফলাইন মোডে চলছে</h1>
+        
+        <p>
+            আপনার ইন্টারনেট সংযোগ নেই, তবে চিন্তা নেই! 
+            দোকান হিসাব অ্যাপ অফলাইনেও কাজ করে।
+        </p>
+        
+        <div class="features">
+            <h3>অফলাইনে যা করতে পারবেন:</h3>
+            
+            <div class="feature-item">
+                <span class="check">✓</span>
+                নতুন বিক্রয় যোগ করুন
+            </div>
+            
+            <div class="feature-item">
+                <span class="check">✓</span>
+                গ্রাহক তথ্য দেখুন ও যোগ করুন
+            </div>
+            
+            <div class="feature-item">
+                <span class="check">✓</span>
+                খরচ এন্ট্রি করুন
+            </div>
+            
+            <div class="feature-item">
+                <span class="check">✓</span>
+                স্টক ব্যবস্থাপনা করুন
+            </div>
+            
+            <div class="feature-item">
+                <span class="check">✓</span>
+                রিপোর্ট দেখুন
+            </div>
+        </div>
+        
+        <p style="font-size: 14px; margin-bottom: 20px;">
+            ইন্টারনেট ফিরে এলে সব ডাটা অটোমেটিক সিঙ্ক হয়ে যাবে।
+        </p>
+        
+        <button class="retry-btn" onclick="checkConnection()">
+            সংযোগ পরীক্ষা করুন
+        </button>
+        
+        <div class="status" id="status">
+            সংযোগের জন্য অপেক্ষা করছি...
+        </div>
+    </div>
+    
+    <script>
+        function updateConnectionStatus() {
+            const status = document.getElementById('connectionStatus');
+            const statusText = document.getElementById('status');
+            
+            if (navigator.onLine) {
+                status.className = 'connection-indicator online';
+                status.innerHTML = 'অনলাইন';
+                statusText.textContent = 'ইন্টারনেট সংযোগ পুনরুদ্ধার! অ্যাপে ফিরে যাচ্ছি...';
+                
+                // Redirect to main app after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            } else {
+                status.className = 'connection-indicator offline pulse';
+                status.innerHTML = 'অফলাইন';
+                statusText.textContent = 'সংযোগের জন্য অপেক্ষা করছি...';
+            }
+        }
+        
+        function checkConnection() {
+            const button = event.target;
+            button.textContent = 'পরীক্ষা করছি...';
+            button.disabled = true;
+            
+            // Simulate connection check
+            setTimeout(() => {
+                updateConnectionStatus();
+                button.textContent = 'সংযোগ পরীক্ষা করুন';
+                button.disabled = false;
+            }, 1500);
+        }
+        
+        // Listen for online/offline events
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+        
+        // Initial status check
+        updateConnectionStatus();
+        
+        // Periodic connection check
+        setInterval(updateConnectionStatus, 5000);
+    </script>
+</body>
+</html>

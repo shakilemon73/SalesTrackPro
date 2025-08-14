@@ -7,6 +7,7 @@ import AuthGuard from "@/components/auth/auth-guard";
 
 import NotFoundMobileOptimized from "@/pages/not-found-mobile-optimized";
 import DashboardMobileOptimized from "@/pages/dashboard-mobile-optimized";
+import DashboardOfflineDemo from "@/pages/dashboard-offline-demo";
 import TransactionsMobileOptimized from "@/pages/transactions-mobile-optimized";
 import CustomersMobileOptimized from "@/pages/customers-mobile-optimized";
 import ReportsMobileOptimized from "@/pages/reports-mobile-optimized";
@@ -31,19 +32,37 @@ import { Button } from "@/components/ui/button";
 // Removed seed data import - using only live Supabase data
 import { supabase } from "./lib/supabase";
 import { initializeAndroidOptimizations } from "./lib/android-optimizations";
+import { useOfflineInit } from "./hooks/use-offline-data";
+import OfflineStatus from "./components/ui/offline-status";
 
 
 function Router() {
   const [showCommunicationPanel, setShowCommunicationPanel] = useState(false);
   const [location] = useLocation();
   
+  // Initialize offline functionality
+  const { isInitialized } = useOfflineInit();
+  
   // Hide bottom navigation on specific pages
   const hideBottomNav = location === "/sales/new" || location === "/customers/new" || location === "/expenses/new" || location.includes("/edit");
 
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden w-full">
-      <Switch>
-        <Route path="/" component={DashboardMobileOptimized} />
+      {/* Offline Status Bar - Fixed at top */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 py-2">
+        <div className="flex justify-between items-center max-w-lg mx-auto">
+          <div className="flex items-center gap-2">
+            <h1 className="text-sm font-semibold text-gray-800">দোকান হিসাব</h1>
+          </div>
+          <OfflineStatus />
+        </div>
+      </div>
+      
+      {/* Main Content with top offset for status bar */}
+      <div className="pt-12">
+        <Switch>
+        <Route path="/" component={DashboardOfflineDemo} />
+        <Route path="/dashboard" component={DashboardMobileOptimized} />
         <Route path="/transactions" component={TransactionsMobileOptimized} />
         <Route path="/customers" component={CustomersMobileOptimized} />
         <Route path="/reports" component={ReportsMobileOptimized} />
@@ -62,10 +81,20 @@ function Router() {
         <Route path="/expenses/new" component={ExpenseEntryMobileOptimized} />
 
 
-        <Route component={NotFoundMobileOptimized} />
-      </Switch>
-      {!hideBottomNav && <BottomNavigationOptimized />}
-      {!hideBottomNav && <FloatingActionMenu />}
+          <Route component={NotFoundMobileOptimized} />
+        </Switch>
+
+        {/* Bottom Navigation - hidden on certain pages */}
+        {!hideBottomNav && <BottomNavigationOptimized />}
+
+        {/* Floating Action Menu */}
+        <FloatingActionMenu />
+
+        {/* Communication Panel */}
+        {showCommunicationPanel && (
+          <CommunicationPanel onClose={() => setShowCommunicationPanel(false)} />
+        )}
+      </div>
     </div>
   );
 }

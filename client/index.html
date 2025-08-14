@@ -74,15 +74,31 @@
       }
     </style>
     
-    <!-- Service Worker Registration - DISABLED FOR INTERNET-ONLY MODE -->
+    <!-- Service Worker Registration - ENABLED FOR OFFLINE FUNCTIONALITY -->
     <script>
       if ('serviceWorker' in navigator) {
-        // Always unregister all service workers to ensure internet-only operation
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for(let registration of registrations) {
-            registration.unregister();
-            console.log('Service Worker unregistered for internet-only mode');
-          }
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js')
+            .then(function(registration) {
+              console.log('📱 SW: Service Worker registered successfully:', registration.scope);
+              
+              // Check for updates
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                if (newWorker) {
+                  newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                      console.log('📱 SW: New version available, will refresh');
+                      // Auto-refresh to get new version
+                      window.location.reload();
+                    }
+                  });
+                }
+              });
+            })
+            .catch(function(error) {
+              console.log('📱 SW: Service Worker registration failed:', error);
+            });
         });
       }
     </script>

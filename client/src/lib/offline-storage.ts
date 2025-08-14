@@ -106,8 +106,30 @@ class OfflineStorageManager {
     });
   }
 
-  // Add pending action for sync
-  async addPendingAction(table: string, data: any, action: 'create' | 'update' | 'delete'): Promise<void> {
+  // Get all data from a table for a specific user
+  async getAll(table: string, userId?: string): Promise<any[]> {
+    return this.get(table, userId);
+  }
+
+  // Add pending action for sync (new interface)
+  async addPendingAction(actionData: OfflineData): Promise<void> {
+    if (!this.db) await this.init();
+    
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(['pendingActions'], 'readwrite');
+      const store = transaction.objectStore('pendingActions');
+      
+      const request = store.put(actionData);
+      request.onsuccess = () => {
+        console.log(`📱 OFFLINE: Added pending action: ${actionData.action} ${actionData.table}`);
+        resolve();
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  // Add pending action for sync (legacy interface)
+  async addPendingActionLegacy(table: string, data: any, action: 'create' | 'update' | 'delete'): Promise<void> {
     if (!this.db) await this.init();
     
     const pendingAction: OfflineData = {
