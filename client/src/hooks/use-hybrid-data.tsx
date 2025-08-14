@@ -258,12 +258,17 @@ export function useHybridCreateCustomer() {
         return { ...old, totalCustomers: (old.totalCustomers || 0) + 1 };
       });
 
-      // Invalidate all related queries for instant cross-page updates
+      // Force immediate refetch for all related data
       queryClient.invalidateQueries({ queryKey: ['customers', user?.user_id] });
       queryClient.invalidateQueries({ queryKey: ['stats', user?.user_id] });
       queryClient.invalidateQueries({ queryKey: ['sales', user?.user_id] });
       queryClient.invalidateQueries({ queryKey: ['expenses', user?.user_id] });
-      console.log('🔄 HYBRID: All queries invalidated after customer creation');
+      
+      // Force immediate refetch 
+      queryClient.refetchQueries({ queryKey: ['customers', user?.user_id] });
+      queryClient.refetchQueries({ queryKey: ['stats', user?.user_id] });
+      
+      console.log('🔄 HYBRID: All queries invalidated and refetched after customer creation');
     },
   });
 }
@@ -330,12 +335,17 @@ export function useHybridCreateSale() {
         };
       });
 
-      // Invalidate all related queries for instant cross-page updates
+      // Force immediate refetch for all related data
       queryClient.invalidateQueries({ queryKey: ['sales', user?.user_id] });
       queryClient.invalidateQueries({ queryKey: ['stats', user?.user_id] });
       queryClient.invalidateQueries({ queryKey: ['customers', user?.user_id] });
       queryClient.invalidateQueries({ queryKey: ['expenses', user?.user_id] });
-      console.log('🔄 HYBRID: All queries invalidated after sale creation');
+      
+      // Force immediate refetch 
+      queryClient.refetchQueries({ queryKey: ['sales', user?.user_id] });
+      queryClient.refetchQueries({ queryKey: ['stats', user?.user_id] });
+      
+      console.log('🔄 HYBRID: All queries invalidated and refetched after sale creation');
     },
   });
 }
@@ -400,12 +410,17 @@ export function useHybridCreateExpense() {
         };
       });
 
-      // Invalidate all related queries for instant cross-page updates
+      // Force immediate refetch for all related data
       queryClient.invalidateQueries({ queryKey: ['expenses', user?.user_id] });
       queryClient.invalidateQueries({ queryKey: ['stats', user?.user_id] });
       queryClient.invalidateQueries({ queryKey: ['sales', user?.user_id] });
       queryClient.invalidateQueries({ queryKey: ['customers', user?.user_id] });
-      console.log('🔄 HYBRID: All queries invalidated after expense creation');
+      
+      // Force immediate refetch 
+      queryClient.refetchQueries({ queryKey: ['expenses', user?.user_id] });
+      queryClient.refetchQueries({ queryKey: ['stats', user?.user_id] });
+      
+      console.log('🔄 HYBRID: All queries invalidated and refetched after expense creation');
     },
   });
 }

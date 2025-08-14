@@ -76,11 +76,10 @@ export default function CollectionMobileOptimized() {
       return;
     }
     
-    const { getBangladeshTimeISO } = require('@/lib/bengali-utils');
     const collectionData = {
       customer_id: data.customer_id,
       amount: collectionAmount,
-      collection_date: getBangladeshTimeISO(),
+      collection_date: new Date().toISOString(),
     };
 
     createCollectionMutation.mutate(collectionData, {

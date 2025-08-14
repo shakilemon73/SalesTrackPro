@@ -11,7 +11,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescri
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useToast } from "@/hooks/use-toast";
 import { hybridAuth } from "@/lib/hybrid-auth";
-import { useHybridSales, useHybridCustomers } from "@/hooks/use-hybrid-data";
+import { useHybridSales, useHybridCustomers, useHybridExpenses } from "@/hooks/use-hybrid-data";
 import { useNetworkStatus } from "@/hooks/use-network-status";
 import { 
   ArrowLeft, ArrowUpRight, ArrowDownRight, 
@@ -38,11 +38,10 @@ export default function TransactionsMobileOptimized() {
 
   const { data: sales = [], isLoading: salesLoading } = useHybridSales();
   const { data: customers = [] } = useHybridCustomers();
+  const { data: expenses = [], isLoading: expensesLoading } = useHybridExpenses();
   
-  // For now, use local storage for expenses and collections
-  const expenses: any[] = [];
+  // For now, use empty for collections until implemented
   const collections: any[] = [];
-  const expensesLoading = false;
   const collectionsLoading = false;
 
   const isLoading = salesLoading || expensesLoading || collectionsLoading;
