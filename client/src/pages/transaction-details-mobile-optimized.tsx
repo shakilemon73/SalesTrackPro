@@ -49,12 +49,20 @@ interface TransactionDetailsProps {
 }
 
 export default function TransactionDetailsMobileOptimized({ type, id }: TransactionDetailsProps) {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const { toast } = useToast();
   const { userId, isLoading: authLoading } = useAuth();
   const queryClient = useQueryClient();
+
+  // Check URL parameters to auto-enter edit mode
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('edit') === 'true') {
+      setIsEditing(true);
+    }
+  }, [location]);
 
   // Fetch transaction details based on type
   const { data: transaction, isLoading: transactionLoading, error: transactionError } = useQuery({
@@ -135,7 +143,7 @@ export default function TransactionDetailsMobileOptimized({ type, id }: Transact
     },
   });
 
-  // Reset form when transaction data loads
+  // Reset form when transaction data loads - FIX FOR INFINITE LOOP
   useEffect(() => {
     if (transaction) {
       form.reset({
@@ -147,7 +155,7 @@ export default function TransactionDetailsMobileOptimized({ type, id }: Transact
         items: getTransactionItems(transaction),
       });
     }
-  }, [transaction, form, customers, type]);
+  }, [transaction?.id, type]); // Only depend on transaction ID and type, not the whole objects
 
   // Update mutation
   const updateMutation = useMutation({

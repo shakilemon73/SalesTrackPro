@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { getBengaliDate, formatCurrency, toBengaliNumber } from "@/lib/bengali-utils";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
 import { pdfService } from '@/lib/pdf-service';
 
 export default function TransactionsMobileOptimized() {
+  const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
@@ -505,8 +506,8 @@ export default function TransactionsMobileOptimized() {
                       className="h-9 text-xs"
                       onClick={() => {
                         setIsSheetOpen(false);
-                        // Navigate to transaction details page which has inline edit functionality
-                        window.location.href = `/transactions/${selectedTransaction.type}/${selectedTransaction.id}`;
+                        // Navigate to transaction details page and trigger edit mode
+                        setLocation(`/transactions/${selectedTransaction.type}/${selectedTransaction.id}?edit=true`);
                       }}
                     >
                       <Edit3 className="w-3 h-3 mr-1" />
