@@ -124,38 +124,38 @@ export default function ReportsMobileOptimized() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 pb-20">
       
-      {/* Compact Header */}
-      <div className="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50">
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between">
+      {/* World-Class Header Design */}
+      <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/60 dark:border-slate-700/60 sticky top-0 z-50">
+        <div className="px-4 py-4">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
               <Link to="/">
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <ArrowLeft className="w-4 h-4" />
-                </Button>
+                <div className="w-9 h-9 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                  <ArrowLeft className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+                </div>
               </Link>
               <div>
-                <h1 className="text-sm font-bold text-slate-900 dark:text-white bengali-font">
+                <h1 className="text-xl font-bold text-slate-900 dark:text-white bengali-font tracking-tight">
                   ব্যবসায়িক রিপোর্ট
                 </h1>
-                <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center space-x-1">
-                  <BarChart3 className="w-3 h-3" />
-                  <span>{getPeriodLabel()} বিশ্লেষণ</span>
-                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400 bengali-font font-medium">
+                  {getPeriodLabel()} বিশ্লেষণ ও পরিসংখ্যান
+                </p>
               </div>
             </div>
             
             <Select value={reportPeriod} onValueChange={setReportPeriod}>
-              <SelectTrigger className="w-20 h-8 text-xs">
+              <SelectTrigger className="w-28 px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl text-sm bengali-font font-medium">
+                <Calendar className="w-4 h-4 mr-2 text-slate-500" />
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="today">আজ</SelectItem>
-                <SelectItem value="week">সপ্তাহ</SelectItem>
-                <SelectItem value="month">মাস</SelectItem>
-                <SelectItem value="year">বছর</SelectItem>
+              <SelectContent className="rounded-xl border-slate-200 dark:border-slate-700">
+                <SelectItem value="today" className="bengali-font">আজ</SelectItem>
+                <SelectItem value="week" className="bengali-font">সপ্তাহ</SelectItem>
+                <SelectItem value="month" className="bengali-font">মাস</SelectItem>
+                <SelectItem value="year" className="bengali-font">বছর</SelectItem>
               </SelectContent>
             </Select>
           </div>
