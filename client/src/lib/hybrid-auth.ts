@@ -138,13 +138,16 @@ class HybridAuthManager {
 
   // Get current user (works offline)
   getCurrentUser(): StoredAuth | null {
-    const authData = localStorage.getItem(this.storageKey);
-    if (!authData) return null;
-    
     try {
-      return JSON.parse(authData);
+      const stored = localStorage.getItem(this.storageKey);
+      if (!stored) return null;
+      
+      const auth = JSON.parse(stored) as StoredAuth;
+      console.log('🔍 AUTH CHECK: User =', auth);
+      console.log('🌐 HYBRID AUTH: User authenticated:', auth.name);
+      return auth;
     } catch (error) {
-      console.error('🌐 HYBRID AUTH: Invalid stored auth data');
+      console.error('🚨 HYBRID AUTH: Error parsing stored auth:', error);
       return null;
     }
   }
@@ -175,34 +178,7 @@ class HybridAuthManager {
   }
 }
 
-// Initialize demo user with proper UUID for immediate testing
-const initializeDemoUser = () => {
-  const demoAuth: StoredAuth = {
-    user_id: '550e8400-e29b-41d4-a716-446655440000', // Proper UUID format
-    email: 'demo@dokanhisab.com',
-    name: 'ডেমো ব্যবসায়ী',
-    phone: '01712345678',
-    business_name: 'ডেমো দোকান',
-    auth_token: 'demo-token',
-    last_sync: new Date().toISOString(),
-    created_at: new Date().toISOString()
-  };
 
-  // Only create demo user if no existing auth data
-  if (!localStorage.getItem('dokan_hisab_auth')) {
-    localStorage.setItem('dokan_hisab_auth', JSON.stringify(demoAuth));
-    console.log('🎯 DEMO USER: Created with proper UUID for testing');
-  }
-};
-
-// Initialize demo user when module loads
-if (typeof window !== 'undefined') {
-  // Add a small delay to ensure DOM is ready
-  setTimeout(() => {
-    initializeDemoUser();
-    console.log('🎯 DEMO USER: Initialization completed');
-  }, 100);
-}
 
 export const hybridAuth = new HybridAuthManager();
 export type { StoredAuth };

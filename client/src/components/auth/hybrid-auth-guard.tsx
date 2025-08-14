@@ -38,27 +38,33 @@ export default function HybridAuthGuard({ children }: { children: React.ReactNod
   const registerForm = useForm<RegisterFormData>();
 
   useEffect(() => {
-    // Add delay to ensure localStorage is ready and demo user is created
     const checkAuth = () => {
-      const authenticated = hybridAuth.isAuthenticated();
+      // Clear any demo user data
       const user = hybridAuth.getCurrentUser();
+      if (user && user.auth_token === 'demo-token') {
+        hybridAuth.logout();
+        console.log('🚮 Removed demo user - real auth required');
+      }
       
-      console.log('🔍 AUTH CHECK: Authenticated =', authenticated);
-      console.log('🔍 AUTH CHECK: User =', user);
+      // Only allow real authenticated users
+      const authenticated = hybridAuth.isAuthenticated();
+      const realUser = hybridAuth.getCurrentUser();
+      const isRealAuth = authenticated && realUser && realUser.auth_token !== 'demo-token';
       
-      setIsAuthenticated(authenticated);
+      console.log('🔍 AUTH CHECK: Real User Authenticated =', isRealAuth);
+      console.log('🔍 AUTH CHECK: User =', realUser);
+      
+      setIsAuthenticated(Boolean(isRealAuth));
       setIsLoading(false);
       
-      if (authenticated && user) {
-        console.log('🌐 HYBRID AUTH: User authenticated:', user.name);
+      if (isRealAuth && realUser) {
+        console.log('🌐 HYBRID AUTH: Real user authenticated:', realUser.name);
       } else {
-        console.log('❌ HYBRID AUTH: No valid user found');
+        console.log('❌ HYBRID AUTH: No valid real user found - login required');
       }
     };
     
-    // Check immediately and after a short delay
     checkAuth();
-    setTimeout(checkAuth, 200);
   }, []);
 
   const handleLogin = async (data: LoginFormData) => {

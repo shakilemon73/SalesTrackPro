@@ -102,20 +102,6 @@ function App() {
     
     // Initialize Android APK optimizations
     initializeAndroidOptimizations();
-    
-    // Test database connection (will only work after authentication)
-    const testConnection = async () => {
-      try {
-        const { count, error } = await supabase.from('customers').select('count', { count: 'exact', head: true });
-        if (!error) {
-          console.log('✅ Database connection verified');
-        }
-      } catch (error) {
-        console.log('🔄 Database connection will be available after authentication');
-      }
-    };
-    
-    testConnection();
   }, []);
 
   return (
