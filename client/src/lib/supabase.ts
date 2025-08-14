@@ -777,6 +777,15 @@ export const supabaseService = {
     }
   },
 
+  async deleteCollection(collectionId: string): Promise<void> {
+    const { error } = await supabase
+      .from('collections')
+      .delete()
+      .eq('id', collectionId);
+    
+    if (error) throw error;
+  },
+
   // Stats - ONLY REAL SUPABASE DATA
   async getStats(userId: string) {
     console.log('🔥 FETCHING STATS for user:', userId);

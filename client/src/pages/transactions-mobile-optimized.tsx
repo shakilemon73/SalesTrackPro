@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useToast } from "@/hooks/use-toast";
 import { supabaseService } from "@/lib/supabase";
 import { useAuth } from "@/hooks/use-auth";
@@ -155,6 +156,8 @@ export default function TransactionsMobileOptimized() {
           return supabaseService.deleteSale(transaction.id);
         case 'expense':
           return supabaseService.deleteExpense(transaction.id);
+        case 'collection':
+          return supabaseService.deleteCollection(transaction.id);
         default:
           throw new Error("Delete not supported for this transaction type");
       }
@@ -367,6 +370,15 @@ export default function TransactionsMobileOptimized() {
       {/* Compact Mobile Transaction Details */}
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent side="bottom" className="h-[85vh] p-0 border-t-0 rounded-t-2xl bg-white dark:bg-slate-900">
+          <VisuallyHidden>
+            <SheetTitle>
+              {selectedTransaction?.type === 'sale' ? 'বিক্রয়ের তথ্য' : 
+               selectedTransaction?.type === 'expense' ? 'খরচের তথ্য' : 'আদায়ের তথ্য'}
+            </SheetTitle>
+            <SheetDescription>
+              লেনদেনের বিস্তারিত তথ্য এবং সম্পাদনা অপশন
+            </SheetDescription>
+          </VisuallyHidden>
           {selectedTransaction && (
             <div className="h-full flex flex-col">
               {/* Compact Header */}
@@ -482,7 +494,7 @@ export default function TransactionsMobileOptimized() {
                 )}
 
                 {/* Compact Action Buttons */}
-                {(selectedTransaction.type === 'sale' || selectedTransaction.type === 'expense') && (
+                {(selectedTransaction.type === 'sale' || selectedTransaction.type === 'expense' || selectedTransaction.type === 'collection') && (
                   <div className="grid grid-cols-2 gap-2 pt-2">
                     <Button 
                       variant="outline" 
@@ -490,7 +502,14 @@ export default function TransactionsMobileOptimized() {
                       className="h-9 text-xs"
                       onClick={() => {
                         setIsSheetOpen(false);
-                        window.location.href = `/transactions/${selectedTransaction.type}/${selectedTransaction.id}`;
+                        // Navigate to correct edit routes based on transaction type
+                        if (selectedTransaction.type === 'sale') {
+                          window.location.href = `/sales/${selectedTransaction.id}/edit`;
+                        } else if (selectedTransaction.type === 'expense') {
+                          window.location.href = `/expenses/${selectedTransaction.id}/edit`;
+                        } else if (selectedTransaction.type === 'collection') {
+                          window.location.href = `/collections/${selectedTransaction.id}/edit`;
+                        }
                       }}
                     >
                       <Edit3 className="w-3 h-3 mr-1" />
