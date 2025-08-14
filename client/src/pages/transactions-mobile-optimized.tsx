@@ -65,16 +65,11 @@ export default function TransactionsMobileOptimized() {
     mutationFn: async ({ transaction, values }: { transaction: any; values: any }) => {
       if (!userId) throw new Error("User not authenticated");
 
-      const updateData = {
-        customer_name: values.customer_name,
-        total_amount: parseFloat(values.total_amount),
-        payment_method: values.payment_method,
-        description: values.customer_name,
-      };
-
       if (transaction.type === 'sale') {
         return supabaseService.updateSale(transaction.id, {
-          ...updateData,
+          customer_name: values.customer_name,
+          total_amount: parseFloat(values.total_amount),
+          payment_method: values.payment_method,
           paid_amount: parseFloat(values.total_amount), // For simplicity, assume full payment
           due_amount: 0,
         });
