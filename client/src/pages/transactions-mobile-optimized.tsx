@@ -505,14 +505,8 @@ export default function TransactionsMobileOptimized() {
                       className="h-9 text-xs"
                       onClick={() => {
                         setIsSheetOpen(false);
-                        // Navigate to correct edit routes based on transaction type
-                        if (selectedTransaction.type === 'sale') {
-                          window.location.href = `/sales/${selectedTransaction.id}/edit`;
-                        } else if (selectedTransaction.type === 'expense') {
-                          window.location.href = `/expenses/${selectedTransaction.id}/edit`;
-                        } else if (selectedTransaction.type === 'collection') {
-                          window.location.href = `/collections/${selectedTransaction.id}/edit`;
-                        }
+                        // Navigate to transaction details page which has inline edit functionality
+                        window.location.href = `/transactions/${selectedTransaction.type}/${selectedTransaction.id}`;
                       }}
                     >
                       <Edit3 className="w-3 h-3 mr-1" />
