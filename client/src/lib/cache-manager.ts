@@ -66,6 +66,11 @@ class CacheManager {
     console.log(`📦 CACHE: Cleared ${key}`);
   }
 
+  // Add delete method for compatibility
+  delete(key: string): void {
+    this.clear(key);
+  }
+
   // Clear all cache
   clearAll(): void {
     this.cache.clear();

@@ -23,8 +23,15 @@ export function useHybridCustomers() {
 
       if (isOnline) {
         try {
+          // Check if we need to bypass cache (after customer creation)
+          const shouldBypassCache = sessionStorage.getItem(`bypass_customer_cache_${user.user_id}`) === 'true';
+          if (shouldBypassCache) {
+            sessionStorage.removeItem(`bypass_customer_cache_${user.user_id}`);
+            console.log('🚫 CACHE: Bypassing cache due to recent customer creation');
+          }
+          
           // Try to get data from Supabase
-          console.log('🔥 FETCHING CUSTOMERS for user:', user.user_id);
+          console.log('🔥 FETCHING CUSTOMERS for user:', user.user_id, 'bypassCache:', shouldBypassCache);
           const onlineData = await supabaseService.getCustomers(user.user_id);
           console.log('✅ Customers fetched from Supabase:', onlineData.length, onlineData);
           
@@ -251,10 +258,30 @@ export function useHybridCreateCustomer() {
 
       return newCustomer;
     },
-    onSuccess: (newCustomer) => {
+    onSuccess: async (newCustomer) => {
+      console.log('🚀 CUSTOMER SUCCESS: Starting immediate updates for:', newCustomer);
+      
+      // Set flag to bypass cache on next fetch
+      sessionStorage.setItem(`bypass_customer_cache_${user?.user_id}`, 'true');
+      
+      // Clear all customer-related caches
+      try {
+        const { cacheManager, createCacheKey } = await import('../lib/cache-manager');
+        const cacheKey = createCacheKey('customers', user?.user_id);
+        cacheManager.clear(cacheKey);
+        console.log('🚫 CACHE: Cleared customer cache for fresh data');
+      } catch (error) {
+        console.warn('Failed to clear cache:', error);
+      }
+      
+      // Remove query cache completely
+      queryClient.removeQueries({ queryKey: ['customers', user?.user_id] });
+      
       // Optimistic update for immediate UI response
       queryClient.setQueryData(['customers', user?.user_id, 'hybrid'], (old: any) => {
-        return old ? [newCustomer, ...old] : [newCustomer];
+        const updated = old ? [newCustomer, ...old] : [newCustomer];
+        console.log('🔄 OPTIMISTIC UPDATE: Updated customers cache with:', updated.length, 'customers');
+        return updated;
       });
       
       // Update stats optimistically
@@ -263,25 +290,16 @@ export function useHybridCreateCustomer() {
         return { ...old, totalCustomers: (old.totalCustomers || 0) + 1 };
       });
 
-      // Force immediate refetch for all related data
-      queryClient.invalidateQueries({ queryKey: ['customers', user?.user_id] });
-      queryClient.invalidateQueries({ queryKey: ['stats', user?.user_id] });
-      queryClient.invalidateQueries({ queryKey: ['sales', user?.user_id] });
-      queryClient.invalidateQueries({ queryKey: ['expenses', user?.user_id] });
+      // Force immediate refetch with cache bypass
+      setTimeout(async () => {
+        await queryClient.refetchQueries({ 
+          queryKey: ['customers', user?.user_id, 'hybrid'],
+          type: 'active'
+        });
+        console.log('🔄 FORCED FRESH REFETCH: Completed after customer creation');
+      }, 100);
       
-      // Force immediate refetch with aggressive timing
-      setTimeout(() => {
-        queryClient.refetchQueries({ queryKey: ['customers', user?.user_id] });
-        queryClient.refetchQueries({ queryKey: ['stats', user?.user_id] });
-        console.log('🔄 CUSTOMER ADDED: Forced immediate refetch for customer pages');
-      }, 50);
-      
-      // Additional refetch after a short delay to ensure updates
-      setTimeout(() => {
-        queryClient.refetchQueries({ queryKey: ['customers', user?.user_id] });
-      }, 500);
-      
-      console.log('🔄 HYBRID: All queries invalidated and refetched after customer creation');
+      console.log('🔄 CUSTOMER ADDED: Completed all cache updates and refetches');
     },
   });
 }
