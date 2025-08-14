@@ -28,6 +28,8 @@ export default function TransactionsMobileOptimized() {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isEditingInSheet, setIsEditingInSheet] = useState(false);
+  const [editValues, setEditValues] = useState<any>({});
   const { toast } = useToast();
   const { userId } = useAuth();
   const queryClient = useQueryClient();
@@ -57,6 +59,57 @@ export default function TransactionsMobileOptimized() {
   });
 
   const isLoading = salesLoading || expensesLoading || collectionsLoading;
+
+  // Update mutation for editing transactions
+  const updateMutation = useMutation({
+    mutationFn: async ({ transaction, values }: { transaction: any; values: any }) => {
+      if (!userId) throw new Error("User not authenticated");
+
+      const updateData = {
+        customer_name: values.customer_name,
+        total_amount: parseFloat(values.total_amount),
+        payment_method: values.payment_method,
+        description: values.customer_name,
+      };
+
+      if (transaction.type === 'sale') {
+        return supabaseService.updateSale(transaction.id, {
+          ...updateData,
+          paid_amount: parseFloat(values.total_amount), // For simplicity, assume full payment
+          due_amount: 0,
+        });
+      } else if (transaction.type === 'expense') {
+        return supabaseService.updateExpense(transaction.id, {
+          description: values.customer_name,
+          amount: parseFloat(values.total_amount),
+          category: values.payment_method,
+        });
+      } else {
+        throw new Error("Update not supported for this transaction type");
+      }
+    },
+    onSuccess: () => {
+      // Invalidate and refetch all transaction-related queries
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
+      
+      toast({
+        title: "সংরক্ষিত! ✅",
+        description: "লেনদেনের তথ্য সফলভাবে আপডেট হয়েছে"
+      });
+      
+      setIsEditingInSheet(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "ত্রুটি!",
+        description: "তথ্য আপডেট করতে সমস্যা হয়েছে",
+        variant: "destructive"
+      });
+      console.error('Update failed:', error);
+    }
+  });
 
   // Combine all transactions
   const allTransactions = [
@@ -147,6 +200,13 @@ export default function TransactionsMobileOptimized() {
 
   const handleTransactionClick = (transaction: any) => {
     setSelectedTransaction(transaction);
+    setIsEditingInSheet(false);
+    setEditValues({
+      customer_name: transaction.customer_name || transaction.description,
+      total_amount: transaction.amount || transaction.total_amount,
+      payment_method: transaction.method || transaction.payment_method,
+      description: transaction.description
+    });
     setIsSheetOpen(true);
   };
 
@@ -478,6 +538,83 @@ export default function TransactionsMobileOptimized() {
                   </div>
                 </div>
 
+                {/* Edit Mode UI - Overlay above existing content when editing */}
+                {isEditingInSheet && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-3">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Edit3 className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm font-medium text-blue-700 bengali-font">সম্পাদনা মোড</span>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-slate-700 bengali-font">গ্রাহক/বিবরণ</label>
+                      <Input
+                        value={editValues.customer_name || ''}
+                        onChange={(e) => setEditValues({...editValues, customer_name: e.target.value})}
+                        className="mt-1 h-9 text-sm"
+                        placeholder="গ্রাহকের নাম বা বিবরণ"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-slate-700 bengali-font">পরিমাণ (৳)</label>
+                      <Input
+                        type="number"
+                        value={editValues.total_amount || ''}
+                        onChange={(e) => setEditValues({...editValues, total_amount: e.target.value})}
+                        className="mt-1 h-9 text-sm number-font"
+                        placeholder="0"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-slate-700 bengali-font">পেমেন্ট পদ্ধতি</label>
+                      <Select value={editValues.payment_method} onValueChange={(value) => setEditValues({...editValues, payment_method: value})}>
+                        <SelectTrigger className="mt-1 h-9 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="নগদ">নগদ</SelectItem>
+                          <SelectItem value="বাকি">বাকি</SelectItem>
+                          <SelectItem value="কার্ড">কার্ড</SelectItem>
+                          <SelectItem value="bKash">bKash</SelectItem>
+                          <SelectItem value="Nagad">Nagad</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="flex space-x-2 pt-2">
+                      <Button 
+                        size="sm" 
+                        className="flex-1"
+                        onClick={() => {
+                          updateMutation.mutate({ 
+                            transaction: selectedTransaction, 
+                            values: editValues 
+                          });
+                        }}
+                        disabled={updateMutation.isPending}
+                      >
+                        {updateMutation.isPending ? (
+                          <>
+                            <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin mr-1" />
+                            সংরক্ষণ হচ্ছে...
+                          </>
+                        ) : (
+                          "সংরক্ষণ করুন"
+                        )}
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setIsEditingInSheet(false)}
+                      >
+                        বাতিল
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Products - Compact list if sale */}
                 {selectedTransaction.type === 'sale' && selectedTransaction.items && selectedTransaction.items.length > 0 && (
                   <div className="space-y-2">
@@ -505,13 +642,11 @@ export default function TransactionsMobileOptimized() {
                       size="sm"
                       className="h-9 text-xs"
                       onClick={() => {
-                        setIsSheetOpen(false);
-                        // Navigate to transaction details page and trigger edit mode
-                        setLocation(`/transactions/${selectedTransaction.type}/${selectedTransaction.id}?edit=true`);
+                        setIsEditingInSheet(!isEditingInSheet);
                       }}
                     >
                       <Edit3 className="w-3 h-3 mr-1" />
-                      সম্পাদনা
+                      {isEditingInSheet ? 'বাতিল' : 'সম্পাদনা'}
                     </Button>
                     <Button 
                       variant="outline" 
