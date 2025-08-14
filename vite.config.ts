@@ -24,7 +24,7 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5000,
-    allowedHosts: ['cd2b4319-1090-46f2-9d56-7838f516072b-00-htirk3brvt33.janeway.replit.dev'],
+    allowedHosts: ['ca86e1b7-93f0-448c-970e-efffdc9f20f3-00-3gut4q9tehjf1.janeway.replit.dev'],
     fs: {
       strict: true,
       deny: ["**/.*"],

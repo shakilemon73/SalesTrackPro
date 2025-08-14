@@ -53,13 +53,10 @@ function Router() {
 
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden w-full">
-      {/* Offline Status Bar - Fixed at top */}
+      {/* App Header - Fixed at top */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 py-2">
-        <div className="flex justify-between items-center max-w-lg mx-auto">
-          <div className="flex items-center gap-2">
-            <h1 className="text-sm font-semibold text-gray-800">দোকান হিসাব</h1>
-          </div>
-          <OfflineStatus />
+        <div className="flex justify-center items-center max-w-lg mx-auto">
+          <h1 className="text-sm font-semibold text-gray-800">দোকান হিসাব</h1>
         </div>
       </div>
       

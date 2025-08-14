@@ -103,17 +103,7 @@ export default function HybridAuthGuard({ children }: { children: React.ReactNod
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-6">
           
-          {/* Connection Status */}
-          <div className="text-center">
-            <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm ${
-              isOnline 
-                ? 'bg-green-100 text-green-800' 
-                : 'bg-orange-100 text-orange-800'
-            }`}>
-              {isOnline ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
-              {isOnline ? 'ইন্টারনেট সংযুক্ত' : 'ইন্টারনেট সংযোগ নেই'}
-            </div>
-          </div>
+
 
           <Card className="shadow-xl">
             <CardHeader className="text-center">
