@@ -24,11 +24,14 @@ export function useHybridCustomers() {
       if (isOnline) {
         try {
           // Try to get data from Supabase
+          console.log('🔥 FETCHING CUSTOMERS for user:', user.user_id);
           const onlineData = await supabaseService.getCustomers(user.user_id);
+          console.log('✅ Customers fetched from Supabase:', onlineData.length, onlineData);
           
           // Store locally for offline use
           for (const customer of onlineData) {
             await offlineStorage.store('customers', customer);
+            console.log('📱 OFFLINE: Stored customers data:', customer.id);
           }
           
           console.log('🌐 HYBRID: Customers synced from online');
@@ -45,7 +48,9 @@ export function useHybridCustomers() {
       }
     },
     enabled: !!user?.user_id,
-    staleTime: isOnline ? 30000 : Infinity, // 30s if online, never stale if offline
+    staleTime: 5000, // 5 seconds for aggressive updates
+    refetchInterval: 10000, // Refetch every 10 seconds
+    refetchOnWindowFocus: true
   });
 }
 
@@ -264,9 +269,17 @@ export function useHybridCreateCustomer() {
       queryClient.invalidateQueries({ queryKey: ['sales', user?.user_id] });
       queryClient.invalidateQueries({ queryKey: ['expenses', user?.user_id] });
       
-      // Force immediate refetch 
-      queryClient.refetchQueries({ queryKey: ['customers', user?.user_id] });
-      queryClient.refetchQueries({ queryKey: ['stats', user?.user_id] });
+      // Force immediate refetch with aggressive timing
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['customers', user?.user_id] });
+        queryClient.refetchQueries({ queryKey: ['stats', user?.user_id] });
+        console.log('🔄 CUSTOMER ADDED: Forced immediate refetch for customer pages');
+      }, 50);
+      
+      // Additional refetch after a short delay to ensure updates
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['customers', user?.user_id] });
+      }, 500);
       
       console.log('🔄 HYBRID: All queries invalidated and refetched after customer creation');
     },
