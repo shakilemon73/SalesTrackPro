@@ -98,7 +98,7 @@ function Router() {
 
 function App() {
   useEffect(() => {
-    console.log('App initialized with Supabase database connection');
+    console.log('🎯 APP: App component mounted and initialized');
     
     // Initialize Android APK optimizations
     initializeAndroidOptimizations();

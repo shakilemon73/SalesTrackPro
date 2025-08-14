@@ -38,15 +38,27 @@ export default function HybridAuthGuard({ children }: { children: React.ReactNod
   const registerForm = useForm<RegisterFormData>();
 
   useEffect(() => {
-    // Check if user is already authenticated
-    const authenticated = hybridAuth.isAuthenticated();
-    setIsAuthenticated(authenticated);
-    setIsLoading(false);
-    
-    if (authenticated) {
+    // Add delay to ensure localStorage is ready and demo user is created
+    const checkAuth = () => {
+      const authenticated = hybridAuth.isAuthenticated();
       const user = hybridAuth.getCurrentUser();
-      console.log('🌐 HYBRID AUTH: User already authenticated:', user?.name);
-    }
+      
+      console.log('🔍 AUTH CHECK: Authenticated =', authenticated);
+      console.log('🔍 AUTH CHECK: User =', user);
+      
+      setIsAuthenticated(authenticated);
+      setIsLoading(false);
+      
+      if (authenticated && user) {
+        console.log('🌐 HYBRID AUTH: User authenticated:', user.name);
+      } else {
+        console.log('❌ HYBRID AUTH: No valid user found');
+      }
+    };
+    
+    // Check immediately and after a short delay
+    checkAuth();
+    setTimeout(checkAuth, 200);
   }, []);
 
   const handleLogin = async (data: LoginFormData) => {

@@ -197,7 +197,11 @@ const initializeDemoUser = () => {
 
 // Initialize demo user when module loads
 if (typeof window !== 'undefined') {
-  initializeDemoUser();
+  // Add a small delay to ensure DOM is ready
+  setTimeout(() => {
+    initializeDemoUser();
+    console.log('🎯 DEMO USER: Initialization completed');
+  }, 100);
 }
 
 export const hybridAuth = new HybridAuthManager();

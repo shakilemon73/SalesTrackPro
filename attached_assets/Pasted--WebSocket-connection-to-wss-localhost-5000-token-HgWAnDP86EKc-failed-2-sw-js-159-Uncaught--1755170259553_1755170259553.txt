@@ -1,0 +1,39 @@
+ WebSocket connection to 'wss://localhost:5000/?token=HgWAnDP86EKc' failed: 
+2
+sw.js:159 Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Request scheme 'chrome-extension' is unsupported
+    at cacheFirst (sw.js:159:13)
+client:536 WebSocket connection to 'wss://ca86e1b7-93f0-448c-970e-efffdc9f20f3-00-3gut4q9tehjf1.janeway.replit.dev/?token=HgWAnDP86EKc' failed: 
+client:536 WebSocket connection to 'wss://localhost:5000/?token=HgWAnDP86EKc' failed: 
+client:512 [vite] failed to connect to websocket.
+your current setup:
+  (browser) ca86e1b7-93f0-448c-970e-efffdc9f20f3-00-3gut4q9tehjf1.janeway.replit.dev/ <--[HTTP]--> localhost:5000/ (server)
+  (browser) ca86e1b7-93f0-448c-970e-efffdc9f20f3-00-3gut4q9tehjf1.janeway.replit.dev:/ <--[WebSocket (failing)]--> localhost:5000/ (server)
+Check out your Vite / network configuration and https://vite.dev/config/server-options.html#server-hmr .
+sw.js:159 Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Request scheme 'chrome-extension' is unsupported
+    at cacheFirst (sw.js:159:13)
+2
+sales-entry-bottom-sheet.tsx:234 Uncaught ReferenceError: useMutation is not defined
+    at SalesEntryBottomSheet (sales-entry-bottom-sheet.tsx:234:30)
+chunk-NFC5BX5N.js?v=409c8810:14032 The above error occurred in the <SalesEntryBottomSheet> component:
+
+    at SalesEntryBottomSheet (https://ca86e1b7-93f0-448c-970e-efffdc9f20f3-00-3gut4q9tehjf1.janeway.replit.dev/src/pages/sales-entry-bottom-sheet.tsx:314:27)
+    at Route (https://ca86e1b7-93f0-448c-970e-efffdc9f20f3-00-3gut4q9tehjf1.janeway.repli…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=409c8810:280:16)
+    at Switch (https://ca86e1b7-93f0-448c-970e-efffdc9f20f3-00-3gut4q9tehjf1.janeway.repli…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=409c8810:336:17)
+    at div
+    at div
+    at Router (https://ca86e1b7-93f0-448c-970e-efffdc9f20f3-00-3gut4q9tehjf1.janeway.replit.dev/src/App.tsx:50:63)
+    at HybridAuthGuard (https://ca86e1b7-93f0-448c-970e-efffdc9f20f3-00-3gut4q9tehjf1.janeway.replit.dev/src/components/auth/hybrid-auth-guard.tsx:26:43)
+    at Provider (https://ca86e1b7-93f0-448c-970e-efffdc9f20f3-00-3gut4q9tehjf1.janeway.repli…unner/workspace/node_modules/.vite/deps/chunk-XOUBXFGS.js?v=409c8810:38:15)
+    at TooltipProvider (https://ca86e1b7-93f0-448c-970e-efffdc9f20f3-00-3gut4q9tehjf1.janeway.repli…rkspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=409c8810:62:5)
+    at QueryClientProvider (https://ca86e1b7-93f0-448c-970e-efffdc9f20f3-00-3gut4q9tehjf1.janeway.repli…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=409c8810:2927:3)
+    at App (https://ca86e1b7-93f0-448c-970e-efffdc9f20f3-00-3gut4q9tehjf1.janeway.replit.dev/src/App.tsx:211:3)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+chunk-NFC5BX5N.js?v=409c8810:9129 Uncaught ReferenceError: useMutation is not defined
+    at SalesEntryBottomSheet (sales-entry-bottom-sheet.tsx:234:30)
+
+2
+sw.js:159 Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Request scheme 'chrome-extension' is unsupported
+    at cacheFirst (sw.js:159:13)
+﻿
