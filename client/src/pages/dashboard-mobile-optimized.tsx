@@ -27,6 +27,7 @@ export default function DashboardMobileOptimized() {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('transactions');
   const [selectedView, setSelectedView] = useState('sales');
+  const [showQuickActions, setShowQuickActions] = useState(true);
   const { toast } = useToast();
   const user = hybridAuth.getCurrentUser();
   const { isOnline } = useNetworkStatus();
@@ -80,171 +81,194 @@ export default function DashboardMobileOptimized() {
   const profitMargin = stats?.totalSales && stats.totalSales > 0 && stats.profit ? (stats.profit / stats.totalSales) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pb-16">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 pb-20">
       
-
-
-      {/* Enhanced Header with Key Metrics */}
-      <DashboardHeaderEnhanced
-        timeOfDay={timeOfDay}
-        stats={{
-          todaySales: stats?.totalSales || 0,
-          todayProfit: stats?.profit || 0,
-          pendingCollection: stats?.pendingCollection || 0,
-          salesCount: stats?.salesCount || 0
-        }}
-        isLoading={statsLoading}
-        onRefresh={() => window.location.reload()}
-      />
-
-      {/* Mobile Framework Container */}
-      <div className="container px-2 py-3">
-        
-        {/* Mobile Framework Grid - KPIs */}
-        <div className="row mb-3">
-          <div className="col-6">
-            {/* Today's Sales - Using Mobile Framework */}
-            <div className="card shadow-md p-3 position-relative" style={{
-              background: 'linear-gradient(135deg, white 0%, rgba(16, 185, 129, 0.05) 50%, rgba(16, 185, 129, 0.08) 100%)'
-            }}>
-              <div className="d-flex align-items-center mb-2">
-                <div className="w-7 h-7 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl d-flex align-items-center justify-content-center shadow-sm mr-2">
-                  <div className="text-white text-sm">💰</div>
-                </div>
-                <div>
-                  <p className="text-xs text-emerald-700 dark:text-emerald-300 bengali-font font-weight-semibold mb-0">আজকের বিক্রয়</p>
-                </div>
+      {/* World-Class Header Design - Clean & Minimalist */}
+      <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/60 dark:border-slate-700/60 sticky top-0 z-50">
+        <div className="container px-4 py-4">
+          {/* Welcome Section with Better Typography */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white bengali-font tracking-tight">
+                {timeOfDay}, {user?.name?.split(' ')[0] || 'ব্যবসায়ী'}
+              </h1>
+              <p className="text-sm text-slate-600 dark:text-slate-400 bengali-font font-medium">
+                {getBengaliDate()} • আজকের ব্যবসার সারসংক্ষেপ
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-white text-lg font-bold">
+                  {user?.name?.charAt(0) || 'ব'}
+                </span>
               </div>
-              <div>
-                <p className="text-xl font-weight-bold text-emerald-800 dark:text-emerald-200 number-font mb-1">
-                  ৳{formatCurrency(stats?.totalSales || 0)}
-                </p>
-                <div className="d-flex align-items-center">
-                  <ArrowUpRight className="w-2.5 h-2.5 text-emerald-600 mr-1" />
-                  <span className="text-emerald-700 dark:text-emerald-400 text-xs bengali-font font-weight-medium">
-                    +{toBengaliNumber(salesGrowth)}%
-                  </span>
-                </div>
-              </div>
-              <div className="position-absolute" style={{top: '4px', right: '4px', fontSize: '14px', opacity: '0.3'}}>📈</div>
             </div>
           </div>
-          <div className="col-6">
 
-            {/* Pending Collection - Using Mobile Framework */}
-            <div className="card shadow-md p-3 position-relative" style={{
-              background: 'linear-gradient(135deg, white 0%, rgba(251, 146, 60, 0.05) 50%, rgba(251, 146, 60, 0.08) 100%)'
-            }}>
-              <div className="d-flex align-items-center mb-2">
-                <div className="w-7 h-7 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl d-flex align-items-center justify-content-center shadow-sm mr-2">
-                  <div className="text-white text-sm">🏦</div>
-                </div>
-                <div>
-                  <p className="text-xs text-orange-700 dark:text-orange-300 bengali-font font-weight-semibold mb-0">বাকি আদায়</p>
-                </div>
+          {/* Key Metrics with Improved Visual Hierarchy */}
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            {/* Today's Sales - Enhanced Design */}
+            <div className="relative bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-950/40 dark:to-green-900/20 rounded-2xl p-4 border border-emerald-200/50 dark:border-emerald-800/30">
+              <div className="absolute top-2 right-2 w-6 h-6 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center">
+                <span className="text-emerald-600 dark:text-emerald-400 text-sm">💰</span>
               </div>
-              <div>
-                <p className="text-xl font-weight-bold text-orange-800 dark:text-orange-200 number-font mb-1">
-                  ৳{formatCurrency(stats?.pendingCollection || 0)}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 bengali-font opacity-90">
+                  আজকের বিক্রয়
                 </p>
-                <div className="d-flex align-items-center">
-                  <Users className="w-2.5 h-2.5 text-orange-600 mr-1" />
-                  <span className="text-orange-700 dark:text-orange-400 text-xs bengali-font font-weight-medium">
-                    {toBengaliNumber(stats?.totalCustomers || 0)} জন
+                <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-100 number-font tracking-tight">
+                  ৳{formatCurrency(stats?.totalSales || 0)}
+                </p>
+                <div className="flex items-center">
+                  <div className="w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center mr-2">
+                    <ArrowUpRight className="w-2.5 h-2.5 text-white" />
+                  </div>
+                  <span className="text-xs text-emerald-700 dark:text-emerald-300 bengali-font font-medium">
+                    {toBengaliNumber(salesGrowth)}% বৃদ্ধি
                   </span>
                 </div>
               </div>
-              <div className="position-absolute" style={{top: '4px', right: '4px', fontSize: '14px', opacity: '0.3'}}>💳</div>
+            </div>
+
+            {/* Pending Collection - Enhanced Design */}
+            <div className="relative bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/40 dark:to-amber-900/20 rounded-2xl p-4 border border-orange-200/50 dark:border-orange-800/30">
+              <div className="absolute top-2 right-2 w-6 h-6 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                <span className="text-orange-600 dark:text-orange-400 text-sm">💳</span>
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-orange-700 dark:text-orange-300 bengali-font opacity-90">
+                  বাকি আদায়
+                </p>
+                <p className="text-2xl font-bold text-orange-900 dark:text-orange-100 number-font tracking-tight">
+                  ৳{formatCurrency(stats?.pendingCollection || 0)}
+                </p>
+                <div className="flex items-center">
+                  <div className="w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center mr-2">
+                    <Users className="w-2.5 h-2.5 text-white" />
+                  </div>
+                  <span className="text-xs text-orange-700 dark:text-orange-300 bengali-font font-medium">
+                    {toBengaliNumber(stats?.totalCustomers || 0)} গ্রাহক
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Mobile Framework Actions */}
-        <div className="card shadow-md p-2">
-          <div className="d-flex align-items-center mb-3">
-            <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg d-flex align-items-center justify-content-center shadow-sm mr-2">
-              <div className="text-white text-sm">⚡</div>
-            </div>
-            <div>
-              <h3 className="text-sm font-weight-bold text-slate-900 dark:text-white bengali-font">দ্রুত কাজ</h3>
-            </div>
-          </div>
-          
-          {/* Primary Actions Row using Mobile Framework */}
-          <div className="row mb-2">
-            <div className="col-3">
-              <Link to="/sales/new" data-testid="link-sales-new" className="btn btn-touch-target text-center">
-                <div className="card-mini p-2 text-center bg-emerald-50 hover-scale">
-                  <div className="text-emerald-600 text-sm mb-1">🛒</div>
-                  <span className="text-xs text-emerald-700 bengali-font font-weight-bold">বিক্রয়</span>
+      {/* Main Content with Better Spacing */}
+      <div className="container px-4 py-6 space-y-6">
+
+        {/* World-Class Quick Actions - Improved UX/UI Design */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 overflow-hidden">
+          {/* Section Header with Better Typography */}
+          <div className="px-5 py-4 bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-800 dark:to-slate-850 border-b border-slate-200/50 dark:border-slate-700/50">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+                  <span className="text-white text-sm">⚡</span>
                 </div>
-              </Link>
-            </div>
-            <div className="col-3">
-              <Link to="/customers/new" data-testid="link-customer-new" className="btn btn-touch-target text-center">
-                <div className="card-mini p-2 text-center bg-blue-50 hover-scale">
-                  <div className="text-blue-600 text-sm mb-1">👥</div>
-                  <span className="text-xs text-blue-700 bengali-font font-weight-bold">গ্রাহক</span>
+                <div>
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white bengali-font">দ্রুত কাজ</h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 bengali-font">প্রয়োজনীয় কাজগুলো</p>
                 </div>
-              </Link>
-            </div>
-            <div className="col-3">
-              <Link to="/collection" data-testid="link-collection" className="btn btn-touch-target text-center">
-                <div className="card-mini p-2 text-center bg-orange-50 hover-scale">
-                  <div className="text-orange-600 text-sm mb-1">💰</div>
-                  <span className="text-xs text-orange-700 bengali-font font-weight-bold">আদায়</span>
-                </div>
-              </Link>
-            </div>
-            <div className="col-3">
-              <Link to="/inventory" data-testid="link-inventory" className="btn btn-touch-target text-center">
-                <div className="card-mini p-2 text-center bg-purple-50 hover-scale">
-                  <div className="text-purple-600 text-sm mb-1">📦</div>
-                  <span className="text-xs text-purple-700 bengali-font font-weight-bold">স্টক</span>
-                </div>
-              </Link>
-            </div>
-          </div>
-          
-          {/* Secondary Actions Row */}
-          <div className="row">
-            <div className="col-3">
-              <Link to="/expenses/new" data-testid="link-expense-new" className="btn btn-touch-target text-center">
-                <div className="card-mini p-2 text-center bg-red-50 hover-scale">
-                  <div className="text-red-600 text-sm mb-1">📝</div>
-                  <span className="text-xs text-red-700 bengali-font font-weight-bold">খরচ</span>
-                </div>
-              </Link>
-            </div>
-            <div className="col-3">
-              <Link to="/transactions" data-testid="link-transactions" className="btn btn-touch-target text-center">
-                <div className="card-mini p-2 text-center bg-teal-50 hover-scale">
-                  <div className="text-teal-600 text-sm mb-1">📊</div>
-                  <span className="text-xs text-teal-700 bengali-font font-weight-bold">হিসাব</span>
-                </div>
-              </Link>
-            </div>
-            <div className="col-3">
-              <button className="btn btn-touch-target text-center w-100" data-testid="button-calculator">
-                <div className="card-mini p-2 text-center bg-slate-50 hover-scale">
-                  <div className="text-slate-600 text-sm mb-1">🧮</div>
-                  <span className="text-xs text-slate-700 bengali-font font-weight-bold">ক্যালক</span>
-                </div>
-              </button>
-            </div>
-            <div className="col-3">
+              </div>
               <button 
-                className="btn btn-touch-target text-center w-100"
-                onClick={() => toast({ title: "WhatsApp রিপোর্ট", description: "রিপোর্ট পাঠানো হচ্ছে..." })}
-                data-testid="button-whatsapp"
+                onClick={() => setShowQuickActions(!showQuickActions)}
+                className="w-6 h-6 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                data-testid="button-toggle-actions"
               >
-                <div className="card-mini p-2 text-center bg-green-50 hover-scale">
-                  <div className="text-green-600 text-sm mb-1">📱</div>
-                  <span className="text-xs text-green-700 bengali-font font-weight-bold">মেসেজ</span>
-                </div>
+                <ChevronDown className={`w-4 h-4 transition-transform ${showQuickActions ? 'rotate-180' : ''}`} />
               </button>
             </div>
           </div>
+          
+          {/* Enhanced Primary Actions with Better Visual Hierarchy */}
+          {showQuickActions && (
+            <div className="p-5 space-y-4">
+              {/* Primary Business Actions */}
+              <div className="grid grid-cols-4 gap-3">
+                <Link to="/sales/new" data-testid="link-sales-new" className="group">
+                  <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-950/30 dark:to-green-900/20 rounded-xl p-3 text-center border border-emerald-200/30 dark:border-emerald-800/20 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-200 group-hover:scale-105 group-hover:shadow-md">
+                    <div className="w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                      <ShoppingCart className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 bengali-font">বিক্রয়</span>
+                  </div>
+                </Link>
+
+                <Link to="/customers/new" data-testid="link-customer-new" className="group">
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-900/20 rounded-xl p-3 text-center border border-blue-200/30 dark:border-blue-800/20 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-200 group-hover:scale-105 group-hover:shadow-md">
+                    <div className="w-8 h-8 bg-blue-500 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                      <Users className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 bengali-font">গ্রাহক</span>
+                  </div>
+                </Link>
+
+                <Link to="/collection" data-testid="link-collection" className="group">
+                  <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-900/20 rounded-xl p-3 text-center border border-orange-200/30 dark:border-orange-800/20 hover:border-orange-300 dark:hover:border-orange-700 transition-all duration-200 group-hover:scale-105 group-hover:shadow-md">
+                    <div className="w-8 h-8 bg-orange-500 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                      <Wallet className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs font-semibold text-orange-700 dark:text-orange-300 bengali-font">আদায়</span>
+                  </div>
+                </Link>
+
+                <Link to="/inventory" data-testid="link-inventory" className="group">
+                  <div className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-950/30 dark:to-violet-900/20 rounded-xl p-3 text-center border border-purple-200/30 dark:border-purple-800/20 hover:border-purple-300 dark:hover:border-purple-700 transition-all duration-200 group-hover:scale-105 group-hover:shadow-md">
+                    <div className="w-8 h-8 bg-purple-500 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                      <Package className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs font-semibold text-purple-700 dark:text-purple-300 bengali-font">স্টক</span>
+                  </div>
+                </Link>
+              </div>
+              
+              {/* Secondary Actions */}
+              <div className="grid grid-cols-4 gap-3">
+                <Link to="/expenses/new" data-testid="link-expense-new" className="group">
+                  <div className="bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-950/30 dark:to-rose-900/20 rounded-xl p-3 text-center border border-red-200/30 dark:border-red-800/20 hover:border-red-300 dark:hover:border-red-700 transition-all duration-200 group-hover:scale-105 group-hover:shadow-md">
+                    <div className="w-8 h-8 bg-red-500 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                      <PenTool className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs font-semibold text-red-700 dark:text-red-300 bengali-font">খরচ</span>
+                  </div>
+                </Link>
+
+                <Link to="/transactions" data-testid="link-transactions" className="group">
+                  <div className="bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-950/30 dark:to-cyan-900/20 rounded-xl p-3 text-center border border-teal-200/30 dark:border-teal-800/20 hover:border-teal-300 dark:hover:border-teal-700 transition-all duration-200 group-hover:scale-105 group-hover:shadow-md">
+                    <div className="w-8 h-8 bg-teal-500 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                      <BarChart3 className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs font-semibold text-teal-700 dark:text-teal-300 bengali-font">হিসাব</span>
+                  </div>
+                </Link>
+
+                <button className="group" data-testid="button-calculator">
+                  <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-800/30 dark:to-gray-800/20 rounded-xl p-3 text-center border border-slate-200/30 dark:border-slate-700/20 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200 group-hover:scale-105 group-hover:shadow-md">
+                    <div className="w-8 h-8 bg-slate-500 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                      <Activity className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 bengali-font">ক্যালক</span>
+                  </div>
+                </button>
+
+                <button 
+                  className="group"
+                  onClick={() => toast({ title: "WhatsApp রিপোর্ট", description: "রিপোর্ট পাঠানো হচ্ছে..." })}
+                  data-testid="button-whatsapp"
+                >
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-900/20 rounded-xl p-3 text-center border border-green-200/30 dark:border-green-800/20 hover:border-green-300 dark:hover:border-green-700 transition-all duration-200 group-hover:scale-105 group-hover:shadow-md">
+                    <div className="w-8 h-8 bg-green-500 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                      <MessageCircle className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs font-semibold text-green-700 dark:text-green-300 bengali-font">মেসেজ</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Business Intelligence Dashboard - Mobile Framework */}
