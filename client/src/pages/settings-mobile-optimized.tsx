@@ -429,6 +429,23 @@ export default function SettingsMobileOptimized() {
               <ChevronRight className="w-4 h-4 text-slate-400" />
             </Button>
 
+            <Link to="/framework-demo">
+              <Button 
+                variant="ghost" 
+                className="w-full justify-between text-sm h-10 hover:bg-slate-50"
+                data-testid="button-framework-demo"
+              >
+                <div className="flex items-center space-x-2">
+                  <Activity className="w-4 h-4 text-purple-600" />
+                  <span className="bengali-font">Mobile Framework Demo</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Badge variant="outline" className="text-xs">CSS</Badge>
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                </div>
+              </Button>
+            </Link>
+
             <Button 
               variant="destructive" 
               onClick={handleLogout}

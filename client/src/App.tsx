@@ -27,6 +27,7 @@ import NotificationsMobileOptimized from "@/pages/notifications-mobile-optimized
 import SalesEntryPureOffline from "@/pages/sales-entry-pure-offline";
 import CustomersMobileOptimizedOffline from "@/pages/customers-mobile-optimized-offline";
 import CustomerAddMobileOptimizedOffline from "@/pages/customer-add-mobile-optimized-offline";
+import MobileFrameworkDemo from "@/pages/mobile-framework-demo";
 import BottomNavigationOptimized from "@/components/ui/bottom-navigation-optimized";
 import CommunicationPanel from "@/components/ui/communication-panel";
 import FloatingActionMenu from "@/components/ui/floating-action-menu";
@@ -76,8 +77,7 @@ function Router() {
         <Route path="/expenses/new" component={ExpenseEntryMobileOptimized} />
         <Route path="/analytics" component={AnalyticsMobileOptimized} />
         <Route path="/notifications" component={NotificationsMobileOptimized} />
-
-
+        <Route path="/framework-demo" component={MobileFrameworkDemo} />
           <Route component={NotFoundMobileOptimized} />
         </Switch>
 
