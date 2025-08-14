@@ -19,7 +19,7 @@ import {
   FileText, Eye, Clock, Edit3, Trash2,
   User, CreditCard, Hash, Copy, X, Package
 } from "lucide-react";
-import jsPDF from 'jspdf';
+import { pdfService } from '@/lib/pdf-service';
 
 export default function TransactionsMobileOptimized() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -106,19 +106,22 @@ export default function TransactionsMobileOptimized() {
     }
   };
 
-  const generatePDFReport = () => {
+  const generatePDFReport = async () => {
     try {
-      const doc = new jsPDF();
-      doc.setFontSize(16);
-      doc.text('লেনদেন রিপোর্ট - দোকান হিসাব', 20, 30);
-      doc.setFontSize(10);
-      doc.text(`তৈরি হয়েছেঃ ${getBengaliDate()}`, 20, 45);
-      doc.text(`মোট বিক্রয়ঃ ${formatCurrency(totals.sales)}`, 20, 60);
-      doc.text(`মোট খরচঃ ${formatCurrency(totals.expenses)}`, 20, 70);
-      doc.text(`নিট লাভঃ ${formatCurrency(totals.net)}`, 20, 80);
-      doc.save('transactions-report.pdf');
-      toast({ title: "রিপোর্ট তৈরি", description: "PDF ডাউনলোড শুরু হয়েছে" });
+      await pdfService.generateTransactionReport({
+        businessName: 'দোকান হিসাব',
+        ownerName: 'ব্যবসায়ী',
+        totalSales: totals.sales,
+        totalExpenses: totals.expenses,
+        totalCollections: totals.collections,
+        netProfit: totals.net,
+        transactionCount: filteredTransactions.length,
+        transactions: filteredTransactions.slice(0, 15), // Include first 15 transactions for details
+        periodTitle: 'সার্বিক লেনদেন প্রতিবেদন'
+      });
+      toast({ title: "রিপোর্ট তৈরি সম্পন্ন", description: "PDF ডাউনলোড শুরু হয়েছে" });
     } catch (error) {
+      console.error('PDF generation error:', error);
       toast({ title: "ত্রুটি", description: "রিপোর্ট তৈরি করতে সমস্যা হয়েছে" });
     }
   };
