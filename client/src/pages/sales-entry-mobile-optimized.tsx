@@ -422,7 +422,7 @@ export default function SalesEntryMobileOptimized() {
                   {/* Payment Method */}
                   <div className="space-y-2">
                     <Label className="text-xs bengali-font">পেমেন্ট পদ্ধতি</Label>
-                    <Select value={form.watch("paymentMethod")} onValueChange={(value: "নগদ" | "বাকি" | "মিশ্র") => form.setValue("paymentMethod", value)}>
+                    <Select value={form.watch("paymentMethod")} onValueChange={(value) => form.setValue("paymentMethod", value as "নগদ" | "বাকি" | "মিশ্র")}>
                       <SelectTrigger className="h-10 text-sm">
                         <SelectValue />
                       </SelectTrigger>

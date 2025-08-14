@@ -1,0 +1,26 @@
+Warning: Encountered two children with the same key, &#x60;নগদ&#x60;. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    at select
+    at https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-MCAXRKP2.js?v=c33b0a34:43:13
+    at https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=c33b0a34:1130:6
+    at Provider (https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-AY5HWWH4.js?v=c33b0a34:38:15)
+    at Provider (https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-AY5HWWH4.js?v=c33b0a34:38:15)
+    at Popper (https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5GPSGVUP.js?v=c33b0a34:1945:11)
+    at Select (https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=c33b0a34:88:5)
+    at div
+    at form
+    at div
+    at _c9 (https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/src/components/ui/card.tsx:20:11)
+    at div
+    at div
+    at TransactionDetailsMobileOptimized (https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/src/pages/transaction-details-mobile-optimized.tsx:74:61)
+    at Route (https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=c33b0a34:280:16)
+    at Switch (https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=c33b0a34:336:17)
+    at div
+    at Router (https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/src/App.tsx:45:63)
+    at AuthGuard (https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/src/components/auth/auth-guard.tsx:21:37)
+    at Provider (https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-AY5HWWH4.js?v=c33b0a34:38:15)
+    at TooltipProvider (https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=c33b0a34:60:5)
+    at QueryClientProvider (https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=c33b0a34:2934:3)
+    at App (https://d4a236ab-6276-4846-a4fe-4d0a887417b6-00-z2t01wtnzeho.spock.replit.dev/src/App.tsx:155:3)

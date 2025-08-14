@@ -550,7 +550,7 @@ export default function TransactionDetailsMobileOptimized({ type, id }: Transact
                       <SelectItem value="বাকি">বাকি</SelectItem>
                       <SelectItem value="মিশ্র">মিশ্র</SelectItem>
                       <SelectItem value="বিকাশ">বিকাশ</SelectItem>
-                      <SelectItem value="নগদ">নগদ (মোবাইল)</SelectItem>
+                      <SelectItem value="নগদ-মোবাইল">নগদ (মোবাইল)</SelectItem>
                       <SelectItem value="রকেট">রকেট</SelectItem>
                       <SelectItem value="ব্যাংক">ব্যাংক ট্রান্সফার</SelectItem>
                     </SelectContent>
